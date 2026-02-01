@@ -995,9 +995,24 @@ namespace BPSR_ZDPS
                 {
                     damage = syncDamageInfo.LuckyValue;
                 }
+
                 // If damage is 0, the target was likely Immune and the DamageType value will reflect that
                 // We will still pass it on so it can be properly registered in the encounter/entity
                 // Note: There are some rare cases where an Immune event occurs but the damage is not 0, HpLessen however will be null
+
+                // If Damage was negative, the hit entity had their HP limits increase within the same frame of damage, causing a game bug where the damage is just "-"
+                // This will workaround that problem by deferring the requested damage to the hp lessen (actual damage) or negating it entirely
+                if (damage < 0)
+                {
+                    if (syncDamageInfo.HpLessenValue > 0)
+                    {
+                        damage = syncDamageInfo.HpLessenValue;
+                    }
+                    else
+                    {
+                        damage = 0;
+                    }
+                }
 
                 bool isCrit = syncDamageInfo.TypeFlag != null && ((syncDamageInfo.TypeFlag & 1) == 1);
                 bool isHeal = syncDamageInfo.Type == EDamageType.Heal;
