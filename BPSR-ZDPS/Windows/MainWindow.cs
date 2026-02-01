@@ -328,7 +328,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.TextAligned(0.5f, -1, "Encounter Saving Is Paused");
                 if (!Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps)
                 {
-                ImGui.TextAligned(0.5f, -1, "Automatically resumes if you change maps.");
+                    ImGui.TextAligned(0.5f, -1, "Automatically resumes if you change maps.");
                 }
                 ImGui.SetCursorPosX((ImGui.GetContentRegionAvail().X - 200) * 0.5f);
                 ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen);
@@ -717,10 +717,17 @@ namespace BPSR_ZDPS.Windows
                 Log.Information("Tried to create a new manual Encounter but Encounter Saving is currently Paused.");
                 return;
             }
+            // TODO: Prevent calling this multiple times in a row without first verifying a new Encounter was created from it
 
-            EncounterManager.StopEncounter();
-            Log.Information($"Starting new manual encounter at {DateTime.Now}");
-            EncounterManager.StartEncounter(true);
+            // Running this in a new thread avoids render freezes (that can result in crashes due to timeouts)
+            Task.Factory.StartNew(() =>
+            {
+                //Log.Information($"Requesting new manual encounter at {DateTime.Now}");
+                //BattleStateMachine.SetDeferredEncounterEndFinalData(DateTime.Now, new EncounterEndFinalData() { BattleId = EncounterManager.CurrentBattleId, Encounter = EncounterManager.Current, EncounterId = EncounterManager.Current.EncounterId, Reason = EncounterStartReason.Force });
+                //EncounterManager.StopEncounter();
+                Log.Information($"Starting new manual encounter at {DateTime.Now}");
+                EncounterManager.StartEncounter(true, EncounterStartReason.Force);
+            });
         }
 
         public void ToggleMouseClickthrough()
