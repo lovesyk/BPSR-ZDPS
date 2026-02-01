@@ -41,6 +41,7 @@ namespace BPSR_ZDPS.Windows
         static List<double> SkillSnapshotsDamageCumulative = new();
         static string[] SkillSnapshotsNames = [];
         static float[] SkillSnapshotsHits = [];
+        static Dictionary<string, ScatterPlotSkillMap> SkillScatterMap = new();
 
         public enum ETableFilterMode : int
         {
@@ -172,8 +173,18 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TableSetupColumn("##RightSide", ImGuiTableColumnFlags.WidthStretch | ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize, 1f, 1);
 
                         ImGui.TableNextColumn();
-                        ImGui.TextUnformatted($"HP: {LoadedEntity.GetAttrKV("AttrHp") ?? "0"}");
-                        ImGui.TextUnformatted($"Max HP: {LoadedEntity.GetAttrKV("AttrMaxHp") ?? "0"}");
+                        var hp = LoadedEntity.Hp;
+                        if (hp == 0)
+                        {
+                            hp = LoadedEntity.GetAttrKV("AttrHp") as int? ?? 0;
+                        }
+                        ImGui.TextUnformatted($"HP: {hp:N0}");
+                        var maxHp = LoadedEntity.MaxHp;
+                        if (maxHp == 0 )
+                        {
+                            maxHp = LoadedEntity.GetAttrKV("AttrMaxHp") as int? ?? 0;
+                        }
+                        ImGui.TextUnformatted($"Max HP: {maxHp:N0}");
                         ImGui.TextUnformatted($"ATK: {LoadedEntity.GetAttrKV("AttrAttack") ?? "0"}");
                         string MainStat = Professions.GetBaseProfessionMainStatName(LoadedEntity.ProfessionId);
                         if (MainStat == "Strength" || MainStat == "")
@@ -709,7 +720,12 @@ namespace BPSR_ZDPS.Windows
                             ImGui.TextUnformatted($"{Utils.NumberToShorthand(entity.Value.Taken.TotalValue)} ({totalDmgContribution}%)");
 
                             ImGui.TableNextColumn();
-                            ImGui.TextUnformatted($"{Utils.NumberToShorthand(entity.Value.Taken.TotalValue / duration.Value.TotalSeconds)}");
+                            double perSecond = entity.Value.Taken.TotalValue / duration.Value.TotalSeconds;
+                            if (perSecond < 1.0f)
+                            {
+                                perSecond = 0;
+                            }
+                            ImGui.TextUnformatted($"{Utils.NumberToShorthand(perSecond)}");
 
                             ImGui.TableNextColumn();
                             ImGui.TextUnformatted($"{Utils.NumberToShorthand(entity.Value.Taken.HitCount)}");
@@ -882,6 +898,26 @@ namespace BPSR_ZDPS.Windows
                                 {
 
                                 }
+                                if (ImGui.BeginPopupContextItem())
+                                {
+                                    if (ImGui.MenuItem("Copy Buff Name"))
+                                    {
+                                        ImGui.SetClipboardText(buffEvent.Name);
+                                    }
+                                    if (ImGui.MenuItem("Copy Buff Description"))
+                                    {
+                                        ImGui.SetClipboardText(buffEvent.Description);
+                                    }
+                                    if (ImGui.MenuItem("Copy Buff Id"))
+                                    {
+                                        ImGui.SetClipboardText(buffEvent.BaseId.ToString());
+                                    }
+                                    if (ImGui.MenuItem("Copy Skill Id"))
+                                    {
+                                        ImGui.SetClipboardText(buffEvent.SourceConfigId.ToString());
+                                    }
+                                    ImGui.EndPopup();
+                                }
 
                                 if (buffTypeColor > -1)
                                 {
@@ -979,7 +1015,7 @@ namespace BPSR_ZDPS.Windows
                         // TODO: Give option to clamp StartTime to when the entity performed first attack (LoadedEntity.DamageStats.StartTime)
                         var startTime = LoadedEncounterStartTime?.ToUniversalTime() ?? LoadedEntity.DamageStats.StartTime;
 
-                        if (HasLoadedGraphsData && LoadedEntity.DamageStats.SkillSnapshots.Count != SkillSnapshotsDamage.Length)
+                        if (HasLoadedGraphsData && LoadedEntity.DamageStats.SkillSnapshots.Count != SkillSnapshotsDamage.Length - 1)
                         {
                             // We're likely watching an entity live so we need to keep updating their data live
                             // Currently it's going to be a very rough and poor performance mess but at least it's only executed on this one tab
@@ -1007,8 +1043,42 @@ namespace BPSR_ZDPS.Windows
                                 lastAdded = lastAdded + value;
                             }
 
-                            SkillSnapshotsNames = LoadedEntity.SkillMetrics.AsValueEnumerable().Select(x => x.Value.Damage.Name ?? "").ToArray();
-                            SkillSnapshotsHits = LoadedEntity.SkillMetrics.AsValueEnumerable().Select(x => (float)x.Value.Damage.HitsCount).ToArray();
+                            SkillSnapshotsNames = LoadedEntity.SkillMetrics.AsValueEnumerable().Where(x => x.Value.Damage.HitsCount > 0).Select(x => x.Value.Damage.Name ?? "").ToArray();
+                            SkillSnapshotsHits = LoadedEntity.SkillMetrics.AsValueEnumerable().Where(x => x.Value.Damage.HitsCount > 0).Select(x => (float)x.Value.Damage.HitsCount).ToArray();
+
+                            // Build Skill Hit scatter data (very expensive)
+                            foreach (var item in LoadedEntity.DamageStats.SkillSnapshots)
+                            {
+                                string skillName = "";
+                                if (LoadedEntity.SkillMetrics.TryGetValue(item.Id, out var skillMetric))
+                                {
+                                    skillName = skillMetric.Damage.Name;
+                                }
+
+                                if (!string.IsNullOrEmpty(skillName))
+                                {
+                                    skillName += $" [{item.Id}]";
+                                }
+                                else
+                                {
+                                    skillName = $"[{item.Id}]";
+                                }
+
+                                double skillMapIdx = 0;
+                                if (!SkillScatterMap.TryGetValue(skillName, out var map))
+                                {
+                                    map = new();
+                                    skillMapIdx = SkillScatterMap.Count;
+                                }
+                                else
+                                {
+                                    skillMapIdx = map.SkillIdentifier.First();
+                                }
+                                map.Time.Add(item.Timestamp.Value.Subtract(startTime.Value).TotalSeconds);
+                                map.SkillIdentifier.Add(skillMapIdx);
+
+                                SkillScatterMap[skillName] = map;
+                            }
                         }
 
                         if (ImPlot.BeginPlot("Total Damage Over Time"))
@@ -1065,6 +1135,18 @@ namespace BPSR_ZDPS.Windows
                             ImPlot.PlotPieChart(SkillSnapshotsNames, ref SkillSnapshotsHits[0], SkillSnapshotsNames.Length, 0, 0, 1, ImPlotPieChartFlags.IgnoreHidden);
                             ImPlot.EndPlot();
                         }
+
+                        if (ImPlot.BeginPlot("Damage Skills Timeline", new Vector2(-1, 520), ImPlotFlags.None))
+                        {
+                            ImPlot.SetupAxes("Time (Encounter Duration In Seconds)", "Casts", ImPlotAxisFlags.AutoFit, ImPlotAxisFlags.AutoFit | ImPlotAxisFlags.NoTickLabels);
+
+                            foreach (var item in SkillScatterMap)
+                            {
+                                ImPlot.PlotScatter(item.Key, ref item.Value.TimeArray[0], ref item.Value.SkillIdentifierArray[0], item.Value.Time.Count);
+                            }
+
+                            ImPlot.EndPlot();
+                        }
                     }
                 }
                 else if (TableFilterMode == ETableFilterMode.Debug)
@@ -1089,6 +1171,16 @@ namespace BPSR_ZDPS.Windows
             SkillSnapshotsDamageCumulative = new();
             SkillSnapshotsNames = [];
             SkillSnapshotsHits = [];
+            SkillScatterMap.Clear();
         }
+    }
+
+    public class ScatterPlotSkillMap
+    {
+        public List<double> Time = new(); // X Axis
+        public List<double> SkillIdentifier = new(); // Y Axis (Index of Skill based on appearance order, used for deprojection mapping)
+
+        public Span<double> TimeArray => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(Time);
+        public Span<double> SkillIdentifierArray => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(SkillIdentifier);
     }
 }
