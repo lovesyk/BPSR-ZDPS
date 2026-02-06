@@ -75,6 +75,48 @@
         "Name": "Basic Attack: Fourth Hit Regen",
         "Desc": "Fourth Basic Attack regenerates health"
     },
+    "30001":
+    {
+        "Name": "Wind Knight Courage Buff",
+        "Desc": "Class resource regeneration tracker for Wind Knights",
+        "BuffType": 1
+    },
+    "30701":
+    {
+        "Name": "Falcon Toss (Sharp Buff)",
+        "Desc": "Grants 1 stack of Sharp",
+        "BuffType": 1
+    },
+    "31401":
+    {
+        "Name": "Aegis Gale (Buff)",
+        "Desc": "DMG is incrementally amplified with each incoming attack",
+        "BuffType": 1
+    },
+    "31601":
+    {
+        "Name": "Inspire Player Tracker",
+        "Desc": "Tracking players to grant Inspire to",
+        "BuffType": 1
+    },
+    "31701":
+    {
+        "Name": "Skyfall Crit Check",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "31702":
+    {
+        "Name": "Skyfall Crit Hit",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "32301":
+    {
+        "Name": "Breach Pursuit Timer",
+        "Desc": "Tracker for Breach Pursuit recast timer",
+        "BuffType": 1
+    },
     "40001":
     {
         "Name": "Thundercut Recast Buff",
@@ -378,11 +420,13 @@
     },
     "55401":
     {
-        "Name": "Sword and Shield Initial Buff"
+        "Name": "Sword and Shield Initial Buff",
+        "BuffType": 1
     },
     "55418":
     {
-        "Name": "Divine Circle Buff"
+        "Name": "Divine Circle Buff",
+        "BuffType": 1
     },
     "500105":
     {
@@ -516,9 +560,24 @@
         "Name": "Dagger of Execution - Force-Kill",
         "Desc": "Forcefully kills the marked target if not protected"
     },
+    "900122":
+    {
+        "Name": "Reset CDs and Full Heal",
+        "BuffType": 1
+    },
+    "902901":
+    {
+        "Name": "End of Dungeon (Invincibility)",
+        "BuffType": 1
+    },
     "2031001":
     {
         "Name": "Blade - Agility",
+        "BuffType": 1
+    },
+    "2031004":
+    {
+        "Name": "Lance - Strength",
         "BuffType": 1
     },
     "2031005":
@@ -539,6 +598,11 @@
     "2031101":
     {
         "Name": "Blade - Luck",
+        "BuffType": 1
+    },
+    "2031104":
+    {
+        "Name": "Lance - Luck",
         "BuffType": 1
     },
     "2031111":
@@ -1980,6 +2044,471 @@
         "Desc": "When Blast Shot explodes, inflicts 10 stacks of Steel Beak to all targets hit",
         "BuffType": 1
     },
+    "2205010":
+    {
+        "Name": "Swift Shadow",
+        "Desc": "Every 50 points of Courage consumed reduces the CD of Spiral Thrust, Breach Pursuit, and Falcon Toss by 1s",
+        "BuffType": 1
+    },
+    "2205030":
+    {
+        "Name": "Vulnerable Strike",
+        "Desc": "Dealing DMG grants a fixed 30% chance to apply Vulnerability to the enemy.\nVulnerability: Increases the DMG you deal to the target by 10% for 5s",
+        "BuffType": 1
+    },
+    "2205040":
+    {
+        "Name": "Sharp (Talent)",
+        "Desc": "Dealing DMG with Special Attacks grants Sharp.\nSharp: ATK +5% for 10s",
+        "BuffType": 1
+    },
+    "2205050":
+    {
+        "Name": "Sharp Expansion II",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205060":
+    {
+        "Name": "Wind Rift Diffusion",
+        "Desc": "Expertise and Ultimates deal 10% more DMG to targets inflicted with Rend, and when hitting Rend targets, deal 1 additional hit of 75% DMG",
+        "BuffType": 1
+    },
+    "2205070":
+    {
+        "Name": "Wind Tear",
+        "Desc": "When Gale Thrust deals DMG, apply Rend to targets",
+        "BuffType": 1
+    },
+    "2205071":
+    {
+        "Name": "Rend",
+        "Desc": "Target loses HP equal to 25% ATK per second"
+    },
+    "2205080":
+    {
+        "Name": "Quickshot Meteor",
+        "Desc": "Gale Thrust is enhanced, increasing hit counts by 2.\nReduces Gale Thrust's Courage consumption by 20%",
+        "BuffType": 1
+    },
+    "2205090":
+    {
+        "Name": "Sharp Expansion III",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205100":
+    {
+        "Name": "Swift Blade II",
+        "Desc": "When Valor Cyclone deals DMG, it has a 7% chance to evolve Basic Attacks into Swift Blade",
+        "BuffType": 1
+    },
+    "2205110":
+    {
+        "Name": "Zephyr Waltz Agility",
+        "Desc": "Additional Courage recovery: Recovers 1 extra point of Courage per second for every 2 stacks of Sharp",
+        "BuffType": 1
+    },
+    "2205120":
+    {
+        "Name": "Wind Chaser",
+        "Desc": "During the casting of Valor Cyclone, for every 20 points of Courage consumed, increase the DMG of Valor Cyclone by 4% up to 20%",
+        "BuffType": 1
+    },
+    "2205130":
+    {
+        "Name": "Vortex Strike (Talent)",
+        "Desc": "After every 2 casts of Drake Cannon, your Spiral Thrust evolves into Vortex Strike",
+        "BuffType": 1
+    },
+    "2205134":
+    {
+        "Name": "Vortex Strike",
+        "Desc": "Spiral Thrust evolved into Vortex Strike",
+        "BuffType": 1
+    },
+    "2205140":
+    {
+        "Name": "Instantaneous Crit (Talent)",
+        "Desc": "While Chasing Step is active, Instant Edge and Sharp Impact have their critical rate doubled",
+        "BuffType": 1
+    },
+    "2205141":
+    {
+        "Name": "Instantaneous Crit",
+        "Desc": "While Chasing Step is active, Instant Edge and Sharp Impact have their critical rate doubled",
+        "BuffType": 1
+    },
+    "2205150":
+    {
+        "Name": "Spear Thrust (Talent)",
+        "Desc": "When Skyfall lands a Lucky Strike, it triggers Spear Thrust, once every 2s.\nDealing DMG with Spear Thrust restores 8 points of Courage. This effect triggers only once, even if multiple targets are hit",
+        "BuffType": 1
+    },
+    "2205160":
+    {
+        "Name": "Wind Fury (Talent)",
+        "Desc": "Casting Sharp Impact grants Wind Fury",
+        "BuffType": 1
+    },
+    "2205170":
+    {
+        "Name": "Sharp Expansion V",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205180":
+    {
+        "Name": "Air Dance Strike",
+        "Desc": "Sharp Impact and Typhoon: Sharp Impact increase the Courage restored by the next Galeform by 50%.\nCasting Sharp Impact immediately grants 3 Sharp, and casting Typhoon: Sharp Impact grants 6 Sharp",
+        "BuffType": 1
+    },
+    "2205190":
+    {
+        "Name": "Sharp Expansion III",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205200":
+    {
+        "Name": "Tornado Dance",
+        "Desc": "During Wind Fury, DMG dealt by Instant Edge and Azure Sever triggers Tornado.\nTriggered at most once when hitting multiple targets",
+        "BuffType": 1
+    },
+    "2205220":
+    {
+        "Name": "Combat Expertise",
+        "Desc": "As the battle goes on, grants continously increasing ATK.\nEvery 10s, ATK +2.5%, up to 10%. Clear after battle",
+        "BuffType": 1
+    },
+    "2205230":
+    {
+        "Name": "Momentum Surge",
+        "Desc": "Increases Sharp effect by 1%, and for each enemy within 12m, additionally increased by 1% up to 3%",
+        "BuffType": 1
+    },
+    "2205132":
+    {
+        "Name": "Release Wind Spiral",
+        "Desc": "Spiral Thrust or Valor Cyclone triggered a Spiral Explosion",
+        "BuffType": 1
+    },
+    "2205210":
+    {
+        "Name": "Chasing Step",
+        "Desc": "When a Crit is achieved by Skyfall or Falcon Toss, a Chasing Step is triggered"
+    },
+    "2205240":
+    {
+        "Name": "Catcher",
+        "Desc": "In combat, for every 1 enemy target defeated (party-wide effect), ATK +5 for 30s, up to 500",
+        "BuffType": 1
+    },
+    "2205250":
+    {
+        "Name": "Wind Split Technique",
+        "Desc": "When Rend deals DMG, it has a 50% chance to grant 2 points of Courage",
+        "BuffType": 1
+    },
+    "2205260":
+    {
+        "Name": "Tempestrike (Talent)",
+        "Desc": "When Galeform ends, it applies Tempestrike.\nEvery 50 points of Courage consumed during Galeform extends the duration of Tempestrike by 1s",
+        "BuffType": 1
+    },
+    "2205270":
+    {
+        "Name": "Divine Concealment",
+        "Desc": "Consuming Courage increases Haste by 1% and Speed by 2% for 5s, stacking up to 5 times",
+        "BuffType": 1
+    },
+    "2205280":
+    {
+        "Name": "Valor",
+        "Desc": "Increases Max Courage by 30",
+        "BuffType": 1
+    },
+    "2205290":
+    {
+        "Name": "Skyward Spec",
+        "Desc": "Replaces Special Attack with Skyfall and enhances the skill.\nWhen having Sharp, gains ATK based on the max number of Sharp",
+        "BuffType": 1
+    },
+    "2205300":
+    {
+        "Name": "Vanguard Spec",
+        "Desc": "Further enhances Gale Thrust.\nCasting Gale Thrust grants a 20% chance to cause Basic Attacks to evolve into Swift Blade, with an additional 5% chance per stack of Sharp",
+        "BuffType": 1
+    },
+    "2205310":
+    {
+        "Name": "Battle Cry",
+        "Desc": "Typhoon Cleave raises the banner spear, granting Inspire to allies.\nAfterward, a follow-up leap can be launched, dealing Attack Damage to the enemies within range and knocking them airborne, while restoring 100 Courage.",
+        "BuffType": 1
+    },
+    "2205311":
+    {
+        "Name": "Battle Cry Leap Ready",
+        "Desc": "Afterward casting Typhoon Cleave, a follow-up leap can be launched, dealing Attack Damage to the enemies within range and knocking them airborne, while restoring 100 Courage.",
+        "BuffType": 1
+    },
+    "2205312":
+    {
+        "Name": "Battle Cry Leap Countdown",
+        "Desc": "Afterward casting Typhoon Cleave, a follow-up leap can be launched, dealing Attack Damage to the enemies within range and knocking them airborne, while restoring 100 Courage.",
+        "BuffType": 1
+    },
+    "2205320":
+    {
+        "Name": "Divine Wind Support",
+        "Desc": "When Falcon Toss, Azure Sever, or Instant Edge hit 1 target, the DMG gains a 10% Wind bonus",
+        "BuffType": 1
+    },
+    "2205340":
+    {
+        "Name": "Sharp Expansion",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205350":
+    {
+        "Name": "Long Lance Sharp Blade",
+        "Desc": "When Strength reaches 300 points, Expertise Skill damage +7%",
+        "BuffType": 1
+    },
+    "2205360":
+    {
+        "Name": "Sharp II",
+        "Desc": "When Strength reaches 500 points, the additional ATK from Sharp increases to 6%",
+        "BuffType": 1
+    },
+    "2205370":
+    {
+        "Name": "Break Pursuit Advancement",
+        "Desc": "Within 15s after Casting the Ultimate, Casting Breach Pursuit will not start CD.\nThis effect is removed after the duration ends or after Casting 3 times Breach Pursuit",
+        "BuffType": 1
+    },
+    "2205380":
+    {
+        "Name": "Wind Spiral",
+        "Desc": "When Gale Thrust deals DMG, it has a fixed 25% chance to grant 1 stack of Wind Spiral for 20s, stacking up to 10 times.",
+        "BuffType": 1
+    },
+    "2205390":
+    {
+        "Name": "Vigor Spike",
+        "Desc": "When Sharp reaches full amount and the caster is in combat, enters Vigor Spike state, effective up to once every 30s",
+        "BuffType": 1
+    },
+    "2205400":
+    {
+        "Name": "Fearless Gale (Talent)",
+        "Desc": "After casting Spiral Thurst or Breach Pursuit or Valor Cyclone, the next Gale Thrust will not consume Courage.\nThis effect is removed after leaving combat",
+        "BuffType": 1
+    },
+    "2205401":
+    {
+        "Name": "Fearless Gale",
+        "Desc": "Gale Thrust does not consume energy",
+        "BuffType": 1
+    },
+    "2205410":
+    {
+        "Name": "Whispering Breeze",
+        "Desc": "When Courage is below or equal to 50%, reduces the Energy Value Cyclone consumes by 2.\nWhen Courage is above 50%, increases the DMG Valor Cyclone deals by 12%",
+        "BuffType": 1
+    },
+    "2205420":
+    {
+        "Name": "Rapid Drake Cannon",
+        "Desc": "Using Swift Blade grants it a 10% chance to evolve Basic Attack into Drake Cannon in 10s. Each failure to evolve increases the chance by 10% until success",
+        "BuffType": 1
+    },
+    "2205421":
+    {
+        "Name": "Drake Cannon Ready",
+        "Desc": "Basic Attack evolved into Drake Cannon",
+        "BuffType": 1
+    },
+    "2205430":
+    {
+        "Name": "Rupture (Talent)",
+        "Desc": "When Valor Cyclone deals DMG, it has a 50% chance to inflict Rupture",
+        "BuffType": 1
+    },
+    "2205431":
+    {
+        "Name": "Rupture",
+        "Desc": "Rend DMG +100%"
+    },
+    "2205440":
+    {
+        "Name": "Spiral Tear",
+        "Desc": "Spiral Thrust and Vortex Strike deals 30% more DMG to the targets with Rend",
+        "BuffType": 1
+    },
+    "2205450":
+    {
+        "Name": "Fortitude (Talent)",
+        "Desc": "During Valor Cyclone, gains Super Armor and reduces DMG taken by 20%.\nWhen Valor Cyclone deals DMG, restores HP equal to 10% ATK",
+        "BuffType": 1
+    },
+    "2205451":
+    {
+        "Name": "Fortitude (Super Armor)",
+        "Desc": "During Valor Cyclone, gains Super Armor and reduces DMG taken by 20%",
+        "BuffType": 1
+    },
+    "2205460":
+    {
+        "Name": "Swift Breeze",
+        "Desc": "Each 1% Haste accelerates the Regen Speed of Courage by 2%",
+        "BuffType": 1
+    },
+    "2205470":
+    {
+        "Name": "Breath of Wind",
+        "Desc": "Skills that consume Courage gain 6% Wind Bonus",
+        "BuffType": 1
+    },
+    "2205480":
+    {
+        "Name": "Wind Rise",
+        "Desc": "When Valor Cyclone deals DMG, increases the critical rate of Drake Cannon and Vortex Strike by 7%.\nThe effect lasts 5s and stacks up to 7 times",
+        "BuffType": 1
+    },
+    "2205490":
+    {
+        "Name": "Strong Attack (Talent)",
+        "Desc": "When Valor Cyclone deals DMG, reduces the CD of Ultimate by 0.5s.\nCan only trigger once on multiple hits",
+        "BuffType": 1
+    },
+    "2205491":
+    {
+        "Name": "Strong Attack Buff",
+        "Desc": "When Valor Cyclone deals DMG, reduces the CD of Ultimate by 0.5s.\nCan only trigger once on multiple hits",
+        "BuffType": 1
+    },
+    "2205500":
+    {
+        "Name": "Spiral Flame (Talent)",
+        "Desc": "Using Vortex Strike increases Haste by 25% for 10s",
+        "BuffType": 1
+    },
+    "2205510":
+    {
+        "Name": "Dragon's Fury Flame",
+        "Desc": "The Crit chance of Drake Cannon and Vortex Strike is doubled.\nIncreases the Crit DMG of Drake Cannon and Vortex Strike by 8%.\nEach 1% Haste grants 0.5% Crit DMG for Drake Cannon and Vortex Strike",
+        "BuffType": 1
+    },
+    "2205520":
+    {
+        "Name": "Wind Gate Drake Cannon",
+        "Desc": "Every 22 triggers of Valor Cyclone allows Basic Attack to evolve into Drake Cannon in 10s",
+        "BuffType": 1
+    },
+    "2205530":
+    {
+        "Name": "Bird Advancement",
+        "Desc": "Increases the charge of Falcon Toss by 1.\nReduces the Courage consumed by Falcon Toss by 50%",
+        "BuffType": 1
+    },
+    "2205540":
+    {
+        "Name": "Spear Advancement",
+        "Desc": "Enhances the effectiveness of Wind Fury by 50%.\nWhen Instant Edge consumes Chasing Step, doubles the charge efficiency of Sharp Impact",
+        "BuffType": 1
+    },
+    "2205550":
+    {
+        "Name": "Spear Recovery",
+        "Desc": "Spear Thrust reduces the CD of Falcon Toss by 2s (which can only be triggered once on multiple hits)",
+        "BuffType": 1
+    },
+    "2205560":
+    {
+        "Name": "Sharp Long Breath",
+        "Desc": "During Wind Fury, Falcon Toss evolves into Azure Sever once",
+        "BuffType": 1
+    },
+    "2205561":
+    {
+        "Name": "Azure Sever",
+        "Desc": "During Wind Fury, Falcon Toss evolves into Azure Sever once",
+        "BuffType": 1
+    },
+    "2205570":
+    {
+        "Name": "Sharp Expansion IV",
+        "Desc": "Sharp cap +1",
+        "BuffType": 1
+    },
+    "2205580":
+    {
+        "Name": "Skyfall (Talent)",
+        "Desc": "When dealing DMG, Skyfall gains a 15% chance to grant 1 stack of Sharp",
+        "BuffType": 1
+    },
+    "2205590":
+    {
+        "Name": "Pursuit Power",
+        "Desc": "Chasing Step consumed increases Strength by 10%. The effect lasts 10s and stacks up to 2 times",
+        "BuffType": 1
+    },
+    "2205600":
+    {
+        "Name": "Exceptional Elegance",
+        "Desc": "During Galeform, increases the DMG dealt by Instant Edge and Skyfall by 25%",
+        "BuffType": 1
+    },
+    "2205610":
+    {
+        "Name": "Typhoon: Sharp Impact",
+        "Desc": "Sharp Impact is enhanced, evolving into Typhoon: Sharp Impact",
+        "BuffType": 1
+    },
+    "2205620":
+    {
+        "Name": "Instant Edge Break Style",
+        "Desc": "Instant Edge consumes 1 more Sharp.\nIncreases the DMG dealt by Instant Edge by 90%",
+        "BuffType": 1
+    },
+    "2205630":
+    {
+        "Name": "Wind Swirl Strike",
+        "Desc": "Increases the DMG dealt by Tornado by 30%.\nIncreases the DMG dealt by Spear Thrust by 30%",
+        "BuffType": 1
+    },
+    "2205640":
+    {
+        "Name": "Sharp Pursuit",
+        "Desc": "When Instant Edge consumes Chasing Step, grants 1 stack of Sharp",
+        "BuffType": 1
+    },
+    "2205650":
+    {
+        "Name": "Instant Edge Combo",
+        "Desc": "Instant Edge has a 25% chance to trigger one extra instance of DMG (if Lucky Strike chance exceeds 25%, that becomes the new trigger chance).\nThis extra DMG equals Instant Edge DMG x current Lucky Strike DMG multiplier%, and is affected by all relevant Instant Edge DMG bonuses",
+        "BuffType": 1
+    },
+    "2205660":
+    {
+        "Name": "Break Style",
+        "Desc": "When dealing Crit DMG, Expertise ignore 50% of the targets' Armor",
+        "BuffType": 1
+    },
+    "2205670":
+    {
+        "Name": "Sharp Echo",
+        "Desc": "If Sharp isn't at Max stacks, increases the DMG dealt by Skyfall by 25%",
+        "BuffType": 1
+    },
+    "2205680":
+    {
+        "Name": "Kamikaze Luck",
+        "Desc": "For each 1 stack of Sharp consumed, gains 3 points of Courage.\nIncreases Lucky Strike final DMG by 50%",
+        "BuffType": 1
+    },
     "2206010":
     {
         "Name": "Lightforged Body",
@@ -2532,6 +3061,18 @@
         "Desc": "Casting Blossom Charge grants Super Armor.\bBlossom Charge Dream DMG increased and Control Duration increased",
         "BuffType": 1
     },
+    "3057110":
+    {
+        "Name": "Beat Performer X11",
+        "Desc": "When you cast Fivefold Crescendo, a percent of the overhealing will continously recover over time",
+        "BuffType": 1
+    },
+    "3057111":
+    {
+        "Name": "Beat Performer X11",
+        "Desc": "When you cast Fivefold Crescendo, a percent of the overhealing will continously recover over time",
+        "BuffType": 1
+    },
     "3058110":
     {
         "Name": "Polarity X11",
@@ -2557,7 +3098,7 @@
     "3059061":
     {
         "Name": "Stasis X6",
-        "Desc": "If no damage is taken for a few seconds, Max HP increased for the next fe seconds, allowing stacking",
+        "Desc": "If no damage is taken for a few seconds, Max HP increased for the next few seconds, allowing stacking",
         "BuffType": 1
     },
     "3059221":

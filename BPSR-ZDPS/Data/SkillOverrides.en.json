@@ -186,7 +186,7 @@
     },
     "1409":
     {
-        "Name": "Typhoon Cleave",
+        "Name": "Typhoon Cleave (Battle Cry Leap)",
         "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_ult_01"
     },
     "1410":
@@ -236,7 +236,7 @@
     },
     "1425":
     {
-        "Name": "Falcon Toss",
+        "Name": "Falcon Toss (Leap)",
         "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx06"
     },
     "1426":
@@ -246,7 +246,7 @@
     },
     "1427":
     {
-        "Name": "Breach Pursuit",
+        "Name": "Breach Pursuit (Sweeping Slash)",
         "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx03"
     },
     "1428":
@@ -256,6 +256,26 @@
     "1429":
     {
         "Name": "Tornado"
+    },
+    "1431":
+    {
+        "Name": "Sharp Impact (Crash Down)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx08"
+    },
+    "1433":
+    {
+        "Name": "Azure Sever (Leap)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf01"
+    },
+    "1434":
+    {
+        "Name": "Vortex Strike",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf02"
+    },
+    "1435":
+    {
+        "Name": "Drake Cannon",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf03"
     },
     "1501":
     {
@@ -698,19 +718,19 @@
     },
     "2363":
     {
-        "Name": "Healing Beat copy"
+        "Name": "Healing Beat (Speaker)"
     },
     "2364":
     {
-        "Name": "Rock the Stage copy"
+        "Name": "Rock the Stage (Speaker)"
     },
     "2365":
     {
-        "Name": "Infinite Rhapsody copy"
+        "Name": "Infinite Rhapsody (Speaker)"
     },
     "2366":
     {
-        "Name": "Concert Circuit copy"
+        "Name": "Concert Circuit (Speaker)"
     },
     "2401":
     {
@@ -1124,7 +1144,8 @@
     },
     "31901":
     {
-        "Name": "Wind Ring of Courage"
+        "Name": "Valor Cyclone",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx07"
     },
     "43201":
     {
@@ -1655,15 +1676,18 @@
     },
     "140301":
     {
-        "Name": "Divine Shadow Spiral"
+        "Name": "Vortex Strike (Final Strike)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf02"
     },
     "140401":
     {
-        "Name": "Dragon Blast Cannon"
+        "Name": "Drake Cannon (Backward Leap)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf03"
     },
     "140501":
     {
-        "Name": "Tornado"
+        "Name": "Tornado",
+        "Desc": "From Tornado Dance talent"
     },
     "141104":
     {
@@ -1671,28 +1695,30 @@
     },
     "149901":
     {
-        "Name": "Wind Spiral/Spiral Detonation"
+        "Name": "Spiral Detonation (Wind Spiral)"
     },
     "149902":
     {
-        "Name": "Spear Piercing"
+        "Name": "Spear Thrust"
     },
     "149904":
     {
-        "Name": "Tina Tornado"
+        "Name": "Instant Edge Combo (Talent)"
     },
     "149905":
     {
-        "Name": "Azure Sever",
+        "Name": "Falcon Toss (Spear Toss)",
         "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx06"
     },
     "149906":
     {
-        "Name": "Extreme Storm Cut"
+        "Name": "Azure Sever (Spear Toss)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf01"
     },
     "149907":
     {
-        "Name": "Sharp Impact (Wind God)"
+        "Name": "Sharp Impact (Leap)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx08"
     },
     "150101":
     {
@@ -3542,11 +3568,12 @@
     },
     "2205071":
     {
-        "Name": "Rip"
+        "Name": "Rend"
     },
     "2205450":
     {
-        "Name": "Wind Ring of Courage Lifesteal"
+        "Name": "Valor Cyclone (Fortitude Talent)",
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx07"
     },
     "2206240":
     {
