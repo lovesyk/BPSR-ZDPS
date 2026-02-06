@@ -75,6 +75,84 @@
         "Name": "Basic Attack: Fourth Hit Regen",
         "Desc": "Fourth Basic Attack regenerates health"
     },
+    "40001":
+    {
+        "Name": "Thundercut Recast Buff",
+        "Desc": "If Blade Intent remains after the strike, the skill can be recast",
+        "BuffType": 1
+    },
+    "40901":
+    {
+        "Name": "Grant max Thunder Sigils",
+        "Desc": "Ultimate ability to grant max Thunder Sigils",
+        "BuffType": 1
+    },
+    "41501":
+    {
+        "Name": "Defensive Stance",
+        "Desc": "Damage Immunity. If hit, counterattacks and performs a backwards leap",
+        "BuffType": 1
+    },
+    "41601":
+    {
+        "Name": "Counterattack Buff",
+        "Desc": "Counterattack Ready",
+        "BuffType": 1
+    },
+    "41701":
+    {
+        "Name": "Stormblade Blade Intent Check",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "42002":
+    {
+        "Name": "Thunder Sigil Resource",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "42201":
+    {
+        "Name": "Consume Thunder Sigils DMG Boost",
+        "Desc": "Consumes Thunder Sigils to boost DMG",
+        "BuffType": 1
+    },
+    "42301":
+    {
+        "Name": "Counterattack Performed",
+        "Desc": "Performed Counterattack",
+        "BuffType": 1
+    },
+    "42801":
+    {
+        "Name": "Gained Max Thunder Sigils",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "43401":
+    {
+        "Name": "Determine ATK Strikes",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "43701":
+    {
+        "Name": "Divine Sickle (Crit Guaranteed)",
+        "Desc": "Divine Sickle will Crit when it hits",
+        "BuffType": 1
+    },
+    "44801":
+    {
+        "Name": "Thundercut Extra Hit Buff",
+        "Desc": "Once Attack Speed reaches 25%|50%|80%, deals 1|2|3 extra attacks",
+        "BuffType": 1
+    },
+    "44901":
+    {
+        "Name": "Scythe Wheel Death Reset",
+        "Desc": "When you die, Moonblades end and the remaining CD of Scythe Wheel is refunded",
+        "BuffType": 1
+    },
     "55222":
     {
         "Name": "Photon Reforge Ready",
@@ -438,6 +516,11 @@
         "Name": "Dagger of Execution - Force-Kill",
         "Desc": "Forcefully kills the marked target if not protected"
     },
+    "2031001":
+    {
+        "Name": "Blade - Agility",
+        "BuffType": 1
+    },
     "2031005":
     {
         "Name": "Forest Ring - Intellect",
@@ -451,6 +534,11 @@
     "2031011":
     {
         "Name": "Guitar - Intellect",
+        "BuffType": 1
+    },
+    "2031101":
+    {
+        "Name": "Blade - Luck",
         "BuffType": 1
     },
     "2031111":
@@ -482,9 +570,472 @@
     {
         "Name": "Stunt! Lightning Smite (Armor Conversion)"
     },
+    "2200020":
+    {
+        "Name": "Blade Intent (Talent)",
+        "Desc": "3 points of Blade Intent are gained when an Expertise Skill is cast",
+        "BuffType": 1
+    },
+    "2200040":
+    {
+        "Name": "Thunder Whirl",
+        "Desc": "Piercing Slash grants Overdrive 1 charge",
+        "BuffType": 1
+    },
+    "2200050":
+    {
+        "Name": "Keen Strike",
+        "Desc": "When Basic Attack deals DMG, 10% chance to trigger Piercing Slash once per second",
+        "BuffType": 1
+    },
+    "2200060":
+    {
+        "Name": "Keen Enhancement",
+        "Desc": "Increases the fixed chance to trigger Piercing Slash by 10%",
+        "BuffType": 1
+    },
+    "2200070":
+    {
+        "Name": "Iaido Mastery",
+        "Desc": "Iaido Slash Crit +10%.\nEach 1% Crit chance grants 0.15% Crit DMG for skills that consume Thunder Sigils. When Crit chance exceeds 60%, every extra 1% grants an additional 0.32% Crit DMG",
+        "BuffType": 1
+    },
+    "2200080":
+    {
+        "Name": "Wind Assault I",
+        "Desc": "Crit Rate obtained in any way is increased by 12%, but Luck chance obtained in any way are reduced by 10%",
+        "BuffType": 1
+    },
+    "2200090":
+    {
+        "Name": "Zen Moment",
+        "Desc": "Crit hits of Special Attacks grant 100 Blade Intent",
+        "BuffType": 1
+    },
+    "2200100":
+    {
+        "Name": "Thunder Sigil Charm II",
+        "Desc": "Increases Max Thunder Sigil by 1",
+        "BuffType": 1
+    },
+    "2200110":
+    {
+        "Name": "Thunder Reversal",
+        "Desc": "Consumes 100 Blade Intent to gain stacks of Thunder Reversal Mark.\nWhen Thunder Reversal Mark reaches 5 stacks, casting Iaido Slash grants Thunder Reversal effect and removes all Mark stacks.\nThunder Reversal: Gain 10% Thunder DMG bonus for 15s. During Thunder Reversal, Marks cannot be gained",
+        "BuffType": 1
+    },
+    "2200120":
+    {
+        "Name": "Vacuum Slash",
+        "Desc": "Each cast of Flash Strike, Raijin Dash, or its enhanced skills grants 1 stack of Thundrage. When Tundrage raches 5 stacks, Iaido Slash evolves into Thunder Cut.\nAfter casting Thunder Cut, 5 stacks of Tundrage are consumed. Thundrage stacks up to 8 times",
+        "BuffType": 1
+    },
+    "2200122":
+    {
+        "Name": "Thundrage (Stacks)",
+        "Desc": "Each cast of Flash Strike, Raijin Dash, or its enhanced skills grants 1 stack of Thundrage. When Tundrage raches 5 stacks, Iaido Slash evolves into Thunder Cut.\nAfter casting Thunder Cut, 5 stacks of Tundrage are consumed. Thundrage stacks up to 8 times",
+        "BuffType": 1
+    },
+    "2200140":
+    {
+        "Name": "Flash Frenzy Blade",
+        "Desc": "When Iaido Slash or Thunder Cut deal DMG, there is a chance to reset the CD of Flash Strike and Raijin Dash. Each Thunder Sigil consumed increases chance by 10%",
+        "BuffType": 1
+    },
+    "2200150":
+    {
+        "Name": "Bladewind Domain",
+        "Desc": "Every 3 casts of Overdrive allows the next Iaido Slash to generate a Bladewind Domain in front.\nEach time Bladewind Domain deals DMG, reduces the CD of Oblivion Combo by 1.5s",
+        "BuffType": 1
+    },
+    "2200160":
+    {
+        "Name": "Touch of Thunder Soul",
+        "Desc": "Moonblades have a fixed 60% chance to cast Thunderstrike on a Lucky Strike.\nThunderstrike deals double DMG",
+        "BuffType": 1
+    },
+    "2200170":
+    {
+        "Name": "Breath of Mark",
+        "Desc": "Lucky Strikes of Moonblades grant a fixed 30% chance to restore 1 Thunder Sigil, once per 2s",
+        "BuffType": 1
+    },
+    "2200180":
+    {
+        "Name": "Phantom Delay",
+        "Desc": "For 12s after casting Chaos Breaker, whenever the Talents Raijin Dash Charge, Moonlight Charge, and Charge Catcher obtain a Charge Seed, 1 additional Charge Seed is granted",
+        "BuffType": 1
+    },
+    "2200182":
+    {
+        "Name": "Charge Seed (Stacks)",
+        "Desc": "Casting Thundercut generates 2 Charge Seed",
+        "BuffType": 1
+    },
+    "2200200":
+    {
+        "Name": "Phantom Scythe Realm I",
+        "Desc": "Increases Max Moonblades by 1",
+        "BuffType": 1
+    },
+    "2200210":
+    {
+        "Name": "Phantom Scythe Realm II",
+        "Desc": "Casting Thundercut grants 12 + Luck% x 10 points of Blade Intent",
+        "BuffType": 1
+    },
+    "2200211":
+    {
+        "Name": "Moonblade Nearby Mark Tracker",
+        "Desc": "Tracking target to deal damage upon Whirling Attack command",
+        "BuffType": 0
+    },
+    "2200220":
+    {
+        "Name": "Power of Thunder",
+        "Desc": "For every 10 instances of damage dealt, triggers Thunder Power.\nThunder Power: Thunder DMG +15 for 10s up to 10 stacks",
+        "BuffType": 1
+    },
+    "2200230":
+    {
+        "Name": "Moonstrike Delay (Talent)",
+        "Desc": "Blade Intent cap +25.\nAfter 5 consecutive Thundercuts, it evolves into Thundercleave which deals higher DMG",
+        "BuffType": 1
+    },
+    "2200231":
+    {
+        "Name": "Moonstrike Delay (Thundercleave Ready)",
+        "Desc": "After 5 consecutive Thundercuts, it evolves into Thundercleave which deals higher DMG",
+        "BuffType": 1
+    },
+    "2200240":
+    {
+        "Name": "Lightning Flash",
+        "Desc": "During Stormflash, doubles Moonblades' Attack Speed",
+        "BuffType": 1
+    },
+    "2200250":
+    {
+        "Name": "Thunder Curse (Talent)",
+        "Desc": "Special Attacks inflict Thunder Curse on the target upon dealing DMG.\nThunder Cure: Each stack increases the target's DMG taken from you by 2% for 10s, stacking up to 4 times",
+        "BuffType": 1
+    },
+    "2200251":
+    {
+        "Name": "Thunder Curse",
+        "Desc": "Each stack increases the target's DMG taken from the Stormblade Caster by 2% for 10s, stacking up to 4 times"
+    },
+    "2200260":
+    {
+        "Name": "Duel Awareness",
+        "Desc": "Deals 20% more DMG to enemies with 80% HP or above",
+        "BuffType": 1
+    },
+    "2200280":
+    {
+        "Name": "Frenzied Thunder Roar",
+        "Desc": "Defeating an enemy triggers Thunderburst, once every 3s",
+        "BuffType": 1
+    },
+    "2200300":
+    {
+        "Name": "Shadow Despise (Talent)",
+        "Desc": "For each enemy within 3m, you gain 3% Armor Penetration, up to 15%.\nThis effect is doubled against Elite or stronger enemies",
+        "BuffType": 1
+    },
+    "2200302":
+    {
+        "Name": "Shadow Despise (Tracking)",
+        "Desc": "For each enemy within 3m, you gain 3% Armor Penetration, up to 15%.\nThis effect is doubled against Elite or stronger enemies"
+    },
+    "2200310":
+    {
+        "Name": "Iai Thunder Dance",
+        "Desc": "When Thunder Sigils are at 3 or higher, Special Attack hits twice",
+        "BuffType": 1
+    },
+    "2200320":
+    {
+        "Name": "Iaido Slash Spec",
+        "Desc": "Further enhances the ability to use Iaido Slash.\nWhen the number of Thunder Sigils consumed by Iaido Slash or Thunder Cut equals the current Thunder Sigil max count, increases DMG of Iaido Slash and Thunder Cut by 12% and grants Super Armor during cast",
+        "BuffType": 1
+    },
+    "2200321":
+    {
+        "Name": "Iaido Slash/Thunder Cut DMG Increase",
+        "Desc": "Increases DMG of Iaido Slash and Thunder Cut by 12%",
+        "BuffType": 1
+    },
+    "2200322":
+    {
+        "Name": "Iaido Slash/Thunder Cut Super Armor",
+        "Desc": "Granted Super Armor during cast",
+        "BuffType": 1
+    },
+    "2200330":
+    {
+        "Name": "Thunder Seed",
+        "Desc": "Casting Thundercut generates 2 Charge Seed",
+        "BuffType": 1
+    },
+    "2200340":
+    {
+        "Name": "Flash Sharp Strike",
+        "Desc": "Triggers Sharp Strike when casting Iaido Slash or Thunder Cut.\nSharp Strike: Increases Crit Rate of Flash Strike and Dracoflash by 10%. If Flash Strike or Dracoflash deal Crit DMG 1 time, gains 1 Thunder Sigil.\nThis effect is removed after the use of Flash strike or Dracoflash or after 10s",
+        "BuffType": 1
+    },
+    "2200350":
+    {
+        "Name": "Rapid Thunder Assault",
+        "Desc": "Each additional Thunder Sigil consumed by a skill increases its DMG by 3%",
+        "BuffType": 1
+    },
+    "2200360":
+    {
+        "Name": "End of Annihilation",
+        "Desc": "The final strike of Oblivion Combo is empowered into Ultimate Slash",
+        "BuffType": 1
+    },
+    "2200380":
+    {
+        "Name": "Thunder Sigil Charm",
+        "Desc": "Increases Max Thunder Sigil by 1",
+        "BuffType": 1
+    },
+    "2200390":
+    {
+        "Name": "Swift Blade",
+        "Desc": "When Agility reaches 500 points, Crit DMG and Luck Damage +5%"
+    },
+    "2200400":
+    {
+        "Name": "Thunder Charm Blade",
+        "Desc": "For each 1 Thunder Sigil consumed by Expertise Skill, gain an additional 3 points of Blade Intent.\nFor every consumption of Blade Intent, grants 20% Resistance for 5s",
+        "BuffType": 1
+    },
+    "2200410":
+    {
+        "Name": "Infinite Thunder",
+        "Desc": "For every 5 Thunder Sigils consumed, the remaining CD of Volt Surge -0.5s",
+        "BuffType": 1
+    },
+    "2200420":
+    {
+        "Name": "Thunder Sigil Rewind",
+        "Desc": "When consuming Thunder Sigils, there is a chance to return 1 Thunder Sigil and for each additional 1 Thunder Sigil consumed, the return chance +9%",
+        "BuffType": 1
+    },
+    "2200430":
+    {
+        "Name": "Thunder Might (Talent)",
+        "Desc": "Activate Volt Surge. Flash Strike and Raijin Dash evolve into Dacroflash and Phantom Slash",
+        "BuffType": 1
+    },
+    "2200431":
+    {
+        "Name": "Thunder Might",
+        "Desc": "Activate Volt Surge. Flash Strike and Raijin Dash evolve into Dacroflash and Phantom Slash",
+        "BuffType": 1
+    },
+    "2200440":
+    {
+        "Name": "Unmatched Raijin Dash",
+        "Desc": "Raijin Dash and Phantom Slash ignore the target's Armor.\nRaijin Dash and Phantom Slash deal 10% more damage per additional 1 enemy hit",
+        "BuffType": 1
+    },
+    "2200450":
+    {
+        "Name": "Violent Slash",
+        "Desc": "Increases the critical rate of Iaido Slash and Thunder Cut by 12%",
+        "BuffType": 1
+    },
+    "2200460":
+    {
+        "Name": "Wind Assault II",
+        "Desc": "Crit Rate obtained in any way is increased by 12%, but Luck chance obtained in any way are reduced by 10%"
+    },
+    "2200470":
+    {
+        "Name": "Dual Blade Intent",
+        "Desc": "When Blade Intent is at least 100, Flash Strike, Raijin Dash, and enhanced versions gain Crit Rate by 10%.\nWhen Blade Intent is at least 100, greatly increases Flash Strike's and Raijin Dash's casting speed",
+        "BuffType": 1
+    },
+    "2200480":
+    {
+        "Name": "Thunder Sigil Affinity",
+        "Desc": "Each additional Thunder Sigil consumed by Expertise Skill or Special Attacks increases your Thunder DMG dealt by 1.5% when they deal DMG",
+        "BuffType": 1
+    },
+    "2200490":
+    {
+        "Name": "Thundrage (Talent)",
+        "Desc": "Each use of Dracoflash or Phantom Slash grants 4 stacks of Thundrage, up to 8 stacks",
+        "BuffType": 1
+    },
+    "2200500":
+    {
+        "Name": "Overdrive Refinement",
+        "Desc": "Reduces the CD of Overdrive by 30%",
+        "BuffType": 1
+    },
+    "2200510":
+    {
+        "Name": "Blade Intent Thunderstrike",
+        "Desc": "When Iaido Slash deals Crit DMG, if Blade Intent exceeds 20, launches Thunderstrike (occurs once per use of Iaido Slash)",
+        "BuffType": 1
+    },
+    "2200520":
+    {
+        "Name": "Thunder Sigil Charm III",
+        "Desc": "Increases Max Thunder Sigil by 1",
+        "BuffType": 1
+    },
+    "2200530":
+    {
+        "Name": "Break Slash",
+        "Desc": "When dealing Crit DMG, Iaido Slash and Thunder Cut nullifies 30% of the target's Armor",
+        "BuffType": 1
+    },
+    "2200540":
+    {
+        "Name": "Arcane",
+        "Desc": "Crit DMG +10%"
+    },
+    "2200550":
+    {
+        "Name": "Instant Slash (Talent)",
+        "Desc": "Iaido Slash reduces the Armor of the target by 6%. The effect lasts 5s and stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2200551":
+    {
+        "Name": "Instant Slash",
+        "Desc": "Iaido Slash reduces the Armor of the target by 6%. The effect lasts 5s and stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2200560":
+    {
+        "Name": "Advancement",
+        "Desc": "Mastery +6%"
+    },
+    "2200570":
+    {
+        "Name": "Thunder Scythe",
+        "Desc": "Reduces the Charge Seeds that Storm Scythe consumes by 5",
+        "BuffType": 1
+    },
+    "2200580":
+    {
+        "Name": "Blade Intent Recovery",
+        "Desc": "Each 1% Haste increases the Regen Speed of Blade Intent by 1%",
+        "BuffType": 1
+    },
+    "2200590":
+    {
+        "Name": "Moonstrike Spec",
+        "Desc": "Replaces Special Attack with Moonstrike, enhancing the ability. Cast Moonstrike to gain 30 Blade Intent",
+        "BuffType": 1
+    },
+    "2200600":
+    {
+        "Name": "Divine Sickle (Talent)",
+        "Desc": "Casting Storm Scythe 7 times triggers Divine Sickle.\nDivine Sickle is guaranteed to Crit. When Luck is between 28% and 45%, Divine Sickle's final damage increases by 100%, but requires 14 casts of Storm Scythe to trigger.\nWhen Luck chance is above 45%, final damage increases by 200%, but requires 21 casts of Storm Scythe to trigger",
+        "BuffType": 1
+    },
     "2200601":
     {
-        "Name": "Divine Scythe",
+        "Name": "Divine Sickle",
+        "Desc": "Casting Storm Scythe 7 times triggers Divine Sickle.\nDivine Sickle is guaranteed to Crit. When Luck is between 28% and 45%, Divine Sickle's final damage increases by 100%, but requires 14 casts of Storm Scythe to trigger.\nWhen Luck chance is above 45%, final damage increases by 200%, but requires 21 casts of Storm Scythe to trigger",
+        "BuffType": 1
+    },
+    "2200610":
+    {
+        "Name": "Moonlight Charge",
+        "Desc": "If Luck chance exceeds 25%, Moonblades trigger a Lucky Strike to gain Charge Seed. Otherwise, when Moonblades deal DMG, it has a fixed 25% chance to gain Charge Seed",
+        "BuffType": 1
+    },
+    "2200620":
+    {
+        "Name": "Blade Intent - Rare",
+        "Desc": "Increases Max Blade Intent by 75",
+        "BuffType": 1
+    },
+    "2200630":
+    {
+        "Name": "Thousand Thunder Flashes",
+        "Desc": "Each 2 Thunderstrike triggered reduces the CD of Stormflash by 0.5s",
+        "BuffType": 1
+    },
+    "2200640":
+    {
+        "Name": "Chaos Breaker (Talent)",
+        "Desc": "When Stormflash is activated, Moonstrike evolves into Chaos Breaker",
+        "BuffType": 1
+    },
+    "2200641":
+    {
+        "Name": "Chaos Breaker",
+        "Desc": "When Stormflash is activated, Moonstrike evolves into Chaos Breaker",
+        "BuffType": 1
+    },
+    "2200650":
+    {
+        "Name": "Enhanced Thunderstrike",
+        "Desc": "Increases the DMG dealt by Thunderstrike by 20%.\nEach 1% Luck grants Thunderstrike 1% more DMG dealt",
+        "BuffType": 1
+    },
+    "2200660":
+    {
+        "Name": "Charge Catcher",
+        "Desc": "Each enemy defeated grants 1 Charge Seed",
+        "BuffType": 1
+    },
+    "2200670":
+    {
+        "Name": "Thunderstrike Whisper",
+        "Desc": "Increases the Thunder DMG Thunderstrike deals by 50%, but Thunderstrike never deals Crit DMG",
+        "BuffType": 1
+    },
+    "2200680":
+    {
+        "Name": "Moonstrike Sharp Strike",
+        "Desc": "When Blade Intent is at least 50, Moonstrike and Chaos Breaker are guaranteed to Crit",
+        "BuffType": 1
+    },
+    "2200690":
+    {
+        "Name": "Thunder Sigil Charm III",
+        "Desc": "Increases Max Thunder Sigil by 1. During Stormflash, each trigger of Storm Scythe extends its duration by 0.5s up to 5s",
+        "BuffType": 1
+    },
+    "2200700":
+    {
+        "Name": "Thunder Rune Mastery",
+        "Desc": "Doubles Max Blade Intent",
+        "BuffType": 1
+    },
+    "2200710":
+    {
+        "Name": "Raijin Dash Charge",
+        "Desc": "When Thundercut triggers a Lucky Strike, grants 1 Charge Seed",
+        "BuffType": 1
+    },
+    "2200720":
+    {
+        "Name": "Moonblade Swift",
+        "Desc": "Moonblades additionally deal 1 instance of Whirling DMG every 6s. Each 2% Haste reduces its CD by 1%",
+        "BuffType": 1
+    },
+    "2200730":
+    {
+        "Name": "Thunder Might (Talent)",
+        "Desc": "During Stormflash, Storm Scythe will activate twice in succession",
+        "BuffType": 1
+    },
+    "2200740":
+    {
+        "Name": "Thunder Sigil Rewind II",
+        "Desc": "During Volt Surge, the return chance of Thunder Sigil Rewind doubles, but the damage bonus of non-derivative skills that consume Thunder Sigil is reduced from 25% to 20%",
         "BuffType": 1
     },
     "2202020":
@@ -1980,6 +2531,28 @@
         "Name": "Verdant Oracle X8",
         "Desc": "Casting Blossom Charge grants Super Armor.\bBlossom Charge Dream DMG increased and Control Duration increased",
         "BuffType": 1
+    },
+    "3058110":
+    {
+        "Name": "Polarity X11",
+        "Desc": "For a few seconds after casting an Expertise Skill, Versatility increases with a stacking buff",
+        "BuffType": 1
+    },
+    "3058111":
+    {
+        "Name": "Polarity X11",
+        "Desc": "For a few seconds after casting an Expertise Skill, Versatility increases with a stacking buff",
+        "BuffType": 1
+    },
+    "3058070":
+    {
+        "Name": "Polarity X7",
+        "Desc": "Mastery gained in any way increased, but Luck gained in any way decreased"
+    },
+    "3059050":
+    {
+        "Name": "Stasis X5",
+        "Desc": "Increase Max HP. When incoming damage exceeds current HP, that damage is reduced"
     },
     "3059061":
     {

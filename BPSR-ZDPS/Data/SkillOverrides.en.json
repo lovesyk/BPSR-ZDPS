@@ -354,6 +354,10 @@
     {
         "Name": "Piercing Slash"
     },
+    "1728":
+    {
+        "Name": "Ultimate Slash"
+    },
     "1731":
     {
         "Name": "Stormflash",
@@ -364,13 +368,39 @@
         "Name": "Stormflash",
         "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_kx08"
     },
+    "1735":
+    {
+        "Name": "Dracoflash",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf03"
+    },
+    "1736":
+    {
+        "Name": "Phantom Slash",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf04"
+    },
+    "1738":
+    {
+        "Name": "Chaos Breaker",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf02"
+    },
     "1739":
     {
-        "Name": "Perception Slash"
+        "Name": "Piercing Slash",
+        "Desc": "From Keen Strike talent"
     },
     "1740":
     {
-        "Name": "Storm Scythe (Thundercut - Final Slash)"
+        "Name": "Storm Scythe (Thundercleave)"
+    },
+    "1742":
+    {
+        "Name": "Thundercleave",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_kx06"
+    },
+    "1850":
+    {
+        "Name": "Arcane! Illusion Resonance: Oblivion Bomb",
+        "Desc": "Dorothy"
     },
     "1901":
     {
@@ -1106,7 +1136,7 @@
     },
     "44701":
     {
-        "Name": "Moon Blade"
+        "Name": "Moonblade"
     },
     "50024":
     {
@@ -1701,11 +1731,13 @@
     },
     "155101":
     {
-        "Name": "Raikiri"
+        "Name": "Thunder Cut",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf05"
     },
     "155102":
     {
-        "Name": "Raikiri - Final Attack"
+        "Name": "Thunder Cut - Final Attack",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf05"
     },
     "170101":
     {
@@ -1801,11 +1833,12 @@
     },
     "179904":
     {
-        "Name": "Divine Shadow Slash - Final Attack"
+        "Name": "Phantom Slash - Final Attack",
+        "Icon": "ui/atlas/skill_weapon_tdl/weapon_tdl-01_tf04"
     },
     "179906":
     {
-        "Name": "Moonstrike Whirl"
+        "Name": "Moonblade (Whirling)"
     },
     "179907":
     {
@@ -2082,6 +2115,11 @@
     {
         "Name": "Stunt! Transform into Bee (Passive)",
         "Desc": "Void Bzzar"
+    },
+    "391009":
+    {
+        "Name": "Arcane! Illusion Resonance: Thunder Tracers",
+        "Desc": "Dorothy"
     },
     "391301":
     {
@@ -3560,6 +3598,11 @@
     "2406140":
     {
         "Name": "Causes AoE when gaining a shield (Set)"
+    },
+    "2900441":
+    {
+        "Name": "Arcane! Illusion Resonance: Charged Cannon",
+        "Desc": "Dorothy"
     },
     "2900540":
     {
