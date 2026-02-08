@@ -93,7 +93,7 @@
     },
     "1247":
     {
-        "Name": "(Talent) Frost Comet"
+        "Name": "Frost Comet (Talent)"
     },
     "1248":
     {
@@ -430,31 +430,43 @@
     },
     "1901":
     {
-        "Name": "Halberd's Edge 1 / Rock Bomb",
+        "Name": "Halberd's Edge - Stage 1 / Granite",
         "Icon": "ui/atlas/skill_weapon_wr/weapon_wr_skill_atk"
     },
     "1902":
     {
-        "Name": "Halberd's Edge 2 / Rock Bomb",
+        "Name": "Halberd's Edge - Stage 2 / Granite",
         "Icon": "ui/atlas/skill_weapon_wr/weapon_wr_skill_atk"
     },
     "1903":
     {
-        "Name": "Halberd's Edge 3",
+        "Name": "Halberd's Edge - Stage 3",
         "Icon": "ui/atlas/skill_weapon_wr/weapon_wr_skill_atk"
     },
     "1904":
     {
-        "Name": "Halberd's Edge 4",
+        "Name": "Halberd's Edge - Stage 4",
         "Icon": "ui/atlas/skill_weapon_wr/weapon_wr_skill_atk"
     },
     "1909":
     {
-        "Name": "Halberd's Edge (Jump)"
+        "Name": "Halberd's Edge (Shield Slam)",
+        "Desc": "From Resolute Breath talent"
     },
     "1912":
     {
         "Name": "Halberd's Edge - Lethal Skill Counter"
+    },
+    "1932":
+    {
+        "Name": "Shield Combo",
+        "Icon": "From Shield Combo talent"
+    },
+    "1935":
+    {
+        "Name": "Rageblow",
+        "Desc": "From Shattering Rageblow talent",
+        "Icon": "ui/atlas/skill_weapon_wr/weapon_wr-01_tg01_01"
     },
     "2201":
     {
@@ -1172,15 +1184,18 @@
     },
     "50033":
     {
-        "Name": "Gather Monsters"
+        "Name": "Sandgrip",
+        "Icon": "ui/atlas/skill_weapon_wr/weapon_wr-01_kx05"
     },
     "50036":
     {
-        "Name": "Weak Spot Strike"
+        "Name": "Weakness Strike",
+        "Desc": "From Weakness Strike talent"
     },
     "50037":
     {
-        "Name": "Block Counterattack"
+        "Name": "Countercrush (Counter Storm)",
+        "Desc": "From Counter Storm talent"
     },
     "50042":
     {
@@ -1188,7 +1203,8 @@
     },
     "50049":
     {
-        "Name": "Sandstone Cloak (Persistent)"
+        "Name": "Sandshroud (Persistent)",
+        "Icon": "ui/atlas/skill_weapon_wr/weapon_wr-01_kx02"
     },
     "50050":
     {
@@ -1895,11 +1911,13 @@
     },
     "199902":
     {
-        "Name": "Earth Collapse and Mountain Destruction"
+        "Name": "Terra Sunder",
+        "Icon": "ui/atlas/skill_weapon_wr/weapon_wr-01_kx03_01"
     },
     "199903":
     {
-        "Name": "Giant Rock Bombardment"
+        "Name": "Stone Fist",
+        "Icon": "ui/atlas/skill_weapon_wr/weaponn-wr_sikll_atk_02"
     },
     "220101":
     {
@@ -3481,6 +3499,12 @@
     "2201570":
     {
         "Name": "Rock Shield"
+    },
+    "2201641":
+    {
+        "Name": "Stone Fist (Rock Heal)",
+        "Desc": "From Rock Heal talent",
+        "Icon": "ui/atlas/skill_weapon_wr/weaponn-wr_sikll_atk_02"
     },
     "2202091":
     {

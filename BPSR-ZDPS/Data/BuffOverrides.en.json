@@ -265,6 +265,47 @@
         "Desc": "When you die, Moonblades end and the remaining CD of Scythe Wheel is refunded",
         "BuffType": 1
     },
+    "50033":
+    {
+        "Name": "Sandgrip",
+        "Desc": "Create a vacuum, pulling nearby enemies toward you",
+        "BuffType": 1
+    },
+    "50035":
+    {
+        "Name": "Special Attack B Upgrade",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "50036":
+    {
+        "Name": "Weakness Strike Triggered",
+        "Desc": "Deals Attack Damage equasl to 50% ATK to an enemy and grants 1 Sand Crystal",
+        "BuffType": 1
+    },
+    "50047":
+    {
+        "Name": "Rage Burst",
+        "Desc": "Actions interrupted and Attack Damage dealt to Heavy Guardian Caster is reduced"
+    },
+    "50056":
+    {
+        "Name": "Sandward Invincible Stage 2",
+        "Desc": "Create a vacuum, pulling nearby enemies toward you",
+        "BuffType": 1
+    },
+    "50063":
+    {
+        "Name": "Auto Counter Lethal Skill",
+        "Desc": "Automatically will counter a Lethal Skill",
+        "BuffType": 1
+    },
+    "50066":
+    {
+        "Name": "Basic Attack Pulls Target",
+        "Desc": "Your Basic Attack attempts to pull a nearby target toward you",
+        "BuffType": 1
+    },
     "55222":
     {
         "Name": "Photon Reforge Ready",
@@ -493,6 +534,17 @@
         "Name": "Sword and Shield Initial Buff",
         "BuffType": 1
     },
+    "55407":
+    {
+        "Name": "Holy Barrier",
+        "Desc": "Shielding nearby allies from DMG",
+        "BuffType": 1
+    },
+    "55408":
+    {
+        "Name": "Holy Barrier Ending",
+        "Desc": "Shielding nearby allies from DMG"
+    },
     "55418":
     {
         "Name": "Divine Circle Buff",
@@ -538,6 +590,11 @@
     "55424":
     {
         "Name": "Condemn Boost",
+        "BuffType": 1
+    },
+    "522001":
+    {
+        "Name": "Successful Counter Attack",
         "BuffType": 1
     },
     "620301":
@@ -660,6 +717,16 @@
         "Name": "Forest Ring - Intellect",
         "BuffType": 1
     },
+    "2031006":
+    {
+        "Name": "Hand Cannon - Agility",
+        "BuffType": 1
+    },
+    "2031007":
+    {
+        "Name": "Guardblade - Strength",
+        "BuffType": 1
+    },
     "2031010":
     {
         "Name": "Sword and Shield - Strength",
@@ -683,6 +750,16 @@
     "2031104":
     {
         "Name": "Lance - Luck",
+        "BuffType": 1
+    },
+    "2031106":
+    {
+        "Name": "Hand Cannon - Luck",
+        "BuffType": 1
+    },
+    "2031107":
+    {
+        "Name": "Guardblade - Luck",
         "BuffType": 1
     },
     "2031111":
@@ -1211,6 +1288,498 @@
         "Desc": "During Volt Surge, the return chance of Thunder Sigil Rewind doubles, but the damage bonus of non-derivative skills that consume Thunder Sigil is reduced from 25% to 20%",
         "BuffType": 1
     },
+    "2201010":
+    {
+        "Name": "Sandgrip (Talent)",
+        "Desc": "After casting Sandgrip, gains 10% Versatility for 10s",
+        "BuffType": 1
+    },
+    "2201020":
+    {
+        "Name": "Stone Fragment Tide",
+        "Desc": "For 8s after you cast Cracking Echo, each Basic Attack pulls a target between 8 and 20 meters away toward you.\nThe same target cannot be pulled again within 3s",
+        "BuffType": 1
+    },
+    "2201040":
+    {
+        "Name": "Life Suppress",
+        "Desc": "You gain the Suppress Expertise effect",
+        "BuffType": 1
+    },
+    "2201050":
+    {
+        "Name": "Weakness Strike",
+        "Desc": "When dealing DMG, Basic Attacks have a 10% chance to trigger Weakness Strike once.\nWeakness Strike: Deals Attack Damage equasl to 50% ATK to an enemy and grants 1 Sand Crystal",
+        "BuffType": 1
+    },
+    "2201051":
+    {
+        "Name": "Weakness Strike CD",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "2201060":
+    {
+        "Name": "Enhanced Weak Point Strike",
+        "Desc": "Weakness Strike's trigger chance +10%",
+        "BuffType": 1
+    },
+    "2201080":
+    {
+        "Name": "Block Recovery",
+        "Desc": "Successful Block restores 1% of your HP and 2 Rage. This can only occur once per second.\nTriggering Lucky Block restores 2% of your HP and 4 Rage. This can only occur once per second",
+        "BuffType": 1
+    },
+    "2201090":
+    {
+        "Name": "Countercrush (Talent)",
+        "Desc": "A successful Block triggers a Countercrush, once per second.\nOn a Lucky Block, randomly triggers 1 to 3 Countercrush, once per second",
+        "BuffType": 1
+    },
+    "2201150":
+    {
+        "Name": "Fortune Bastion",
+        "Desc": "During Brave Bastion, you can Block Magic Damage",
+        "BuffType": 1
+    },
+    "2201160":
+    {
+        "Name": "Slam Shelter",
+        "Desc": "A successful hit with Shield Bash reduces the target's DMG dealt to you by 3% for 10s, stacking up to 3 times",
+        "BuffType": 1
+    },
+    "2201170":
+    {
+        "Name": "Resolute Breath (Talent)",
+        "Desc": "While shielded, use Basic Attack midair to slam down, detonating the shield and dealing damage equal to 30% Max HP to nearby enemies",
+        "BuffType": 1
+    },
+    "2201173":
+    {
+        "Name": "Resolute Breath Ready",
+        "Desc": "While shielded, use Basic Attack midair to slam down, detonating the shield and dealing damage equal to 30% Max HP to nearby enemies",
+        "BuffType": 1
+    },
+    "2201180":
+    {
+        "Name": "Smash Support",
+        "Desc": "Increases the effectiveness of Shield granted by Shield Bash by 30%",
+        "BuffType": 1
+    },
+    "2201190":
+    {
+        "Name": "Sandy Shelter (Talent)",
+        "Desc": "During Stoneform, every 20 Rage gained triggers Sandy Shelter",
+        "BuffType": 1
+    },
+    "2201200":
+    {
+        "Name": "Shield Combo (Talent)",
+        "Desc": "Basic Attacks have a 5% chance to trigger Shield Combo upon dealing DMG.\nEach 1% Mastery grants an extra 0.2% chance",
+        "BuffType": 1
+    },
+    "2201210":
+    {
+        "Name": "Breath of Stone",
+        "Desc": "Each Sand Crystal consume reduces the CD of Stoneform by 1s",
+        "BuffType": 1
+    },
+    "2201220":
+    {
+        "Name": "Elemental Harmony",
+        "Desc": "While shielded, Magic Damage and Wind DMG you take are -25% and 50% respectively",
+        "BuffType": 1
+    },
+    "2201240":
+    {
+        "Name": "Shield Echo (Talent)",
+        "Desc": "During Sandshroud, adding a shield to yourself via Shield Bash triggers Shield Echo",
+        "BuffType": 1
+    },
+    "2201250":
+    {
+        "Name": "Shattering Rageblow (Talent)",
+        "Desc": "When dealing DMG, Granite Fury has a 20% chance to allow your next Basic Attack to evolve into Rageblow. Each 2% Luck adds 1% chance.\nAfter casting Rageblow, increases Block DMG Reduction by 10% for 10s",
+        "BuffType": 1
+    },
+    "2201251":
+    {
+        "Name": "Basic Attack evolved into Rageblow",
+        "Desc": "Basic Attack evolved into Rageblow",
+        "BuffType": 1
+    },
+    "2201270":
+    {
+        "Name": "Survival Instinct (Talent)",
+        "Desc": "When HP falls below 30%, triggers Survival Instinct, once every 60s",
+        "BuffType": 1
+    },
+    "2201280":
+    {
+        "Name": "Shadow Veil (Talent)",
+        "Desc": "Each enemy within 3 meters increases your Block chance by 3%, up to 15%. (Doubles the effect against Elite or stronger enemies.)\nRemains unchanged when Earthfort Spec is active.\nIf Block Spec is activated, the effect becomes: Every enemy within 3 meters increases Block DMG Reduction by 1%, up to 5% (Doubled against Elite or stronger enemies)",
+        "BuffType": 1
+    },
+    "2201281":
+    {
+        "Name": "Shadow Veil (Tracking)",
+        "Desc": "Earthfort: Each enemy within 3 meters increases your Block chance by 3%, up to 15%.\nBlock Spec: Every enemy within 3 meters increases Block DMG Reduction by 1%, up to 5%",
+        "BuffType": 1
+    },
+    "2201290":
+    {
+        "Name": "Valiant Fury (Talent)",
+        "Desc": "When Enraged, you gain 30% bonus Armor, decreasing by 5% per second",
+        "BuffType": 1
+    },
+    "2201291":
+    {
+        "Name": "Valiant Fury",
+        "Desc": "When Enraged, you gain 30% bonus Armor, decreasing by 5% per second",
+        "BuffType": 1
+    },
+    "2201300":
+    {
+        "Name": "Group Suppress",
+        "Desc": "Each enemy within 3 meters enhances the effectiveness of Suppress by 3%, up to 15%. This effect is doubled against Elite or stronger enemies",
+        "BuffType": 1
+    },
+    "2201310":
+    {
+        "Name": "Rage Awakening",
+        "Desc": "Consuming Rage has a chance to enter Enraged state for 5s. The more Rage you consume, the higher the chance.\nEach Rage increases the chance by 1%",
+        "BuffType": 1
+    },
+    "2201320":
+    {
+        "Name": "Block Spec",
+        "Desc": "Replaces Special Attack with Countercrush, and enhances the ability.\nWhen Lucky Block triggers, increases Block DMG Reduction by 10%",
+        "BuffType": 1
+    },
+    "2201330":
+    {
+        "Name": "Earthfort Spec",
+        "Desc": "Further enhances the ability to use Shield Bash.\nEach additional enemy hit increases the damage dealt by Shield Bash by 30%, up to 150%.\nWhen attacked, increases All-Element Resistance by 0.6% for 4s, stacking up to 10 times. Each 1% Mastery increases this effect by 2%",
+        "BuffType": 1
+    },
+    "2201340":
+    {
+        "Name": "Resonant Domain",
+        "Desc": "Cracking Echo generates a Sandfield that lasts for 5s",
+        "BuffType": 1
+    },
+    "2201341":
+    {
+        "Name": "Sandfield Protection",
+        "Desc": "Within the zone, reduces your Magic Damage taken by 50%",
+        "BuffType": 1
+    },
+    "2201343":
+    {
+        "Name": "Sandfield Redirection",
+        "Desc": "50% of the DMG taken by Allies (up to 10) is redirected to you",
+        "BuffType": 1
+    },
+    "2201345":
+    {
+        "Name": "Sandfield Creation",
+        "Desc": "Creating a Sandfield zone",
+        "BuffType": 1
+    },
+    "2201350":
+    {
+        "Name": "Sandstone Rewind",
+        "Desc": "When Rageblow deals DMG, it reduces the CD of Brave Bastion by 3s",
+        "BuffType": 1
+    },
+    "2201360":
+    {
+        "Name": "Standstone Shock (Talent)",
+        "Desc": "During Brave Bastion, casting Countercrush or Granite Fury triggers Sand Crystal Shock",
+        "BuffType": 1
+    },
+    "2201362":
+    {
+        "Name": "Sand Crystal Shock",
+        "Desc": "Sand Crystal Shock Triggered",
+        "BuffType": 1
+    },
+    "2201370":
+    {
+        "Name": "Block Blessing (Talent)",
+        "Desc": "A successful Block grants a 30% chance for your next Granite Fury cast to consume no Sand Crystals. This can occur up to once every 3s",
+        "BuffType": 1
+    },
+    "2201380":
+    {
+        "Name": "Fury Shelter",
+        "Desc": "While Enraged, Max HP +20%",
+        "BuffType": 1
+    },
+    "2201390":
+    {
+        "Name": "Enraged Suppress",
+        "Desc": "While Enraged, Suppress effect +50%",
+        "BuffType": 1
+    },
+    "2201400":
+    {
+        "Name": "Enrage Delay",
+        "Desc": "When Strength reaches 500, extends the duration of Enraged by 1 second",
+        "BuffType": 1
+    },
+    "2201410":
+    {
+        "Name": "Sandstone Revival",
+        "Desc": "For each 1 Sand Crystal consumed, restore 1% of Max HP",
+        "BuffType": 1
+    },
+    "2201420":
+    {
+        "Name": "Enrage Expansion",
+        "Desc": "While Enraged, Attack Speed +8%",
+        "BuffType": 1
+    },
+    "2201430":
+    {
+        "Name": "Rage Burst Improvement",
+        "Desc": "The charge count of Rage Burst +1.\nWhile Enraged, Rage Burst and Terra Sunder become instant cast",
+        "BuffType": 1
+    },
+    "2201440":
+    {
+        "Name": "Star Fury",
+        "Desc": "Increases Star Shatter and Starfall DMG by 30% and guarantees Enraged status",
+        "BuffType": 1
+    },
+    "2201450":
+    {
+        "Name": "Stone Domain",
+        "Desc": "Throughout the duration of Sandshroud, being attacked reduces the attack speed of enemy targets within a 5 meter radius by 30% for 3s.\nThroughout the duration of Sandshroud, Armor of allies within an 8 meter radius +10%",
+        "BuffType": 1
+    },
+    "2201460":
+    {
+        "Name": "Amplified Earthfort",
+        "Desc": "Upon the triggered of Weakness Strike, gains Amplified Earthfort",
+        "BuffType": 1
+    },
+    "2201470":
+    {
+        "Name": "Boulder Shield",
+        "Desc": "During Stoneform, reduces all DMG taken by 10%",
+        "BuffType": 1
+    },
+    "2201480":
+    {
+        "Name": "Shield Bash (Talent)",
+        "Desc": "Enhances Shield effectiveness by 10%.\nDuring Sandshroud, additionally enhances Shield effectiveness by 10%",
+        "BuffType": 1
+    },
+    "2201490":
+    {
+        "Name": "Recovery (Talent)",
+        "Desc": "Each successful hit of Expertise Skill or Special Attack increases Strength by 1% in 5s. The effect stacks up to 10 times. With 10 stacks, increases Strength by 10% for 8s.\nDuring this effect, the next Expertise Skill heals you for 20% of the DMG dealt, yet no additional Strength stacks can be gained",
+        "BuffType": 1
+    },
+    "2201500":
+    {
+        "Name": "Starfall (Talent)",
+        "Desc": "For every 20 Sand Crystals consumed, Star Shatter evolves into Starfall",
+        "BuffType": 1
+    },
+    "2201501":
+    {
+        "Name": "Starfall",
+        "Desc": "Star Shatter evolves into Starfall",
+        "BuffType": 1
+    },
+    "2201510":
+    {
+        "Name": "Rock Master",
+        "Desc": "Casting Starfall grants Rock Master.\nRock Master: For 15s, Basic Attack evolves into 1 Rupture, and Rage Burst evolves into 1 Terra Sunder.\nWhen Rock Master activates, grants 10% Rock Bonus for 10s",
+        "BuffType": 1
+    },
+    "2201512":
+    {
+        "Name": "Rock Master: Rage Burst Evolves",
+        "Desc": "Rage Burst evolves into Terra Sunder",
+        "BuffType": 1
+    },
+    "2201513":
+    {
+        "Name": "Rock Master: Basic Attack Evoles",
+        "Desc": "Basic Attack evolves into Rupture",
+        "BuffType": 1
+    },
+    "2201520":
+    {
+        "Name": "Shatter Strike",
+        "Desc": "When Star Shatter or Starfall defeats a target, Star Shatter immediately recovers 1 charge",
+        "BuffType": 1
+    },
+    "2201530":
+    {
+        "Name": "Enraged Rupture",
+        "Desc": "While Enraged, Rupture is bound to trigger Weakness Strike",
+        "BuffType": 1
+    },
+    "2201540":
+    {
+        "Name": "Star Shatter Pursuit",
+        "Desc": "Star Shatter and Starfall deals additionally 200% DMG to targets with current HP less than or equal to 35%",
+        "BuffType": 1
+    },
+    "2201550":
+    {
+        "Name": "Great Rock Master",
+        "Desc": "Casting Stoneform grants Rock Master: For 15s, Basic Attack evolves into 1 Rupture, and Rage Burst evolves into 1 Terra Sunder",
+        "BuffType": 1
+    },
+    "2201560":
+    {
+        "Name": "Bravery in Battle",
+        "Desc": "In combat, 50% of overhealing converts into a shield (accumulated shield cannot exceed 50% of Max HP)",
+        "BuffType": 1
+    },
+    "2201570":
+    {
+        "Name": "Rock Guard",
+        "Desc": "Armor +5%.\nEach attack of Terra Sunder deals an additional instance of Attack Damage to the target, equal to 100% Armor",
+        "BuffType": 1
+    },
+    "2201580":
+    {
+        "Name": "Rampart Fury",
+        "Desc": "When you take DMG, Lucky Block reduces DMG taken by 2%, lasting for 8s, stacking up to 3 times",
+        "BuffType": 1
+    },
+    "2201590":
+    {
+        "Name": "Block Shelter (Talent)",
+        "Desc": "Granite Fury DMG enhances Lucky Block DMG Reduction by 2% for 8s. Stacks up to 3 times",
+        "BuffType": 1
+    },
+    "2201600":
+    {
+        "Name": "Sand Block",
+        "Desc": "Successfully Blocking has a 20% chance to gain 1 Sand Crystal. If it was a Lucky Block, gain an additional 1 Sand Crystal",
+        "BuffType": 1
+    },
+    "2201610":
+    {
+        "Name": "Rock Heart (Talent)",
+        "Desc": "Every 10 casts of Granite Fury grant Rock Heart.\nRock Heart: For 10s, Granite Fury evolves into Stone Fist.\nWhen Rock Heart activates, grants 10% Rock Bonus for 10s\nCasting Stone Fist guarantees Enraged",
+        "BuffType": 1
+    },
+    "2201620":
+    {
+        "Name": "Granite (Talent)",
+        "Desc": "After casting Stone Fist, for the next 10s, summons 1 Granite every 2s",
+        "BuffType": 1
+    },
+    "2201621":
+    {
+        "Name": "Stone Fist (Buff 1)",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "2201622":
+    {
+        "Name": "Stone Fist (Buff 2)",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "2201630":
+    {
+        "Name": "Granite Fury (Talent)",
+        "Desc": "For every 50 Rage generated, summons 1 Granite",
+        "BuffType": 1
+    },
+    "2201640":
+    {
+        "Name": "Rock Heal (Talent)",
+        "Desc": "Stone Fist restores 5% Max HP.\nFor every 1 extra enemy hit, restores an additional 2% Max HP up to 15%. Excess healing is converted into Shield",
+        "BuffType": 1
+    },
+    "2201641":
+    {
+        "Name": "Rock Heal (Heal)",
+        "Desc": "Stone Fist restores 5% Max HP.\nFor every 1 extra enemy hit, restores an additional 2% Max HP up to 15%",
+        "BuffType": 1
+    },
+    "2201642":
+    {
+        "Name": "Rock Heal (Overhealing Shield)",
+        "Desc": "Stone Fist's excess healing is converted into Shield",
+        "BuffType": 1
+    },
+    "2201643":
+    {
+        "Name": "Rock Heal",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "2201650":
+    {
+        "Name": "Rampart Fortitude",
+        "Desc": "While Brave Bastion is active, taking DMG doubles Countercrush DMG",
+        "BuffType": 1
+    },
+    "2201660":
+    {
+        "Name": "Rage Enhancement",
+        "Desc": "Granite Fury consumes 1 Sand Crystal",
+        "BuffType": 1
+    },
+    "2201670":
+    {
+        "Name": "Granite Combo",
+        "Desc": "When Granite deals DMG, there is a chance, equal to Luck Chance, to summon an additional Granite",
+        "BuffType": 1
+    },
+    "2201680":
+    {
+        "Name": "Intimidation",
+        "Desc": "When Granite hits a target, it reduces all DMG taken by 10% for the next 5s",
+        "BuffType": 1
+    },
+    "2201690":
+    {
+        "Name": "Granite Fury II (Talent)",
+        "Desc": "Summoning 20 Granites grants Rock Heart: For 10s, Granite Fury evolves into Stone Fist",
+        "BuffType": 1
+    },
+    "2201700":
+    {
+        "Name": "Counter Storm (Talent)",
+        "Desc": "For 10s after casting Cracking Echo, trigger 1 Countercrush every 2s",
+        "BuffType": 1
+    },
+    "2201701":
+    {
+        "Name": "Counter Storm",
+        "Desc": "For 10s after casting Cracking Echo, trigger 1 Countercrush every 2s",
+        "BuffType": 1
+    },
+    "2201710":
+    {
+        "Name": "Rock Luck",
+        "Desc": "Luck Chance +5%.\nCountercrush Crit +50%",
+        "BuffType": 1
+    },
+    "2201720":
+    {
+        "Name": "Rock Mastery",
+        "Desc": "Mastery +2,500.\nDuring Brave Bastion, Mastery +8%",
+        "BuffType": 1
+    },
+    "2201730":
+    {
+        "Name": "Enraged Rock Heart",
+        "Desc": "While Enraged, increases Luck Chance by 10%",
+        "BuffType": 1
+    },
     "2202020":
     {
         "Name": "Brimming Vitality",
@@ -1275,6 +1844,18 @@
     {
         "Name": "Smite Spec",
         "Desc": "Further enhances the ability to use Wild Bloom. Wild Bloom, Regen Pulse, and Nature Ward grant Symbiotic Mark to allies",
+        "BuffType": 1
+    },
+    "2202112":
+    {
+        "Name": "Smite Spec: Overhealing",
+        "Desc": "Overhealing",
+        "BuffType": 1
+    },
+    "2202113":
+    {
+        "Name": "Smite Spec: Overflow CD",
+        "Desc": "Overflow CD",
         "BuffType": 1
     },
     "2202120":
@@ -1381,15 +1962,26 @@
     },
     "2202260":
     {
-        "Name": "Wings of Revival",
-        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once ever 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s",
+        "Name": "Wings of Revival (Talent)",
+        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once every 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s",
         "BuffType": 1
     },
     "2202261":
     {
         "Name": "Wings of Revival (Tracking)",
-        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once ever 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s",
+        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once every 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s",
         "BuffType": 1
+    },
+    "2202262":
+    {
+        "Name": "Wings of Revival",
+        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once every 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s",
+        "BuffType": 1
+    },
+    "2202263":
+    {
+        "Name": "Wings of Revival (CD)",
+        "Desc": "When an ally within 20 meters takes DMG exceeding 30% of their HP, Revival triggers, which can affect the same target up to once every 45s.\nRevival: Restores HP equal to 50% of the DMG taken over 5s"
     },
     "2202270":
     {
@@ -3644,6 +4236,12 @@
     {
         "Name": "Stasis X6",
         "Desc": "If no damage is taken for a few seconds, Max HP increased for the next few seconds, allowing stacking",
+        "BuffType": 1
+    },
+    "3059062":
+    {
+        "Name": "Stasis X6",
+        "Desc": "Max HP increased for the next few seconds",
         "BuffType": 1
     },
     "3059221":
