@@ -11032,6 +11032,43 @@
     "IsShowSpVariableProgress": [],
     "ShowChange": []
   },
+  "900201": {
+    "Id": 900201,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 9002,
+    "Param": [],
+    "TargetPos": [
+      [
+        1,
+        212
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Summon the Year Demon",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "900202": {
+    "Id": 900202,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 9002,
+    "Param": [],
+    "TargetPos": [],
+    "IsTeamShare": false,
+    "TargetDes": "Use Firecrackers to defeat the Year Demon!",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
   "920001": {
     "Id": 920001,
     "TargetType": 10,
@@ -11625,19 +11662,31 @@
     "SpVariable": [
       [
         "1",
+        "event4_hp"
+      ],
+      [
+        "1",
         "event4_point"
       ]
     ],
     "SpVariableLimit": [
       [
         "1",
+        "event4_hp_max"
+      ],
+      [
+        "1",
         "event4_point_max"
       ]
     ],
     "SpVariableName": [
-      "Escort Target HP"
+      "Escort Target HP",
+      "Escort Party Size"
     ],
-    "IsShowSpVariableProgress": [],
+    "IsShowSpVariableProgress": [
+      1,
+      0
+    ],
     "ShowChange": []
   },
   "920206": {
@@ -12494,6 +12543,22 @@
     "SpVariableName": [
       "Ee-chan's Satisfaction"
     ],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "1210001": {
+    "Id": 1210001,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 12100,
+    "Param": [],
+    "TargetPos": [],
+    "IsTeamShare": false,
+    "TargetDes": "Strike the clock's compass 8 times to hear the chord of the earth",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
     "IsShowSpVariableProgress": [],
     "ShowChange": []
   },
