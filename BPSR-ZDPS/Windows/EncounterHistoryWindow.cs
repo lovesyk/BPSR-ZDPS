@@ -247,6 +247,7 @@ namespace BPSR_ZDPS.Windows
                         var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, i);
                         if (ImGui.Selectable(encounterIndexText, isSelected, ImGuiSelectableFlags.SpanAllColumns))
                         {
+                            AppState.OpenedHistoricalEncounter = null;
                             // TODO: This clean up logic won't play nice if the Entity Inspector is open on a Historical
                             if (!isSelected && SelectedEncounterIndex != -1)
                             {
@@ -590,13 +591,12 @@ namespace BPSR_ZDPS.Windows
                             {
                                 HideEntitiesWithNoDamageDealt = !HideEntitiesWithNoDamageDealt;
                             }
-                            ImGui.BeginDisabled(!Settings.Instance.KeepPastEncounterInMeterUntilNextDamage);
+
                             if (ImGui.MenuItem("Show In Meters UI"))
                             {
-                                AppState.ActiveEncounter = encounters[SelectedEncounterIndex];
+                                AppState.OpenedHistoricalEncounter = encounters[SelectedEncounterIndex];
                             }
-                            ImGui.EndDisabled();
-                            ImGui.SetItemTooltip("This only works if 'Keep Past Encounter In Meter Until Next Damage' is Enabled");
+
                             ImGui.EndPopup();
                         }
 

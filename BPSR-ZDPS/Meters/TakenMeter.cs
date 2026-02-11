@@ -32,16 +32,23 @@ namespace BPSR_ZDPS.Meters
         {
             if (ImGui.BeginListBox("##TakenMeterList", new Vector2(-1, -1)))
             {
+                Encounter? activeEncounter = null;
+
+                if (AppState.OpenedHistoricalEncounter != null)
+                {
+                    activeEncounter = AppState.OpenedHistoricalEncounter;
+                }
+
                 if (Settings.Instance.KeepPastEncounterInMeterUntilNextDamage)
                 {
                     if ((AppState.ActiveEncounter == null && EncounterManager.Current != null) || (AppState.ActiveEncounter != null && AppState.ActiveEncounter.Entities.IsEmpty))
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
-                    /*else if (AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId)
+                    else if (AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId)
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
-                    }*/
+                    }
                     else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId)
                     {
                         if (EncounterManager.Current.HasStatsBeenRecorded())
@@ -58,111 +65,122 @@ namespace BPSR_ZDPS.Meters
                     }
                 }
 
-                var playerList = AppState.ActiveEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster).OrderByDescending(x => x.Value.TotalTakenDamage);
+                if (activeEncounter == null)
+                {
+                    activeEncounter = AppState.ActiveEncounter;
+                }
+
+                var playerList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
 
                 ulong topTotalValue = 0;
 
-                int i = 0;
-                foreach (var player in playerList)
+                ImGuiListClipper clipper = new();
+                clipper.Begin(playerList.Count());
+                while (clipper.Step())
                 {
-                    var entity = player.Value;
-
-                    if (i == 0 && Settings.Instance.NormalizeMeterContributions)
+                    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
                     {
-                        topTotalValue = entity.TotalTakenDamage;
-                    }
+                        var player = playerList[i];
 
-                    string name = "Unknown";
-                    if (!string.IsNullOrEmpty(entity.Name))
-                    {
-                        name = entity.Name;
-                    }
+                        var entity = player.Value;
 
-                    if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.UUID)
-                    {
-                        AppState.PlayerMeterPlacement = i + 1;
-                        AppState.PlayerTotalMeterValue = entity.TotalTakenDamage;
-                        AppState.PlayerMeterValuePerSecond = entity.TakenStats.ValuePerSecond;
-                    }
-
-                    double contribution = 0.0;
-                    double contributionProgressBar = 0.0;
-                    if (AppState.ActiveEncounter.TotalNpcTakenDamage != 0)
-                    {
-                        contribution = Math.Round(((double)entity.TotalTakenDamage / (double)AppState.ActiveEncounter.TotalNpcTakenDamage) * 100, 4);
-
-                        if (Settings.Instance.NormalizeMeterContributions)
+                        if (i == 0 && Settings.Instance.NormalizeMeterContributions)
                         {
-                            contributionProgressBar = Math.Round(((double)entity.TotalTakenDamage / (double)topTotalValue) * 100, 4);
+                            topTotalValue = entity.TotalTakenDamage;
                         }
-                        else
+
+                        string name = "Unknown";
+                        if (!string.IsNullOrEmpty(entity.Name))
                         {
-                            contributionProgressBar = contribution;
+                            name = entity.Name;
                         }
-                    }
-                        string activePerSecond = "";
-                    if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
-                    {
-                            activePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.ValuePerSecondActive)}] ";
-                    }
-                    string totalTaken = Utils.NumberToShorthand(entity.TotalTakenDamage);
-                    string totalTps = Utils.NumberToShorthand(entity.TakenStats.ValuePerSecond);
-                    StringBuilder format = new();
-                    var startPoint = ImGui.GetCursorPos();
-                    // ImGui.GetTextLineHeightWithSpacing();
 
-                    ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale);
-
-                    bool hasHpData = entity.Hp >= 0 && entity.MaxHp > 0;
-                    if (hasHpData && (Settings.Instance.MeterSettingsNpcTakenShowHpData || Settings.Instance.MeterSettingsNpcTakenUseHpMeter))
-                    {
-                        var healthPct = MathF.Round((float)entity.Hp / (float)entity.MaxHp, 4);
-
-                        if (Settings.Instance.MeterSettingsNpcTakenShowHpData)
+                        if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.UUID)
                         {
-                            format.Append("[ ");
+                            AppState.PlayerMeterPlacement = i + 1;
+                            AppState.PlayerTotalMeterValue = entity.TotalTakenDamage;
+                            AppState.PlayerMeterValuePerSecond = entity.TakenStats.ValuePerSecond;
+                        }
 
-                            format.Append(Utils.NumberToShorthand(entity.Hp));
+                        double contribution = 0.0;
+                        double contributionProgressBar = 0.0;
+                        if (activeEncounter.TotalNpcTakenDamage != 0)
+                        {
+                            contribution = Math.Round(((double)entity.TotalTakenDamage / (double)activeEncounter.TotalNpcTakenDamage) * 100, 4);
 
-                            if (!Settings.Instance.MeterSettingsNpcTakenHideMaxHp)
+                            if (Settings.Instance.NormalizeMeterContributions)
                             {
-                                format.Append($" / {Utils.NumberToShorthand(entity.MaxHp)}");
+                                contributionProgressBar = Math.Round(((double)entity.TotalTakenDamage / (double)topTotalValue) * 100, 4);
+                            }
+                            else
+                            {
+                                contributionProgressBar = contribution;
+                            }
+                        }
+                        string activePerSecond = "";
+                        if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
+                        {
+                            activePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.ValuePerSecondActive)}] ";
+                        }
+                        string totalTaken = Utils.NumberToShorthand(entity.TotalTakenDamage);
+                        string totalTps = Utils.NumberToShorthand(entity.TakenStats.ValuePerSecond);
+                        StringBuilder format = new();
+                        var startPoint = ImGui.GetCursorPos();
+                        // ImGui.GetTextLineHeightWithSpacing();
+
+                        ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale);
+
+                        bool hasHpData = entity.Hp >= 0 && entity.MaxHp > 0;
+                        if (hasHpData && (Settings.Instance.MeterSettingsNpcTakenShowHpData || Settings.Instance.MeterSettingsNpcTakenUseHpMeter))
+                        {
+                            var healthPct = MathF.Round((float)entity.Hp / (float)entity.MaxHp, 4);
+
+                            if (Settings.Instance.MeterSettingsNpcTakenShowHpData)
+                            {
+                                format.Append("[ ");
+
+                                format.Append(Utils.NumberToShorthand(entity.Hp));
+
+                                if (!Settings.Instance.MeterSettingsNpcTakenHideMaxHp)
+                                {
+                                    format.Append($" / {Utils.NumberToShorthand(entity.MaxHp)}");
+                                }
+
+                                format.Append($" ({(healthPct * 100).ToString("00.00")}%)");
+
+                                format.Append(" ]");
                             }
 
-                            format.Append($" ({(healthPct * 100).ToString("00.00")}%)");
+                            if (Settings.Instance.MeterSettingsNpcTakenUseHpMeter)
+                            {
+                                ImGui.SetCursorPos(startPoint);
+                                //ImGui.PushStyleColor(ImGuiCol.FrameBg, new Vector4(0, 0, 0, 0));
+                                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, Colors.DarkRed);
 
-                            format.Append(" ]");
+                                ImGui.ProgressBar(healthPct, new Vector2(-1, 0), $"##TakenEntryHealth_{i}");
+                                ImGui.PopStyleColor();
+                            }
                         }
 
-                        if (Settings.Instance.MeterSettingsNpcTakenUseHpMeter)
+                        if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter || !hasHpData)
                         {
-                            ImGui.SetCursorPos(startPoint);
-                            //ImGui.PushStyleColor(ImGuiCol.FrameBg, new Vector4(0, 0, 0, 0));
-                            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, Colors.DarkRed);
-
-                            ImGui.ProgressBar(healthPct, new Vector2(-1, 0), $"##TakenEntryHealth_{i}");
-                            ImGui.PopStyleColor();
+                            ImGui.ProgressBar((float)contributionProgressBar / 100.0f, new Vector2(-1, 0), $"##TakenEntryContribution_{i}");
                         }
-                    }
-
-                    if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter || !hasHpData)
-                    {
-                        ImGui.ProgressBar((float)contributionProgressBar / 100.0f, new Vector2(-1, 0), $"##TakenEntryContribution_{i}");
-                    }
 
                         format.Append($" {totalTaken} {activePerSecond}({totalTps}) {contribution.ToString("F0").PadLeft(3, ' ')}%");
 
-                    ImGui.SetCursorPos(startPoint);
-                    if (SelectableWithHint($"{name} [{entity.UID.ToString()}]##TakenEntry_{i}", format.ToString()))
-                    {
-                        mainWindow.entityInspector = new EntityInspector();
-                        mainWindow.entityInspector.LoadEntity(entity, AppState.ActiveEncounter.StartTime);
-                        mainWindow.entityInspector.Open();
-                    }
+                        ImGui.SetCursorPos(startPoint);
+                        if (SelectableWithHint($"{name} [{entity.UID.ToString()}]##TakenEntry_{i}", format.ToString()))
+                        {
+                            mainWindow.entityInspector = new EntityInspector();
+                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
+                            mainWindow.entityInspector.Open();
+                        }
 
-                    ImGui.PopFont();
-                    i++;
+                        ImGui.PopFont();
+                    }
                 }
+                clipper.End();
 
                 ImGui.EndListBox();
             }

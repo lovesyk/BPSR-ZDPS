@@ -300,9 +300,9 @@ namespace BPSR_ZDPS.Windows
                 ImGui.EndTable();
             }
 
-            if (AppState.ActiveEncounter != null && Settings.Instance.KeepPastEncounterInMeterUntilNextDamage)
+            if ((AppState.ActiveEncounter != null && Settings.Instance.KeepPastEncounterInMeterUntilNextDamage) || AppState.OpenedHistoricalEncounter != null)
             {
-                if (AppState.ActiveEncounter.BattleId != EncounterManager.Current?.BattleId || AppState.ActiveEncounter.EncounterId != EncounterManager.Current?.EncounterId)
+                if (AppState.ActiveEncounter.BattleId != EncounterManager.Current?.BattleId || AppState.ActiveEncounter.EncounterId != EncounterManager.Current?.EncounterId || AppState.OpenedHistoricalEncounter != null)
                 {
                     ImGui.PushStyleColor(ImGuiCol.ChildBg, Colors.Goldenrod_Transparent);
                     ImGui.BeginChild("##EncounterNotCurrentChild", ImGuiChildFlags.AutoResizeY);
@@ -311,6 +311,7 @@ namespace BPSR_ZDPS.Windows
                     ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen);
                     if (ImGui.Button("Go To Current Encounter##GoToCurrentEncounterBtn", new Vector2(200, 0)))
                     {
+                        AppState.OpenedHistoricalEncounter = null;
                         AppState.ActiveEncounter = EncounterManager.Current;
                         // Try and release some stale resources immediately
                         GC.Collect();
