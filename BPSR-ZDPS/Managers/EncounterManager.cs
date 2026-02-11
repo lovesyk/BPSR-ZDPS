@@ -128,7 +128,14 @@ namespace BPSR_ZDPS
             if (Current != null)
             {
                 currentDifficulty = Current.ExData.DungeonDifficulty;
+                if (Settings.Instance.SkipSavingEncountersWithNoCombatData && !Current.HasStatsBeenRecorded())
+                {
+                    nextEncounterIdModifier = 0;
+                }
+                else
+                {
                 nextEncounterIdModifier = 1;
+            }
             }
 
             Current = new Encounter(CurrentBattleId);
@@ -1668,7 +1675,7 @@ namespace BPSR_ZDPS
                 }
                 buffEvent.SetRemoveTime(encounterTime.Duration());
 
-                if (!Settings.Instance.UseDatabaseForEncounterHistory && Settings.Instance.LimitEncounterBuffTrackingWithoutDatabase && BuffEvents.Count > 99)
+                if (Settings.Instance.LimitEncounterBuffTrackingInOpenWorld && BattleStateMachine.IsInOpenWorld() && BuffEvents.Count > 99)
                 {
                     BuffEvents.Remove(BuffEvents.AsValueEnumerable().First().Key);
                 }
@@ -1687,7 +1694,7 @@ namespace BPSR_ZDPS
                 }
                 buffEvent.SetAddTime(encounterTime.Duration());
 
-                if (!Settings.Instance.UseDatabaseForEncounterHistory && Settings.Instance.LimitEncounterBuffTrackingWithoutDatabase && BuffEvents.Count > 99)
+                if (Settings.Instance.LimitEncounterBuffTrackingInOpenWorld && BattleStateMachine.IsInOpenWorld() && BuffEvents.Count > 99)
                 {
                     BuffEvents.Remove(BuffEvents.AsValueEnumerable().First().Key);
                 }
@@ -1710,7 +1717,7 @@ namespace BPSR_ZDPS
             }
             buffEvent.AddData(attributeName, attributeValue);
 
-            if (!Settings.Instance.UseDatabaseForEncounterHistory && Settings.Instance.LimitEncounterBuffTrackingWithoutDatabase && BuffEvents.Count > 99)
+            if (Settings.Instance.LimitEncounterBuffTrackingInOpenWorld && BattleStateMachine.IsInOpenWorld() && BuffEvents.Count > 99)
             {
                 BuffEvents.Remove(BuffEvents.AsValueEnumerable().First().Key);
             }

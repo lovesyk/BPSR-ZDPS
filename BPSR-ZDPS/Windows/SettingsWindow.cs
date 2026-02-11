@@ -36,7 +36,8 @@ namespace BPSR_ZDPS.Windows
         static bool keepPastEncounterInMeterUntilNextDamage;
         static bool useDatabaseForEncounterHistory;
         static int databaseRetentionPolicyDays;
-        static bool limitEncounterBuffTrackingWithoutDatabase;
+        static bool skipSavingEncountersWithNoCombatData;
+        static bool limitEncounterBuffTrackingInOpenWorld;
         static bool allowEncounterSavingPausingInOpenWorld;
         static bool persistEncounterSavingPauseStateBetweenMaps;
         static bool minimalProcessingWhileEncounterSavingPaused;
@@ -402,14 +403,23 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Unindent();
                         ImGui.EndDisabled();
 
-                        ImGui.BeginDisabled(useDatabaseForEncounterHistory);
                         ImGui.AlignTextToFramePadding();
-                        ImGui.Text("Limit Encounter Buff Tracking Without Database: ");
+                        ImGui.Text("Skip Saving Encounters With No Combat Data [Experimental]: ");
                         ImGui.SameLine();
-                        ImGui.Checkbox("##LimitEncounterBuffTrackingWithoutDatabase", ref limitEncounterBuffTrackingWithoutDatabase);
+                        ImGui.Checkbox("##SkipSavingEncountersWithNoCombatData", ref skipSavingEncountersWithNoCombatData);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, buffs are limited to only the latest 100 per entity instead of being limitless. This only applies if the Database is disabled to allow reduced memory usage. This setting is not retroactive.");
+                        ImGui.TextWrapped("When enabled, Encounters that have no combat data (such as damage events) will not be saved to the database.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Limit Encounter Buff Tracking In Open World: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##LimitEncounterBuffTrackingInOpenWorld", ref limitEncounterBuffTrackingInOpenWorld);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, buffs are limited to only the latest 100 per entity instead of being limitless. This setting is not retroactive.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
                         ImGui.EndDisabled();
@@ -1458,7 +1468,8 @@ namespace BPSR_ZDPS.Windows
 
             useDatabaseForEncounterHistory = Settings.Instance.UseDatabaseForEncounterHistory;
             databaseRetentionPolicyDays = Settings.Instance.DatabaseRetentionPolicyDays;
-            limitEncounterBuffTrackingWithoutDatabase = Settings.Instance.LimitEncounterBuffTrackingWithoutDatabase;
+            skipSavingEncountersWithNoCombatData = Settings.Instance.SkipSavingEncountersWithNoCombatData;
+            limitEncounterBuffTrackingInOpenWorld = Settings.Instance.LimitEncounterBuffTrackingInOpenWorld;
             allowEncounterSavingPausingInOpenWorld = Settings.Instance.AllowEncounterSavingPausingInOpenWorld;
             persistEncounterSavingPauseStateBetweenMaps = Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps;
             minimalProcessingWhileEncounterSavingPaused = Settings.Instance.MinimalProcessingWhileEncounterSavingPaused;
@@ -1559,7 +1570,8 @@ namespace BPSR_ZDPS.Windows
 
             Settings.Instance.UseDatabaseForEncounterHistory = useDatabaseForEncounterHistory;
             Settings.Instance.DatabaseRetentionPolicyDays = databaseRetentionPolicyDays;
-            Settings.Instance.LimitEncounterBuffTrackingWithoutDatabase = limitEncounterBuffTrackingWithoutDatabase;
+            Settings.Instance.SkipSavingEncountersWithNoCombatData = skipSavingEncountersWithNoCombatData;
+            Settings.Instance.LimitEncounterBuffTrackingInOpenWorld = limitEncounterBuffTrackingInOpenWorld;
             Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps = persistEncounterSavingPauseStateBetweenMaps;
             Settings.Instance.MinimalProcessingWhileEncounterSavingPaused = minimalProcessingWhileEncounterSavingPaused;
 

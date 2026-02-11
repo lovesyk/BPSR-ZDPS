@@ -32,7 +32,8 @@ public class Settings
     public bool KeepPastEncounterInMeterUntilNextDamage { get; set; } = false;
     public bool UseDatabaseForEncounterHistory { get; set; } = true;
     public int DatabaseRetentionPolicyDays { get; set; } = 0;
-    public bool LimitEncounterBuffTrackingWithoutDatabase { get; set; } = false;
+    public bool SkipSavingEncountersWithNoCombatData { get; set; } = false;
+    public bool LimitEncounterBuffTrackingInOpenWorld { get; set; } = false;
     public bool AllowEncounterSavingPausingInOpenWorld { get; set; } = false;
     public bool PersistEncounterSavingPauseStateBetweenMaps { get; set; } = false;
     public bool MinimalProcessingWhileEncounterSavingPaused { get; set; } = false;
