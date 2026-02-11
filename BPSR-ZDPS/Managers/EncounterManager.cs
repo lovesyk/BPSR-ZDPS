@@ -2352,7 +2352,8 @@ namespace BPSR_ZDPS
         public int Duration { get; private set; }
         public int SourceConfigId { get; private set; } // Original Skill Id
         public string Name { get; private set; }
-        public string Description { get; private set; }
+        [JsonIgnore]
+        public string Description { get; private set; } = "";
         public string Icon { get; private set; }
         public int BuffAbilityType { get; private set; }
         public int BuffAbilitySubType { get; private set; }
@@ -2383,7 +2384,6 @@ namespace BPSR_ZDPS
                 if (HelperMethods.DataTables.Buffs.Data.TryGetValue(baseId.ToString(), out var buffTableData))
                 {
                     Name = buffTableData.Name;
-                    Description = buffTableData.Desc;
                     Icon = buffTableData.GetIconName();
                     BuffType = buffTableData.BuffType.Value;
                     BuffPriority = buffTableData.BuffPriority.Value;
@@ -2428,6 +2428,11 @@ namespace BPSR_ZDPS
 
         }
 
+        public void SetDescription(string value)
+        {
+            Description = value;
+        }
+
         public void SetEvent(int uuid, int baseId, int level, long fireUuid, string entityCasterName, int layer, int duration, int sourceConfigId)
         {
             Uuid = uuid;
@@ -2459,7 +2464,6 @@ namespace BPSR_ZDPS
                 if (HelperMethods.DataTables.Buffs.Data.TryGetValue(baseId.ToString(), out var buffTableData))
                 {
                     Name = buffTableData.Name;
-                    Description = buffTableData.Desc;
                     Icon = buffTableData.GetIconName();
 
                     // These should have already existed from the constructor

@@ -982,6 +982,10 @@ namespace BPSR_ZDPS.Windows
                                 }
                                 if (ImGui.BeginPopupContextItem())
                                 {
+                                    if (ImGui.MenuItem("Copy Buff Id"))
+                                    {
+                                        ImGui.SetClipboardText(buffEvent.BaseId.ToString());
+                                    }
                                     if (ImGui.MenuItem("Copy Buff Name"))
                                     {
                                         ImGui.SetClipboardText(buffEvent.Name);
@@ -989,10 +993,6 @@ namespace BPSR_ZDPS.Windows
                                     if (ImGui.MenuItem("Copy Buff Description"))
                                     {
                                         ImGui.SetClipboardText(buffEvent.Description);
-                                    }
-                                    if (ImGui.MenuItem("Copy Buff Id"))
-                                    {
-                                        ImGui.SetClipboardText(buffEvent.BaseId.ToString());
                                     }
                                     if (ImGui.MenuItem("Copy Skill Id"))
                                     {
@@ -1006,9 +1006,21 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.PopStyleColor();
                                 }
                                 
-                                if (!string.IsNullOrEmpty(buffEvent.Description))
+                                if (ImGui.BeginItemTooltip())
                                 {
-                                    ImGui.SetItemTooltip($"Buff Id: {buffEvent.BaseId}\n{buffEvent.Description.Replace("%", "%%")}{extraTooltip}");
+                                    if (string.IsNullOrEmpty(buffEvent.Description))
+                                    {
+                                        if (HelperMethods.DataTables.Buffs.Data.TryGetValue(buffEvent.BaseId.ToString(), out var buffTableData))
+                                        {
+                                            buffEvent.SetDescription(buffTableData.Desc);
+                                        }
+                                        else
+                                {
+                                            buffEvent.SetDescription("");
+                                        }
+                                    }
+                                    ImGui.TextUnformatted($"Buff Id: {buffEvent.BaseId}\n{buffEvent.Description}{extraTooltip}");
+                                    ImGui.EndTooltip();
                                 }
 
                                 ImGui.TableNextColumn();
