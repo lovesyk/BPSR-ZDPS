@@ -124,12 +124,12 @@ namespace BPSR_ZDPS.Meters
                             contributionProgressBar = contribution;
                         }
                     }
-                    string truePerSecond = "";
+                        string activePerSecond = "";
                     if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
                     {
-                        truePerSecond = $"[{Utils.NumberToShorthand(entity.DamageStats.TrueValuePerSecond)}] ";
+                            activePerSecond = $"[{Utils.NumberToShorthand(entity.DamageStats.ValuePerSecondActive)}] ";
                     }
-                    string dps_format = $"{Utils.NumberToShorthand(entity.TotalDamage)} {truePerSecond}({Utils.NumberToShorthand(entity.DamageStats.ValuePerSecond)}) {contribution.ToString("F0").PadLeft(3, ' ')}%"; // Format: TotalDamage (DPS) Contribution%
+                        string dps_format = $"{Utils.NumberToShorthand(entity.TotalDamage)} {activePerSecond}({Utils.NumberToShorthand(entity.DamageStats.ValuePerSecond)}) {contribution.ToString("F0").PadLeft(3, ' ')}%"; // Format: TotalDamage (DPS) Contribution%
                     var startPoint = ImGui.GetCursorPos();
                     // ImGui.GetTextLineHeightWithSpacing();
 

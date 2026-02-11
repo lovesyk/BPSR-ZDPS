@@ -108,10 +108,10 @@ namespace BPSR_ZDPS.Meters
                             contributionProgressBar = contribution;
                         }
                     }
-                    string truePerSecond = "";
+                        string activePerSecond = "";
                     if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
                     {
-                        truePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.TrueValuePerSecond)}] ";
+                            activePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.ValuePerSecondActive)}] ";
                     }
                     string totalTaken = Utils.NumberToShorthand(entity.TotalTakenDamage);
                     string totalTps = Utils.NumberToShorthand(entity.TakenStats.ValuePerSecond);
@@ -122,7 +122,7 @@ namespace BPSR_ZDPS.Meters
                         format.Append($"[ {entity.TotalDeaths} ] ");
                     }
 
-                    format.Append($"{totalTaken} {truePerSecond}({totalTps}) {contribution.ToString("F0").PadLeft(3, ' ')}%");
+                        format.Append($"{totalTaken} {activePerSecond}({totalTps}) {contribution.ToString("F0").PadLeft(3, ' ')}%");
                     var startPoint = ImGui.GetCursorPos();
 
                     ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale);

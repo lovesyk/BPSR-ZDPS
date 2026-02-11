@@ -126,7 +126,7 @@ namespace BPSR_ZDPS.Windows
 
             encounterReportWindow.Draw();
 
-            ImGui.SetNextWindowSize(new Vector2(740, 675), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(880, 675), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250), new Vector2(ImGui.GETFLTMAX()));
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
@@ -331,7 +331,7 @@ namespace BPSR_ZDPS.Windows
                 if (SelectedEncounterIndex != -1)
                 {
                     ImGuiTableFlags tableFlags = ImGuiTableFlags.ScrollX;
-                    int columnsCount = 26;
+                    int columnsCount = 27;
                     if (ImGui.BeginTable("##HistoricalEncounterStatsTable", columnsCount, tableFlags, new Vector2(-1, -1)))
                     {
                         ImGui.TableSetupColumn("#");
@@ -341,7 +341,8 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TableSetupColumn("Ability Score");
                         ImGui.TableSetupColumn("Season Strength");
                         ImGui.TableSetupColumn("Total DMG");
-                        ImGui.TableSetupColumn("Total DPS");
+                        ImGui.TableSetupColumn("Active DPS");
+                        ImGui.TableSetupColumn("Encounter DPS");
                         ImGui.TableSetupColumn("Shield Break");
                         ImGui.TableSetupColumn("Crit Rate");
                         ImGui.TableSetupColumn("Lucky Rate");
@@ -481,6 +482,9 @@ namespace BPSR_ZDPS.Windows
                             }
                             // Since we're using TextUnformatted instead of Text we don't need to escape the % symbol
                             ImGui.TextUnformatted($"{totalDamageDealt} ({totalDamagePct}%)");
+
+                            ImGui.TableNextColumn();
+                            ImGui.TextUnformatted(Utils.NumberToShorthand(entity.DamageStats.ValuePerSecondActive));
 
                             ImGui.TableNextColumn();
                             ImGui.TextUnformatted(Utils.NumberToShorthand(entity.DamageStats.ValuePerSecond));
@@ -692,6 +696,7 @@ namespace BPSR_ZDPS.Windows
             {
                 enc.SetStartTime(firstEncounter.StartTime);
                 enc.BattleId = firstEncounter.BattleId;
+                enc.FirstDamageTimeStamp = firstEncounter.FirstDamageTimeStamp;
             }
             if (lastEncounter != null)
             {

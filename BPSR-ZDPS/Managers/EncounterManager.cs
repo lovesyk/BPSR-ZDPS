@@ -117,6 +117,12 @@ namespace BPSR_ZDPS
 
                 CheckTimeOutStatus(reason);
 
+                if (Current.TotalDamage > 0)
+                {
+                    // Perform final PerSecond calculations
+                    RecalculateEncounterPerValues();
+                }
+
                 // This is safe to call to ensure we're sending a proper End Final before a new Encounter is made no matter what
                 BattleStateMachine.SetDeferredEncounterEndFinalData(DateTime.Now.Subtract(new TimeSpan(0, 0, 1)), new EncounterEndFinalData() { EncounterId = Current.EncounterId, BattleId = Current.BattleId, Reason = reason, Encounter = Current });
                 BattleStateMachine.CheckDeferredCalls();
@@ -134,8 +140,8 @@ namespace BPSR_ZDPS
                 }
                 else
                 {
-                nextEncounterIdModifier = 1;
-            }
+                    nextEncounterIdModifier = 1;
+                }
             }
 
             Current = new Encounter(CurrentBattleId);
@@ -210,7 +216,7 @@ namespace BPSR_ZDPS
             }
 
             UpdateTruePerValuesCTS = new();
-            if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
+            //if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
             {
                 // Only allow calculating the True Per Second if it was enabled since there is a performance cost to doing so
                 Task.Run(() =>
@@ -364,19 +370,58 @@ namespace BPSR_ZDPS
 
             while (!cancellationTokenSource.IsCancellationRequested && await timer.WaitForNextTickAsync())
             {
-                var duration_rep = 1 / Current.GetDuration().TotalSeconds;
-                if (Current.TotalDamage > 0)
+                if (Current != null && Current.TotalDamage > 0)
                 {
-                    var entities = Current.Entities.AsValueEnumerable();
-                    foreach (var entity in entities)
-                    {
-                        var trueDamagePerSecond = entity.Value.TotalDamage * duration_rep;
-                        var trueHealingPerSecond = entity.Value.TotalHealing * duration_rep;
-                        var trueTakenPerSecond = entity.Value.TotalTakenDamage * duration_rep;
+                    RecalculateEncounterPerValues();
+                }
+            }
+        }
 
-                        entity.Value.DamageStats.TrueValuePerSecond = trueDamagePerSecond;
-                        entity.Value.HealingStats.TrueValuePerSecond = trueHealingPerSecond;
-                        entity.Value.TakenStats.TrueValuePerSecond = trueTakenPerSecond;
+        public static void RecalculateEncounterPerValues()
+        {
+            var entities = Current.Entities.AsValueEnumerable();
+            foreach (var entity in entities)
+            {
+                DateTime now = DateTime.UtcNow;
+                entity.Value.RecalculateInactiveTime(now, true);
+                double inactiveTime = entity.Value.GetInactiveTime();
+
+                entity.Value.DamageStats.InactiveTime = inactiveTime;
+                if (entity.Value.DamageStats.ValueTotal > 0)
+                {
+                    entity.Value.DamageStats.RecalculatePerSecond(now);
+                }
+
+                entity.Value.HealingStats.InactiveTime = inactiveTime;
+                if (entity.Value.HealingStats.ValueTotal > 0)
+                {
+                    entity.Value.HealingStats.RecalculatePerSecond(now);
+                }
+
+                entity.Value.TakenStats.InactiveTime = inactiveTime;
+                if (entity.Value.TakenStats.ValueTotal > 0)
+                {
+                    entity.Value.TakenStats.RecalculatePerSecond(now);
+                }
+
+                foreach (var skill in entity.Value.SkillMetrics)
+                {
+                    skill.Value.Damage.InactiveTime = inactiveTime;
+                    if (skill.Value.Damage.ValueTotal > 0)
+                    {
+                        skill.Value.Damage.RecalculatePerSecond(now);
+                    }
+
+                    skill.Value.Healing.InactiveTime = inactiveTime;
+                    if (skill.Value.Healing.ValueTotal > 0)
+                    {
+                        skill.Value.Healing.RecalculatePerSecond(now);
+                    }
+
+                    skill.Value.Taken.InactiveTime = inactiveTime;
+                    if (skill.Value.Taken.ValueTotal > 0)
+                    {
+                        skill.Value.Taken.RecalculatePerSecond(now);
                     }
                 }
             }
@@ -465,6 +510,7 @@ namespace BPSR_ZDPS
         public EDungeonState DungeonState { get; set; } = EDungeonState.DungeonStateNull;
         public uint ChannelLine { get; set; } = 0;
         public Dictionary<long, EncounterBossDataCache> PreviousBossCache = new();
+        public DateTime? FirstDamageTimeStamp = null;
 
         public Encounter()
         {
@@ -792,6 +838,8 @@ namespace BPSR_ZDPS
         {
             LastUpdate = extraPacketData.ArrivalTime;
 
+            FirstDamageTimeStamp ??= LastUpdate;
+
             var attackerType = (EEntityType)Utils.UuidToEntityType(attackerUuid);
             var targetType = (EEntityType)Utils.UuidToEntityType(targetUuid);
 
@@ -827,6 +875,9 @@ namespace BPSR_ZDPS
             bool isCrit, bool isLucky, bool isCauseLucky, bool isMiss, bool isDead, Vec3 damagePos, ExtraPacketData extraPacketData)
         {
             LastUpdate = extraPacketData.ArrivalTime;
+
+            // TODO: Should potentially exclude specific skills from setting this (like Symbiotic Mark)
+            FirstDamageTimeStamp ??= LastUpdate;
 
             var attackerType = (EEntityType)Utils.UuidToEntityType(attackerUuid);
 
@@ -1037,6 +1088,11 @@ namespace BPSR_ZDPS
         public ulong TotalShield { get; set; } = 0;
         public ulong TotalCasts { get; set; } = 0;
         public ulong TotalDeaths { get; set; } = 0;
+        public double TotalInactiveTime { get; set; } = 0.0;
+        public double InactiveTime { get; set; } = 0.0;
+
+        public DateTime? FirstCombatActionTime { get; set; } = null;
+        public DateTime? LastCombatActionTime { get; set; } = null;
 
         // The key is the BuffUuid, however it is specifically a ulong here to enable key-based and index-based lookups
         // An OrderedDictionary automatically uses an int32 as the index lookup and using an int32 as the key overrides that
@@ -1445,7 +1501,7 @@ namespace BPSR_ZDPS
                     combatStats.SetName(skill.Name);
                 }
 
-                combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
+                combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
 
                 container = new();
                 if (skillType == ESkillType.Damage)
@@ -1493,7 +1549,7 @@ namespace BPSR_ZDPS
                     combatStats.SetName(skill.Name);
                 }
 
-                combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
+                combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
             }
 
             if (!InteractedEntities.TryGetValue(otherUuid, out var statTracker))
@@ -1579,10 +1635,52 @@ namespace BPSR_ZDPS
             InteractedEntities[otherUuid] = statTracker;
         }
 
+        public void RecalculateInactiveTime(DateTime now, bool skipSave = false)
+        {
+            if (!skipSave)
+            {
+                FirstCombatActionTime ??= now;
+            }
+
+            DateTime? lastCombatAction = FirstCombatActionTime;
+
+            if (LastCombatActionTime != null)
+            {
+                lastCombatAction = LastCombatActionTime.Value;
+            }
+
+            if (lastCombatAction == null)
+            {
+                //Serilog.Log.Warning("RecalculateInactiveTime did not have a valid FirstCombatActionTime or LastCombatActionTime set, skipping the recalculation request");
+                return;
+            }
+
+            double inactiveSeconds = now.Subtract(lastCombatAction.Value).TotalSeconds;
+            if (inactiveSeconds > 10.0)
+            {
+                InactiveTime = inactiveSeconds - 10.0;
+            }
+
+            if (!skipSave)
+            {
+                TotalInactiveTime += InactiveTime;
+                InactiveTime = 0.0;
+                LastCombatActionTime = now;
+                FirstCombatActionTime ??= now;
+            }
+        }
+
+        public double GetInactiveTime()
+        {
+            return TotalInactiveTime + InactiveTime;
+        }
+
         public void AddDamage(long targetUuid, int skillId, int skillLevel, long damage, long hpLessen, long shieldBreak,
             EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode,
             bool isCrit, bool isLucky, bool isCauseLucky, bool isMiss, bool isDead, Vec3 damagePos, ExtraPacketData extraPacketData)
         {
+            RecalculateInactiveTime(extraPacketData.ArrivalTime);
+
             if (damageType != EDamageType.Immune)
             {
                 TotalDamage += (ulong)damage;
@@ -1601,7 +1699,7 @@ namespace BPSR_ZDPS
                 targetPos = targetEntity.Position;
             }
 
-            DamageStats.AddData(targetUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
+            DamageStats.AddData(targetUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
 
             RegisterSkillData(ESkillType.Damage, targetUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
 
@@ -1618,6 +1716,8 @@ namespace BPSR_ZDPS
             EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode,
             bool isCrit, bool isLucky, bool isCauseLucky, bool isMiss, bool isDead, Vec3 damagePos, ExtraPacketData extraPacketData)
         {
+            RecalculateInactiveTime(extraPacketData.ArrivalTime);
+
             TotalHealing += (ulong)damage;
             TotalOverhealing += (ulong)overhealing;
 
@@ -1629,7 +1729,7 @@ namespace BPSR_ZDPS
                 targetPos = targetEntity.Position;
             }
 
-            HealingStats.AddData(targetUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
+            HealingStats.AddData(targetUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
 
             // We pass in overhealing in place of hpLessen due to hpLessen and damage (requested healing) being the same value
             RegisterSkillData(ESkillType.Healing, targetUuid, skillId, skillLevel, damage, isCrit, isLucky, overhealing, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData);
@@ -1647,6 +1747,8 @@ namespace BPSR_ZDPS
             EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode,
             bool isCrit, bool isLucky, bool isCauseLucky, bool isMiss, bool isDead, Vec3 damagePos, ExtraPacketData extraPacketData)
         {
+            RecalculateInactiveTime(extraPacketData.ArrivalTime);
+
             if (damageType != EDamageType.Immune)
             {
                 TotalTakenDamage += (ulong)damage;
@@ -1660,7 +1762,7 @@ namespace BPSR_ZDPS
                 instigatorPos = instigatorEntity.Position;
             }
 
-            TakenStats.AddData(attackerUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak,isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, victimPos, extraPacketData);
+            TakenStats.AddData(attackerUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak,isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, victimPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
             RegisterSkillData(ESkillType.Taken, attackerUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, victimPos, extraPacketData);
         }
 
@@ -1774,6 +1876,38 @@ namespace BPSR_ZDPS
             TotalShield += newEntity.TotalShield;
             TotalCasts += newEntity.TotalCasts;
             TotalDeaths += newEntity.TotalDeaths;
+            TotalInactiveTime += newEntity.TotalInactiveTime;
+            InactiveTime += newEntity.InactiveTime;
+
+            if (newEntity.FirstCombatActionTime.HasValue)
+            {
+                if (FirstCombatActionTime.HasValue)
+                {
+                    if (newEntity.FirstCombatActionTime.Value < FirstCombatActionTime.Value)
+                    {
+                        FirstCombatActionTime = newEntity.FirstCombatActionTime.Value;
+                    }
+                }
+                else
+                {
+                    FirstCombatActionTime = newEntity.FirstCombatActionTime.Value;
+                }
+            }
+
+            if (newEntity.LastCombatActionTime.HasValue)
+            {
+                if (LastCombatActionTime.HasValue)
+                {
+                    if (newEntity.LastCombatActionTime.Value > LastCombatActionTime.Value)
+                    {
+                        LastCombatActionTime = newEntity.LastCombatActionTime.Value;
+                    }
+                }
+                else
+                {
+                    LastCombatActionTime = newEntity.LastCombatActionTime.Value;
+                }
+            }
 
             DamageStats.MergeCombatStats(newEntity.DamageStats);
             HealingStats.MergeCombatStats(newEntity.HealingStats);
@@ -1987,7 +2121,8 @@ namespace BPSR_ZDPS
         public long ValueMax { get; private set; }
         public long ValueMin { get; private set; }
         public double ValueAverage { get; private set; }
-        public double ValuePerSecond { get; private set; }
+        public double ValuePerSecond { get; set; }
+        public double ValuePerSecondActive { get; set; }
         public double TrueValuePerSecond { get; set; }
 
         public ulong HpLessenTotal { get; private set; }
@@ -2012,6 +2147,8 @@ namespace BPSR_ZDPS
 
         public DateTime? StartTime = null;
         public DateTime? EndTime = null;
+        public DateTime? EntityStartTime = null;
+        public double InactiveTime = 0.0;
 
         public List<SkillSnapshot> SkillSnapshots { get; private set; } = new();
 
@@ -2072,10 +2209,47 @@ namespace BPSR_ZDPS
             ValueImmuneTotal += (ulong)value;
         }
 
-        public void AddData(long otherUuid, int skillId, int level, long value, bool isCrit, bool isLucky, long hpLessenValue, long shieldBreak, bool isCauseLucky, EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode, bool isDead, Vec3 damagePos, Vector3? instigatorPos, Vector3? targetPos, ExtraPacketData extraPacketData)
+        public void RecalculatePerSecond(DateTime? endTime)
+        {
+            DateTime? end = EndTime;
+            if (endTime != null)
+            {
+                end = endTime;
+            }
+
+            if (StartTime != null && end != null && StartTime <= end)
+            {
+                var seconds = (end.Value - StartTime.Value).TotalSeconds;
+                if (seconds >= 1.0)
+                {
+                    ValuePerSecond = seconds > 0 ? Math.Round((double)ValueTotal / seconds, 0) : 0;
+                }
+                else
+                {
+                    ValuePerSecond = ValueTotal;
+                }
+            }
+
+            if (EntityStartTime != null && end != null && EntityStartTime <= end)
+            {
+                var seconds = (end.Value - EntityStartTime.Value).TotalSeconds - InactiveTime;
+                if (seconds >= 1.0)
+                {
+                    ValuePerSecondActive = seconds > 0 ? Math.Round((double)ValueTotal / seconds, 0) : 0;
+                }
+                else
+                {
+                    ValuePerSecondActive = ValueTotal;
+                }
+            }
+        }
+
+        public void AddData(long otherUuid, int skillId, int level, long value, bool isCrit, bool isLucky, long hpLessenValue, long shieldBreak, bool isCauseLucky, EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode, bool isDead, Vec3 damagePos, Vector3? instigatorPos, Vector3? targetPos, ExtraPacketData extraPacketData, double inactiveTime, DateTime? startTime)
         {
             DateTime now = extraPacketData.ArrivalTime;
-            StartTime ??= now;
+            InactiveTime = inactiveTime;
+            StartTime ??= EncounterManager.Current.FirstDamageTimeStamp;// now;
+            EntityStartTime ??= startTime;
             EndTime = now;
 
             Id = skillId;
@@ -2148,7 +2322,7 @@ namespace BPSR_ZDPS
             CritRate = HitsCount > 0 ? Math.Round(((double)CritCount / (double)HitsCount) * 100.0, 0) : 0.0;
             LuckyRate = HitsCount > 0 ? Math.Round(((double)LuckyCount / (double)HitsCount) * 100.0, 0) : 0.0;
 
-            if (StartTime != null && EndTime != null && StartTime < EndTime)
+            if (StartTime != null && EndTime != null && StartTime <= EndTime)
             {
                 var seconds = (EndTime.Value - StartTime.Value).TotalSeconds;
                 if (seconds >= 1.0)
@@ -2158,6 +2332,19 @@ namespace BPSR_ZDPS
                 else
                 {
                     ValuePerSecond = ValueTotal;
+                }
+            }
+
+            if (EntityStartTime != null && EndTime != null && EntityStartTime <= EndTime)
+            {
+                var seconds = (EndTime.Value - EntityStartTime.Value).TotalSeconds - InactiveTime;
+                if (seconds >= 1.0)
+                {
+                    ValuePerSecondActive = seconds > 0 ? Math.Round((double)ValueTotal / seconds, 0) : 0;
+                }
+                else
+                {
+                    ValuePerSecondActive = ValueTotal;
                 }
             }
 
@@ -2291,6 +2478,23 @@ namespace BPSR_ZDPS
                 }
             }
 
+            if (newCombatStats.EntityStartTime.HasValue)
+            {
+                if (EntityStartTime.HasValue)
+                {
+                    if (newCombatStats.EntityStartTime.Value < EntityStartTime.Value)
+                    {
+                        EntityStartTime = newCombatStats.EntityStartTime.Value;
+                    }
+                }
+                else
+                {
+                    EntityStartTime = newCombatStats.EntityStartTime.Value;
+                }
+            }
+
+            InactiveTime += newCombatStats.InactiveTime;
+
             if (StartTime != null && EndTime != null && StartTime < EndTime)
             {
                 var seconds = (EndTime.Value - StartTime.Value).TotalSeconds;
@@ -2301,6 +2505,19 @@ namespace BPSR_ZDPS
                 else
                 {
                     ValuePerSecond = ValueTotal;
+                }
+            }
+
+            if (EntityStartTime != null && EndTime != null && EntityStartTime <= EndTime)
+            {
+                var seconds = (EndTime.Value - EntityStartTime.Value).TotalSeconds - InactiveTime;
+                if (seconds >= 1.0)
+                {
+                    ValuePerSecondActive = seconds > 0 ? Math.Round((double)ValueTotal / seconds, 0) : 0;
+                }
+                else
+                {
+                    ValuePerSecondActive = ValueTotal;
                 }
             }
 

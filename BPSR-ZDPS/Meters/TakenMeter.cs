@@ -100,10 +100,10 @@ namespace BPSR_ZDPS.Meters
                             contributionProgressBar = contribution;
                         }
                     }
-                    string truePerSecond = "";
+                        string activePerSecond = "";
                     if (Settings.Instance.DisplayTruePerSecondValuesInMeters)
                     {
-                        truePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.TrueValuePerSecond)}] ";
+                            activePerSecond = $"[{Utils.NumberToShorthand(entity.TakenStats.ValuePerSecondActive)}] ";
                     }
                     string totalTaken = Utils.NumberToShorthand(entity.TotalTakenDamage);
                     string totalTps = Utils.NumberToShorthand(entity.TakenStats.ValuePerSecond);
@@ -150,7 +150,7 @@ namespace BPSR_ZDPS.Meters
                         ImGui.ProgressBar((float)contributionProgressBar / 100.0f, new Vector2(-1, 0), $"##TakenEntryContribution_{i}");
                     }
 
-                    format.Append($" {totalTaken} {truePerSecond}({totalTps}) {contribution.ToString("F0").PadLeft(3, ' ')}%");
+                        format.Append($" {totalTaken} {activePerSecond}({totalTps}) {contribution.ToString("F0").PadLeft(3, ' ')}%");
 
                     ImGui.SetCursorPos(startPoint);
                     if (SelectableWithHint($"{name} [{entity.UID.ToString()}]##TakenEntry_{i}", format.ToString()))

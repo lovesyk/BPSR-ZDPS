@@ -543,12 +543,12 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Unindent();
 
                         ImGui.AlignTextToFramePadding();
-                        ImGui.Text("Display True Per Second Values In Meters: ");
+                        ImGui.Text("Display Active Per Second Values In Meters: ");
                         ImGui.SameLine();
                         ImGui.Checkbox("##DisplayTruePerSecondValuesInMeters", ref displayTruePerSecondValuesInMeters);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, the Damage, Healing, and Taken Per Second value shown in the Meters will have the 'true' Per Second value, shown in square brackets, in addition to the normal 'Active Per Second' value. This means it is recalculated every second instead of only using the time the entity was actively participating in combat pressing buttons.\nNote: Both values are accurate, they are just two different metrics.\nThis only works starting from the Next Encounter. It is not retroactive and this value currently only will be shown in the Meters UI.");
+                        ImGui.TextWrapped("When enabled, the Damage, Healing, and Taken Per Second value shown in the Meters will have the 'Active' Per Second value, shown in square brackets, in addition to the normal 'Encounter Per Second' value. This means it is recalculated every second while taking down time and late starts into account instead of ignoring down time and calculating based on when the first damage event in the Encounter was dealt.\nNote: Both values are accurate, they are just two different metrics.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
