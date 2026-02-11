@@ -84,6 +84,8 @@ public class Settings
     public uint HotkeysEncounterReset { get; set; }
     public uint HotkeysPinnedWindowClickthrough { get; set; }
 
+    public uint FixedFramerateScale { get; set; } = 1;
+
     public ChatSettings Chat { get; set; } = new();
 
     public void Apply()

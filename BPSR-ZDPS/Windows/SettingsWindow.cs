@@ -86,6 +86,7 @@ namespace BPSR_ZDPS.Windows
         static string latestZDPSVersionCheckURL;
 
         static bool lowPerformanceMode;
+        static int fixedFramerate;
 
         // External Settings
         static bool externalBPTimerEnabled;
@@ -99,6 +100,10 @@ namespace BPSR_ZDPS.Windows
         static int RunOnceDelayed = 0;
 
         static bool IsElevated = false;
+
+        static Dictionary<int, float> allowedSyncRates = new();
+        static float fpsUpdateTracker = 0.0f;
+        static double currentFps = 0.0;
 
         public static void Open()
         {
@@ -140,6 +145,8 @@ namespace BPSR_ZDPS.Windows
             // Disable all HotKeys while we're in the Settings menu to prevent unexpected behavior when rebinding
             HotKeyManager.UnregisterAllHotKeys();
 
+            RecalculateRefreshRates();
+
             ImGui.PopID();
         }
 
@@ -155,7 +162,7 @@ namespace BPSR_ZDPS.Windows
             ImGui.SetNextWindowSizeConstraints(new Vector2(550, 350), new Vector2(ImGui.GETFLTMAX()));
             //ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X, io.DisplaySize.Y), ImGuiCond.Appearing);
 
-            ImGui.SetNextWindowSize(new Vector2(650, 680), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(700, 700), ImGuiCond.FirstUseEver);
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
             if (ImGui.BeginPopupModal($"Settings{TITLE_ID}"))
@@ -934,6 +941,40 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
+                        ImGui.BeginDisabled(lowPerformanceMode);
+                        int maxSyncRate = 1;
+                        if (allowedSyncRates.Count > 0)
+                        {
+                            maxSyncRate = allowedSyncRates.Last().Key;
+                        }
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("ZDPS Refresh Rate (Alternate Performance Tuning): ");
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        if (ImGui.SliderInt("##FixedFramerate", ref fixedFramerate, 1, maxSyncRate, $"{fixedFramerate} ({allowedSyncRates[fixedFramerate]}hz)", ImGuiSliderFlags.ClampOnInput))
+                        {
+                            Settings.Instance.FixedFramerateScale = (uint)fixedFramerate;
+                        }
+                        ImGui.PopStyleColor(2);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("Set the UI refresh rate of ZDPS. Setting this below 55hz will likely cause UI stuttering. Changes to this setting are applied and saved in real-time.");
+                        ImGui.TextWrapped("Note: Setting this as close to 60hz as possible is recommended for all users.");
+                        if (fpsUpdateTracker >= 0.5)
+                        {
+                            currentFps = Math.Round(1 / io.DeltaTime, 1);
+                            fpsUpdateTracker = 0;
+                        }
+                        else
+                        {
+                            fpsUpdateTracker += io.DeltaTime;
+                        }
+                        ImGui.TextUnformatted($"Estimated Current FPS (from Delta Time): {currentFps}");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+                        ImGui.EndDisabled();
+
                         ImGui.EndChild();
                         ImGui.EndTabItem();
                     }
@@ -1533,6 +1574,7 @@ namespace BPSR_ZDPS.Windows
             logToFile = Settings.Instance.LogToFile;
 
             lowPerformanceMode = Settings.Instance.LowPerformanceMode;
+            fixedFramerate = (int)Settings.Instance.FixedFramerateScale;
 
             // External
             externalBPTimerEnabled = Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled;
@@ -1633,6 +1675,7 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.LogToFile = logToFile;
 
             Settings.Instance.LowPerformanceMode = lowPerformanceMode;
+            Settings.Instance.FixedFramerateScale = (uint)fixedFramerate;
 
             // External
             Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled = externalBPTimerEnabled;
@@ -1788,6 +1831,26 @@ namespace BPSR_ZDPS.Windows
             }
             ImGui.EndDisabled();
             ImGui.SetItemTooltip("Clear Keybinding.");
+        }
+
+        public static void RecalculateRefreshRates()
+        {
+            allowedSyncRates.Clear();
+            var glfwMonitor = Hexa.NET.GLFW.GLFW.GetPrimaryMonitor();
+            var glfwVidMode = Hexa.NET.GLFW.GLFW.GetVideoMode(glfwMonitor);
+            for (int i = 1; i < 5; i++)
+            {
+                float syncRate = (float)glfwVidMode.RefreshRate / (float)i;
+                if (syncRate >= 35.0f)
+                {
+                    allowedSyncRates.Add(i, MathF.Round(syncRate, 2));
+                }
+            }
+
+            if (allowedSyncRates.Count == 0)
+            {
+                allowedSyncRates.Add(1, glfwVidMode.RefreshRate);
+            }
         }
     }
 }
