@@ -715,9 +715,9 @@ namespace BPSR_ZDPS
                         EncounterManager.Current.SetAttrKV(uuid, "AttrSeasonStrengthTotal", reader.ReadInt32());
                         break;
                     case EAttrType.AttrSkillLevelIdList:
-                        EncounterManager.Current.SetAttrKV(uuid, "AttrSkillLevelIdList", reader.ReadInt32());
+                        //EncounterManager.Current.SetAttrKV(uuid, "AttrSkillLevelIdList", reader.ReadInt32());
                         // TODO: Enable this when we want to track every skill level and tier for players when they appear
-                        /*List<SkillLevelInfo> skillLevelInfoList = new();
+                        List<DataTypes.Skills.SkillLevelInfo> skillLevelInfoList = new();
                         while (!reader.IsAtEnd)
                         {
                             int len = reader.ReadLength();
@@ -725,9 +725,9 @@ namespace BPSR_ZDPS
                             SkillLevelInfo info = new();
 
                             reader.ReadMessage(info);
-                            skillLevelInfoList.Add(info);
-                        }*/
-                        
+                            skillLevelInfoList.Add(new DataTypes.Skills.SkillLevelInfo(info));
+                        }
+                        EncounterManager.Current.SetAttrKV(uuid, "AttrSkillLevelIdList", skillLevelInfoList);
                         break;
                     case EAttrType.AttrTeamId:
                         EncounterManager.Current.SetAttrKV(uuid, "AttrTeamId", reader.ReadInt64());
@@ -1110,7 +1110,7 @@ namespace BPSR_ZDPS
                 {
                     if (attackerUuid != targetUuid)
                     {
-                    EncounterManager.Current.AddDamage(attackerUuid, targetUuid, skillId, syncDamageInfo.OwnerLevel, damage, hpLessen, shieldBreak, syncDamageInfo.Property, syncDamageInfo.Type, syncDamageInfo.DamageMode, isCrit, isLucky, isCauseLucky, isMiss, isDead, syncDamageInfo.DamagePos, extraData);
+                        EncounterManager.Current.AddDamage(attackerUuid, targetUuid, skillId, syncDamageInfo.OwnerLevel, damage, hpLessen, shieldBreak, syncDamageInfo.Property, syncDamageInfo.Type, syncDamageInfo.DamageMode, isCrit, isLucky, isCauseLucky, isMiss, isDead, syncDamageInfo.DamagePos, extraData);
                     }
 
                     EncounterManager.Current.AddTakenDamage(attackerUuid, targetUuid, skillId, syncDamageInfo.OwnerLevel, damage, hpLessen, shieldBreak, syncDamageInfo.Property, syncDamageInfo.Type, syncDamageInfo.DamageMode, isCrit, isLucky, isCauseLucky, isMiss, isDead, syncDamageInfo.DamagePos, extraData);
@@ -1520,7 +1520,7 @@ namespace BPSR_ZDPS
                                     {
                                         long historicalHp = character.Value.RecentHpHistory.ElementAt(i);
                                         if (historicalHp < lowestHp)
-                            {
+                                        {
                                             lowestHp = historicalHp;
                                         }
                                     }

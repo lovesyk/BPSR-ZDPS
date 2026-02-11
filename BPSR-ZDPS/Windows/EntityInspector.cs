@@ -54,6 +54,7 @@ namespace BPSR_ZDPS.Windows
             Attributes,
             Buffs,
             Graphs,
+            SkillBook,
             Debug
         }
 
@@ -186,7 +187,6 @@ namespace BPSR_ZDPS.Windows
                         {
                             hp = LoadedEntity.GetAttrKV("AttrHp") as int? ?? 0;
                         }
-                        ImGui.TextUnformatted($"HP: {hp:N0}");
                         var maxHp = LoadedEntity.MaxHp;
                         if (maxHp == 0)
                         {
@@ -421,7 +421,7 @@ namespace BPSR_ZDPS.Windows
 
                 ImGui.Separator();
 
-                string[] FilterButtons = { "Damage", "Healing", "Taken", "Taken By Entity", "Attributes", "Buffs", "Graphs", "Debug" };
+                string[] FilterButtons = { "Damage", "Healing", "Taken", "Taken By Entity", "Attributes", "Buffs", "Graphs", "Skill Book", "Debug" };
 
                 for (int filerBtnIdx = 0; filerBtnIdx < FilterButtons.Length; filerBtnIdx++)
                 {
@@ -1234,6 +1234,95 @@ namespace BPSR_ZDPS.Windows
                             }
 
                             ImPlot.EndPlot();
+                        }
+                    }
+                }
+                else if (TableFilterMode == ETableFilterMode.SkillBook)
+                {
+                    var skillLevelIdList = LoadedEntity.GetAttrKV("AttrSkillLevelIdList");
+                    if (skillLevelIdList != null)
+                    {
+                        if (skillLevelIdList is Newtonsoft.Json.Linq.JArray)
+                        {
+                            // This is a Historical Entity, need to restore the original object type
+                            skillLevelIdList = ((Newtonsoft.Json.Linq.JArray)skillLevelIdList).ToObject<List<DataTypes.Skills.SkillLevelInfo>>();
+                            LoadedEntity.SetAttrKV("AttrSkillLevelIdList", skillLevelIdList);
+                        }
+
+                        if (skillLevelIdList is List<DataTypes.Skills.SkillLevelInfo>)
+                        {
+                            var list = (List<DataTypes.Skills.SkillLevelInfo>)skillLevelIdList;
+
+                            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f, ImGui.GetStyle().CellPadding.Y));
+
+                            if (ImGui.BeginTable("##SkillStatsTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit))
+                            {
+                                ImGui.TableSetupColumn("ID");
+                                ImGui.TableSetupColumn("Skill Name", ImGuiTableColumnFlags.WidthStretch, 100f);
+                                ImGui.TableSetupColumn("Level");
+                                ImGui.TableSetupColumn("Tier");
+
+                                ImGui.TableHeadersRow();
+
+                                foreach (var item in list)
+                                {
+                                    ImGui.TableNextColumn();
+                                    ImGui.Selectable($"{item.SkillId}", true, ImGuiSelectableFlags.SpanAllColumns);
+                                    if (ImGui.BeginPopupContextItem())
+                                    {
+                                        if (ImGui.MenuItem("Copy Skill ID"))
+                                        {
+                                            ImGui.SetClipboardText(item.SkillId.ToString());
+                                        }
+                                        if (ImGui.MenuItem("Copy Skill Name"))
+                                        {
+                                            ImGui.SetClipboardText(item.Name);
+                                        }
+                                        ImGui.EndPopup();
+                                    }
+
+                                    ImGui.TableNextColumn();
+                                    if (Settings.Instance.ShowSkillIconsInDetails)
+                                    {
+                                        var skillIconName = item.GetIconName();
+
+                                        var itemRectSize = ImGui.GetItemRectSize().Y;
+                                        float texSize = itemRectSize;
+
+                                        if (!string.IsNullOrEmpty(skillIconName))
+                                        {
+                                            var tex = ImageArchive.LoadImage(Path.Combine("Skills", skillIconName));
+
+                                            if (tex != null)
+                                            {
+                                                ImGui.Image((ImTextureRef)tex, new Vector2(texSize, texSize));
+                                                ImGui.SameLine();
+                                            }
+                                            else
+                                            {
+                                                ImGui.Dummy(new Vector2(0, texSize));
+                                                ImGui.SameLine();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ImGui.Dummy(new Vector2(0, texSize));
+                                            ImGui.SameLine();
+                                        }
+                                    }
+                                    ImGui.TextUnformatted($"{item.Name}");
+
+                                    ImGui.TableNextColumn();
+                                    ImGui.TextUnformatted($"{item.CurrentLevel}");
+
+                                    ImGui.TableNextColumn();
+                                    ImGui.TextUnformatted($"{item.Tier}");
+                                }
+
+                                ImGui.EndTable();
+                            }
+
+                            ImGui.PopStyleVar();
                         }
                     }
                 }
