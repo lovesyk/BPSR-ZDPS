@@ -96,6 +96,27 @@ namespace BPSR_ZDPS.Meters
 
                 ulong topTotalValue = 0;
 
+                // This is required to get the player rank value since the clipper may not process them
+                int entityIdx = 0;
+                foreach (var entity in entityList)
+                {
+                    if (entityIdx == 0 && Settings.Instance.NormalizeMeterContributions)
+                    {
+                        topTotalValue = entity.Value.TotalDamage;
+                    }
+
+                    if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.Value.UUID)
+                    {
+                        AppState.PlayerMeterPlacement = entityIdx + 1;
+                        AppState.PlayerTotalMeterValue = entity.Value.TotalDamage;
+                        AppState.PlayerMeterValuePerSecond = entity.Value.DamageStats.ValuePerSecond;
+
+                        // We can exit the loop now since we don't need anything else
+                        break;
+                    }
+                    entityIdx++;
+                }
+
                 ImGuiListClipper clipper = new();
                 clipper.Begin(entityList.Count());
                 while(clipper.Step())
@@ -106,11 +127,6 @@ namespace BPSR_ZDPS.Meters
 
                         var entity = player.Value;
 
-                        if (i == 0 && Settings.Instance.NormalizeMeterContributions)
-                        {
-                            topTotalValue = entity.TotalDamage;
-                        }
-
                         string name = "Unknown";
                         if (!string.IsNullOrEmpty(entity.Name))
                         {
@@ -119,12 +135,6 @@ namespace BPSR_ZDPS.Meters
                         else
                         {
                             name = $"[U:{entity.UID}]";
-                        }
-                        if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.UUID)
-                        {
-                            AppState.PlayerMeterPlacement = i + 1;
-                            AppState.PlayerTotalMeterValue = entity.TotalDamage;
-                            AppState.PlayerMeterValuePerSecond = entity.DamageStats.ValuePerSecond;
                         }
 
                         string profession = "Unknown";
@@ -205,7 +215,7 @@ namespace BPSR_ZDPS.Meters
                         }
 
                         ImGui.SetCursorPos(startPoint);
-                        if (SelectableWithHintImage($" {(i + 1).ToString().PadLeft((playerList.Count() < 101 ? 2 : 3), '0')}.", $"{nameFormat}##DpsEntry_{i}", dps_format, entity.ProfessionId))
+                        if (SelectableWithHintImage($" {(i + 1).ToString().PadLeft((entityList.Count() < 101 ? 2 : 3), '0')}.", $"{nameFormat}##DpsEntry_{i}", dps_format, entity.ProfessionId))
                         //if (SelectableWithHint($" {(i + 1).ToString().PadLeft((playerList.Count() < 101 ? 2 : 3), '0')}. {name}-{profession} ({entity.AbilityScore})##DpsEntry_{i}", dps_format))
                         //if (ImGui.Selectable($"{name}-{profession} ({entity.AbilityScore}) [{entity.UID.ToString()}] ({entity.TotalDamage})##DpsEntry_{i}"))
                         {

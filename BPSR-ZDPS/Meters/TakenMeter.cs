@@ -74,6 +74,14 @@ namespace BPSR_ZDPS.Meters
 
                 ulong topTotalValue = 0;
 
+                if (playerList.Count() > 0)
+                {
+                    if (Settings.Instance.NormalizeMeterContributions)
+                    {
+                        topTotalValue = playerList.First().Value.TotalTakenDamage;
+                    }
+                }
+
                 ImGuiListClipper clipper = new();
                 clipper.Begin(playerList.Count());
                 while (clipper.Step())
@@ -84,22 +92,10 @@ namespace BPSR_ZDPS.Meters
 
                         var entity = player.Value;
 
-                        if (i == 0 && Settings.Instance.NormalizeMeterContributions)
-                        {
-                            topTotalValue = entity.TotalTakenDamage;
-                        }
-
                         string name = "Unknown";
                         if (!string.IsNullOrEmpty(entity.Name))
                         {
                             name = entity.Name;
-                        }
-
-                        if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.UUID)
-                        {
-                            AppState.PlayerMeterPlacement = i + 1;
-                            AppState.PlayerTotalMeterValue = entity.TotalTakenDamage;
-                            AppState.PlayerMeterValuePerSecond = entity.TakenStats.ValuePerSecond;
                         }
 
                         double contribution = 0.0;

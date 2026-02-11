@@ -70,6 +70,26 @@ namespace BPSR_ZDPS.Meters
 
                 ulong topTotalValue = 0;
 
+                int entityIdx = 0;
+                foreach (var entity in playerList)
+                {
+                    if (entityIdx == 0 && Settings.Instance.NormalizeMeterContributions)
+                    {
+                        topTotalValue = entity.Value.TotalTakenDamage;
+                    }
+
+                    if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.Value.UUID)
+                    {
+                        AppState.PlayerMeterPlacement = entityIdx + 1;
+                        AppState.PlayerTotalMeterValue = entity.Value.TotalTakenDamage;
+                        AppState.PlayerMeterValuePerSecond = entity.Value.TakenStats.ValuePerSecond;
+
+                        // We can exit the loop now since we don't need anything else
+                        break;
+                    }
+                    entityIdx++;
+                }
+
                 clipper.Begin(playerList.Count());
                 while (clipper.Step())
                 {
@@ -79,11 +99,6 @@ namespace BPSR_ZDPS.Meters
 
                         var entity = player.Value;
 
-                        if (i == 0 && Settings.Instance.NormalizeMeterContributions)
-                        {
-                            topTotalValue = entity.TotalTakenDamage;
-                        }
-
                         string name = "Unknown";
                         if (!string.IsNullOrEmpty(entity.Name))
                         {
@@ -92,12 +107,6 @@ namespace BPSR_ZDPS.Meters
                         else
                         {
                             name = $"[U:{entity.UID}]";
-                        }
-                        if (AppState.PlayerUID != 0 && AppState.PlayerUID == (long)entity.UID)
-                        {
-                            AppState.PlayerMeterPlacement = i + 1;
-                            AppState.PlayerTotalMeterValue = entity.TotalTakenDamage;
-                            AppState.PlayerMeterValuePerSecond = entity.TakenStats.ValuePerSecond;
                         }
 
                         string profession = "Unknown";

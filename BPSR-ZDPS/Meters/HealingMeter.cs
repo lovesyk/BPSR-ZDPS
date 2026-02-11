@@ -70,6 +70,26 @@ namespace BPSR_ZDPS.Meters
 
                 ulong topTotalValue = 0;
 
+                int entityIdx = 0;
+                foreach (var entity in playerList)
+                {
+                    if (entityIdx == 0 && Settings.Instance.NormalizeMeterContributions)
+                    {
+                        topTotalValue = entity.Value.TotalHealing;
+                    }
+
+                    if (AppState.PlayerUUID != 0 && AppState.PlayerUUID == entity.Value.UUID)
+                    {
+                        AppState.PlayerMeterPlacement = entityIdx + 1;
+                        AppState.PlayerTotalMeterValue = entity.Value.TotalHealing;
+                        AppState.PlayerMeterValuePerSecond = entity.Value.HealingStats.ValuePerSecond;
+
+                        // We can exit the loop now since we don't need anything else
+                        break;
+                    }
+                    entityIdx++;
+                }
+
                 ImGuiListClipper clipper = new();
                 clipper.Begin(playerList.Count());
                 while(clipper.Step())
