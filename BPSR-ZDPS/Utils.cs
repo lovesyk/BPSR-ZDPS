@@ -404,16 +404,21 @@ namespace BPSR_ZDPS
 
         public static (string id, string token)? SplitAndValidateDiscordWebhook(string url)
         {
-            const string DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/";
+            const string DISCORD_DOMAIN = "discord.com";
+            const string DISCORD_WEBHOOK = "/api/webhooks/";
 
             try
             {
-                if (url.StartsWith(DISCORD_WEBHOOK_URL, StringComparison.InvariantCultureIgnoreCase))
+                Uri validator = new Uri(url);
+                if (validator.Host.EndsWith(DISCORD_DOMAIN, StringComparison.OrdinalIgnoreCase))
                 {
-                    var pathSegments = url.Substring(DISCORD_WEBHOOK_URL.Length).Split('/');
-                    if (pathSegments.Length == 2)
+                    if (validator.PathAndQuery.StartsWith(DISCORD_WEBHOOK, StringComparison.OrdinalIgnoreCase))
                     {
-                        return (pathSegments[0], pathSegments[1]);
+                        var pathSegments = validator.PathAndQuery.Substring(DISCORD_WEBHOOK.Length).Split('/');
+                        if (pathSegments.Length == 2)
+                        {
+                            return (pathSegments[0], pathSegments[1]);
+                        }
                     }
                 }
 
