@@ -707,17 +707,35 @@ namespace BPSR_ZDPS.Windows
                                 foreach (var snapshot in stat.Value.SkillSnapshots.AsValueEnumerable())
                                 {
                                     ImGui.TableNextRow();
-                                    ImGui.TableNextColumn(); // Skip ID Column
+                                    ImGui.TableNextColumn(); // ID Column
 
-                                    ImGui.TableNextColumn(); // Skip Name Column
+                                    ImGui.TableNextColumn(); // Name Column
+                                    if (snapshot.IsKill)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.LightRed);
+                                    }
                                     ImGui.TextUnformatted(snapshot.Timestamp.Value.Subtract(startTime.Value).ToString());
+                                    if (TableFilterMode == ETableFilterMode.SkillsTaken)
+                                    {
+                                        if (ImGui.IsItemHovered() && ImGui.BeginItemTooltip())
+                                        {
+                                            if (EntityCache.Instance.Cache.Lines.TryGetValue(snapshot.OtherUUID, out var cachedOther))
+                                            {
+                                                if (!string.IsNullOrEmpty(cachedOther.Name))
+                                                {
+                                                    ImGui.TextUnformatted($"{cachedOther.Name}");
+                                                }
+                                            }
+                                            ImGui.EndTooltip();
+                                        }
+                                    }
 
                                     ImGui.TableNextColumn();
                                     ImGui.TextUnformatted(Utils.NumberToShorthand(snapshot.Value));
 
-                                    ImGui.TableNextColumn(); // Skip PerSecondActive Column
+                                    ImGui.TableNextColumn(); // PerSecondActive Column
 
-                                    ImGui.TableNextColumn(); // Skip PerSecond Column
+                                    ImGui.TableNextColumn(); // PerSecond Column
 
                                     ImGui.TableNextColumn();
                                     ImGui.TextUnformatted($"Hit: {snapshotIdx + 1}");
@@ -725,9 +743,31 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TableNextColumn();
                                     ImGui.TextUnformatted($"Crit: {snapshot.IsCrit}");
 
-                                    ImGui.TableNextColumn(); // Skip AVG Column
+                                    ImGui.TableNextColumn(); // AVG Column
 
-                                    ImGui.TableNextColumn(); // Skip Total Column
+                                    ImGui.TableNextColumn(); // Total Column
+                                    if (TableFilterMode == ETableFilterMode.SkillsDamage)
+                                    {
+                                        if (snapshot.IsKill)
+                                        {
+                                            ImGui.TextUnformatted($"Kill");
+                                        }
+                                    }
+
+                                    if (TableFilterMode == ETableFilterMode.SkillsTaken)
+                                    {
+                                        ImGui.TableNextColumn();
+                                        if (snapshot.IsKill)
+                                        {
+                                            ImGui.TextUnformatted($"Death");
+                                        }
+                                    }
+
+                                    if (snapshot.IsKill)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
+
                                     snapshotIdx++;
                                 }
                                 // Force down to the next row just in case we missed a column
