@@ -1187,7 +1187,10 @@ namespace BPSR_ZDPS
             long playerUuid = Utils.EntityIdToUuid(vData.CharId, (long)EEntityType.EntChar, false, false);
 
             AppState.PlayerUID = vData.CharId;
+            if (!string.IsNullOrEmpty(vData.CharBase.AccountId))
+            {
             AppState.AccountId = vData.CharBase.AccountId;
+            }
             long playerUid = vData.CharId;
 
             if (vData.RoleLevel?.Level != 0)
