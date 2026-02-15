@@ -1189,7 +1189,7 @@ namespace BPSR_ZDPS
             AppState.PlayerUID = vData.CharId;
             if (!string.IsNullOrEmpty(vData.CharBase.AccountId))
             {
-            AppState.AccountId = vData.CharBase.AccountId;
+                AppState.AccountId = vData.CharBase.AccountId;
             }
             long playerUid = vData.CharId;
 
@@ -1462,6 +1462,34 @@ namespace BPSR_ZDPS
                 }
                 else
                 {
+                    return;
+                }
+
+                if (!Settings.Instance.UseLegacyWipeDetection)
+                {
+                    var currentEncounterDuration = EncounterManager.Current.GetDuration();
+                    var characterList = EncounterManager.Current.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == EEntityType.EntChar);
+                    foreach (var character in characterList)
+                    {
+                        if (character.Value.RecentBuffEventHistory.Count > 0)
+                        {
+                            foreach (var recentBuff in character.Value.RecentBuffEventHistory)
+                            {
+                                if (recentBuff.Value.BaseId == 510072)
+                                {
+                                    // This buff indicates a wipe is actively occurring.
+                                    // There are a few events that will occur over the next 3 seconds so we delay to let them register into the current event
+                                    if (recentBuff.Value.EventAddTime.Add(TimeSpan.FromSeconds(3.1)).TotalSeconds <= currentEncounterDuration.TotalSeconds)
+                                    {
+                                        Log.Debug($"Encounter Wipe Reset buff was found and duration was hit, creating a new Encounter now");
+                                        EncounterManager.Current.SetWipeState(true);
+                                        EncounterManager.StartEncounter(false, EncounterStartReason.Wipe);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
 

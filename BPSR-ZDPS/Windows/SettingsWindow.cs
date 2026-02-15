@@ -30,6 +30,7 @@ namespace BPSR_ZDPS.Windows
         static bool useAutomaticWipeDetection;
         static bool skipTeleportStateCheckInAutomaticWipeDetection;
         static bool disableWipeRecalculationOverwriting;
+        static bool useLegacyWipeDetection;
         static bool splitEncountersOnNewPhases;
         static bool displayTruePerSecondValuesInMeters;
         static bool allowGamepadNavigationInputInZDPS;
@@ -524,7 +525,17 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Checkbox("##SkipTeleportStateCheckInAutomaticWipeDetection", ref skipTeleportStateCheckInAutomaticWipeDetection);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed. You probably want this Disabled.");
+                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed.\nYou probably want this Disabled.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Use Legacy Wipe Detection: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##UseLegacyWipeDetection", ref useLegacyWipeDetection);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, uses the old legacy methods for detecting wipes. You probably do not want to enable this.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1523,6 +1534,7 @@ namespace BPSR_ZDPS.Windows
             useAutomaticWipeDetection = Settings.Instance.UseAutomaticWipeDetection;
             skipTeleportStateCheckInAutomaticWipeDetection = Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection;
             disableWipeRecalculationOverwriting = Settings.Instance.DisableWipeRecalculationOverwriting;
+            useLegacyWipeDetection = Settings.Instance.UseLegacyWipeDetection;
             splitEncountersOnNewPhases = Settings.Instance.SplitEncountersOnNewPhases;
             displayTruePerSecondValuesInMeters = Settings.Instance.DisplayTruePerSecondValuesInMeters;
             allowGamepadNavigationInputInZDPS = Settings.Instance.AllowGamepadNavigationInputInZDPS;
@@ -1628,6 +1640,7 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.UseAutomaticWipeDetection = useAutomaticWipeDetection;
             Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection = skipTeleportStateCheckInAutomaticWipeDetection;
             Settings.Instance.DisableWipeRecalculationOverwriting = disableWipeRecalculationOverwriting;
+            Settings.Instance.UseLegacyWipeDetection = useLegacyWipeDetection;
             Settings.Instance.SplitEncountersOnNewPhases = splitEncountersOnNewPhases;
             Settings.Instance.DisplayTruePerSecondValuesInMeters = displayTruePerSecondValuesInMeters;
             Settings.Instance.AllowGamepadNavigationInputInZDPS = allowGamepadNavigationInputInZDPS;
