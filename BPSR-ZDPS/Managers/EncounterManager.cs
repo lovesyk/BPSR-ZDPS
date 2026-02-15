@@ -1499,6 +1499,28 @@ namespace BPSR_ZDPS
                 if (HelperMethods.DataTables.Skills.Data.TryGetValue(skillId.ToString(), out var skill))
                 {
                     combatStats.SetName(skill.Name);
+
+                    // Try to use the AttrSkillLevelIdList to determine skill tier information right away
+                    var attrSkillLevelIdList = GetAttrKV("AttrSkillLevelIdList");
+                    if (attrSkillLevelIdList != null)
+                    {
+                        if (attrSkillLevelIdList is List<DataTypes.Skills.SkillLevelInfo>)
+                        {
+                            var list = (List<DataTypes.Skills.SkillLevelInfo>)attrSkillLevelIdList;
+
+                            int skillLevelGroup = skillId;
+                            if (skill.SkillLevelGroup != 0)
+                            {
+                                skillLevelGroup = skill.SkillLevelGroup;
+                            }
+
+                            var knownSkill = list.Where(x => x.SkillId == skillLevelGroup).FirstOrDefault();
+                            if (knownSkill != null && knownSkill != default)
+                            {
+                                combatStats.SetSummonData(combatStats.SummonUUID, knownSkill.Tier);
+                            }
+                        }
+                    }
                 }
 
                 combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);
@@ -1547,6 +1569,28 @@ namespace BPSR_ZDPS
                 if (string.IsNullOrEmpty(combatStats.Name) && HelperMethods.DataTables.Skills.Data.TryGetValue(skillId.ToString(), out var skill))
                 {
                     combatStats.SetName(skill.Name);
+
+                    // Try to use the AttrSkillLevelIdList to determine skill tier information right away
+                    var attrSkillLevelIdList = GetAttrKV("AttrSkillLevelIdList");
+                    if (attrSkillLevelIdList != null)
+                    {
+                        if (attrSkillLevelIdList is List<DataTypes.Skills.SkillLevelInfo>)
+                        {
+                            var list = (List<DataTypes.Skills.SkillLevelInfo>)attrSkillLevelIdList;
+
+                            int skillLevelGroup = skillId;
+                            if (skill.SkillLevelGroup != 0)
+                            {
+                                skillLevelGroup = skill.SkillLevelGroup;
+                            }
+
+                            var knownSkill = list.Where(x => x.SkillId == skillLevelGroup).FirstOrDefault();
+                            if (knownSkill != null && knownSkill != default)
+                            {
+                                combatStats.SetSummonData(combatStats.SummonUUID, knownSkill.Tier);
+                            }
+                        }
+                    }
                 }
 
                 combatStats.AddData(otherUuid, skillId, skillLevel, value, isCrit, isLucky, hpLessenValue, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, targetPos, extraPacketData, GetInactiveTime(), FirstCombatActionTime);

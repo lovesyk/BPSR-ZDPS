@@ -519,7 +519,19 @@
     },
     "55355":
     {
-        "Name": "Healing of Stillness",
+        "Name": "Healing of Stillness (First/Second)",
+        "Desc": "If you deal no DMG to enemies for 5s, each hit of your Basic Attack will heal up to 10 allies",
+        "BuffType": 1
+    },
+    "55356":
+    {
+        "Name": "Healing of Stillness (Third)",
+        "Desc": "If you deal no DMG to enemies for 5s, each hit of your Basic Attack will heal up to 10 allies",
+        "BuffType": 1
+    },
+    "55357":
+    {
+        "Name": "Healing of Stillness (Fourth)",
         "Desc": "If you deal no DMG to enemies for 5s, each hit of your Basic Attack will heal up to 10 allies",
         "BuffType": 1
     },
@@ -618,8 +630,20 @@
     },
     "500111":
     {
-        "Name": "Wipe Reset Timer",
-        "Desc": "Begins the wipe reset process",
+        "Name": "Death Action Timer",
+        "Desc": "Recently died and is performing first stage of revive",
+        "BuffType": 0
+    },
+    "500112":
+    {
+        "Name": "Revive Action Timer",
+        "Desc": "Just revived and is locked from actions briefly",
+        "BuffType": 0
+    },
+    "500114":
+    {
+        "Name": "Revive Buff",
+        "Desc": "Revive Buff",
         "BuffType": 0
     },
     "510072":
@@ -698,6 +722,11 @@
         "Name": "Power of Unity (Detection)",
         "BuffType": 1
     },
+    "683116":
+    {
+        "Name": "Power of Unity (Detection)",
+        "BuffType": 1
+    },
     "701008":
     {
         "Name": "Dungeon Mode Marker - PT",
@@ -736,6 +765,11 @@
     {
         "Name": "Dagger of Execution - Force-Kill",
         "Desc": "Forcefully kills the marked target if not protected"
+    },
+    "883102":
+    {
+        "Name": "Lizard Armor",
+        "Desc": "Deals damage with Sand Break to gain Shield"
     },
     "900122":
     {

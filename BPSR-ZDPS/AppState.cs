@@ -119,6 +119,15 @@ namespace BPSR_ZDPS
                     {
                         skill.Name = string.IsNullOrEmpty(item.Value.Name) ? skill.Name : item.Value.Name;
                         skill.Icon = string.IsNullOrEmpty(item.Value.Icon) ? skill.Icon : item.Value.Icon;
+                        if (item.Value.SkillLevelGroup > 0)
+                        {
+                            skill.SkillLevelGroup = item.Value.SkillLevelGroup;
+                        }
+                        if (item.Value.SlotPositionId != null && item.Value.SlotPositionId.Count > 0)
+                        {
+                            skill.SlotPositionId = new();
+                            skill.SlotPositionId.AddRange(item.Value.SlotPositionId);
+                        }
                     }
                     else
                     {
@@ -135,6 +144,15 @@ namespace BPSR_ZDPS
                             {
                                 skill.Id = newId;
                             }
+                        }
+                        if (item.Value.SkillLevelGroup > 0)
+                        {
+                            skill.SkillLevelGroup = item.Value.SkillLevelGroup;
+                        }
+                        if (item.Value.SlotPositionId != null && item.Value.SlotPositionId.Count > 0)
+                        {
+                            skill.SlotPositionId = new();
+                            skill.SlotPositionId.AddRange(item.Value.SlotPositionId);
                         }
                         HelperMethods.DataTables.Skills.Data.Add(item.Key, skill);
                     }

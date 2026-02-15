@@ -2336,6 +2336,9 @@
     <None Update="Data\Images\Skills_Imagines\skill_aoyi_skill_icon_055.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Images\Skills_Imagines\skill_aoyi_skill_icon_056.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Images\Skills_Imagines\skill_aoyi_skill_icon_057.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

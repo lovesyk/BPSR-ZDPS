@@ -32,7 +32,8 @@
     "1216":
     {
         "Name": "Ultra Cold: Crystal Veil",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx05"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx05",
+        "SkillLevelGroup": 1211
     },
     "1219":
     {
@@ -108,7 +109,8 @@
     "1250":
     {
         "Name": "Maelstrom",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx06"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx06",
+        "SkillLevelGroup": 1210
     },
     "1251":
     {
@@ -122,7 +124,8 @@
     "1257":
     {
         "Name": "Blizzard",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx03"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx03",
+        "SkillLevelGroup": 1244
     },
     "1258":
     {
@@ -137,24 +140,28 @@
     "1260":
     {
         "Name": "Meteor Storm",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx07",
+        "SkillLevelGroup": 1239
     },
     "1261":
     {
         "Name": "Blizzard (Glacier Fury)",
         "Desc": "From Glacier Fury talent",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx03"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx03",
+        "SkillLevelGroup": 1244
     },
     "1262":
     {
         "Name": "Meteor Storm (Expansion)",
         "Desc": "From Meteor Storm Expansion talent",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx07",
+        "SkillLevelGroup": 1239
     },
     "1263":
     {
         "Name": "Glacier Hymn (Comet)",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_ult"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_ult",
+        "SkillLevelGroup": 1248
     },
     "1401":
     {
@@ -320,17 +327,20 @@
     "1560":
     {
         "Name": "Regen Pulse",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05",
+        "SkillLevelGroup": 1523
     },
     "1561":
     {
         "Name": "Regen Pulse (Pulse Retrospect)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05",
+        "SkillLevelGroup": 1523
     },
     "1562":
     {
         "Name": "Healing Ring (Spreads once, heals once)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx05",
+        "SkillLevelGroup": 1523
     },
     "1701":
     {
@@ -427,7 +437,13 @@
     "1850":
     {
         "Name": "Arcane! Illusion Resonance: Oblivion Bomb",
-        "Desc": "Dorothy"
+        "Desc": "Dorothy",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_053",
+        "SkillLevelGroup": 3949,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1901":
     {
@@ -561,7 +577,8 @@
     },
     "2305":
     {
-        "Name": "Passive Effect Encore Damage"
+        "Name": "Passive Effect Encore Damage",
+        "SkillLevelGroup": 2315
     },
     "2306":
     {
@@ -577,12 +594,14 @@
     {
         "Name": "Rhapsody of Flame - Flame's Rampage",
         "Desc": "When Heroic Melody is active, Rhapsody of Flame will erupt, dealing Magic Damage equal to 50% ATK every 3s (affected by Haste)",
-        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02",
+        "SkillLevelGroup": 2309
     },
     "230106":
     {
         "Name": "Flame Note Damage",
-        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02",
+        "SkillLevelGroup": 2309
     },
     "2310":
     {
@@ -617,7 +636,8 @@
     "230401":
     {
         "Name": "Encore Damage",
-        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx07",
+        "SkillLevelGroup": 2315
     },
     "2316":
     {
@@ -695,7 +715,8 @@
     "55301":
     {
         "Name": "Rhapsody of Flame",
-        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_jt/weapon_jt-01_kx02",
+        "SkillLevelGroup": 2309
     },
     "55341":
     {
@@ -809,7 +830,8 @@
     "55404":
     {
         "Name": "Divine Circle",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx02",
+        "SkillLevelGroup": 2409
     },
     "2410":
     {
@@ -819,12 +841,14 @@
     "2451":
     {
         "Name": "Judgment (Holy Trigger)",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03",
+        "SkillLevelGroup": 2410
     },
     "55421":
     {
         "Name": "Judgment",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03",
+        "SkillLevelGroup": 2410
     },
     "2411":
     {
@@ -834,7 +858,8 @@
     "2452":
     {
         "Name": "Scorching Judgment Sacred Blade",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03_ex"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx03_ex",
+        "SkillLevelGroup": 2411
     },
     "2412":
     {
@@ -879,22 +904,26 @@
     "55412":
     {
         "Name": "Zeal Crusade (Ruthless Rewind)",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07",
+        "SkillLevelGroup": 2419
     },
     "55416":
     {
         "Name": "Zeal Crusade",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07",
+        "SkillLevelGroup": 2419
     },
     "55417":
     {
         "Name": "Zeal Crusade (Wide Ruthless Rewind)",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07",
+        "SkillLevelGroup": 2419
     },
     "55431":
     {
         "Name": "Zeal Crusade",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07",
+        "SkillLevelGroup": 2419
     },
     "2420":
     {
@@ -904,22 +933,26 @@
     "55413":
     {
         "Name": "Radiance",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08",
+        "SkillLevelGroup": 2420
     },
     "55414":
     {
         "Name": "Radiance",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08",
+        "SkillLevelGroup": 2420
     },
     "55415":
     {
         "Name": "Radiance",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08",
+        "SkillLevelGroup": 2420
     },
     "240102":
     {
         "Name": "Radiance",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx08",
+        "SkillLevelGroup": 2420
     },
     "2421":
     {
@@ -1034,37 +1067,79 @@
     "3210061":
     {
         "Name": "Stunt! Super Critical - Passive",
-        "Desc": "Muku Warrior"
+        "Desc": "Muku Warrior",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_026",
+        "SkillLevelGroup": 3904,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391001":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 01",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391002":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 02",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391003":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 03",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391004":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 04",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391005":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 05",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391006":
     {
         "Name": "Stunt! Chaotic Barrage - Missile 06",
-        "Desc": "Void Ogre"
+        "Desc": "Void Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_009",
+        "SkillLevelGroup": 3910,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3698":
     {
@@ -1156,12 +1231,14 @@
     "21414":
     {
         "Name": "Divine Circle Bloom (Ticks)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_ult"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_ult",
+        "SkillLevelGroup": 1509
     },
     "21418":
     {
         "Name": "Stag Charge",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_tg01_01"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_tg01_01",
+        "SkillLevelGroup": 1518
     },
     "21423":
     {
@@ -1347,7 +1424,8 @@
     "55432":
     {
         "Name": "Zeal Crusade (Wide Raid)",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx07",
+        "SkillLevelGroup": 2419
     },
     "100101":
     {
@@ -1440,7 +1518,13 @@
     "100730":
     {
         "Name": "Stunt! Frenzied Shot (Active)",
-        "Desc": "Goblin Warrior"
+        "Desc": "Goblin Warrior",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_020",
+        "SkillLevelGroup": 3915,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "100734":
     {
@@ -1509,7 +1593,13 @@
     "102640":
     {
         "Name": "Stunt! Boarrier Rush",
-        "Desc": "Boarrier Tyrant"
+        "Desc": "Boarrier Tyrant",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_001",
+        "SkillLevelGroup": 3905,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "110206":
     {
@@ -1658,22 +1748,26 @@
     "120201":
     {
         "Name": "Raincall Surge - Final Curved 1",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk",
+        "SkillLevelGroup": 1201
     },
     "120301":
     {
         "Name": "Raincall Surge - Final Blow",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk",
+        "SkillLevelGroup": 1201
     },
     "120401":
     {
         "Name": "Raincall Surge - Stage 1/2",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk",
+        "SkillLevelGroup": 1201
     },
     "120501":
     {
         "Name": "Raincall Surge - Final Curved 2",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_skill_atk",
+        "SkillLevelGroup": 1201
     },
     "120901":
     {
@@ -1683,7 +1777,8 @@
     "120902":
     {
         "Name": "Frost Lance",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_tg02"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_tg02",
+        "SkillLevelGroup": 1242
     },
     "121301":
     {
@@ -1698,7 +1793,8 @@
     "121501":
     {
         "Name": "Crystal Veil",
-        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx05"
+        "Icon": "ui/atlas/skill_weapon_mz/weapon_mz-01_kx05",
+        "SkillLevelGroup": 1211
     },
     "140101":
     {
@@ -1791,47 +1887,56 @@
     "149906":
     {
         "Name": "Azure Sever (Spear Toss)",
-        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf01"
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_tf01",
+        "SkillLevelGroup": 1425
     },
     "149907":
     {
         "Name": "Sharp Impact (Leap)",
-        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_cq/weapon_cq-01_kx08",
+        "SkillLevelGroup": 1431
     },
     "150101":
     {
         "Name": "Stag Charge",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_tg01_01"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_tg01_01",
+        "SkillLevelGroup": 1518
     },
     "1550":
     {
         "Name": "Feral Seed - Seed Meteor",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09",
+        "SkillLevelGroup": 1519
     },
     "150103":
     {
         "Name": "Feral Seed - Stage 1",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09",
+        "SkillLevelGroup": 1519
     },
     "150104":
     {
         "Name": "Feral Seed - Stage 2",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx09",
+        "SkillLevelGroup": 1519
     },
     "150106":
     {
         "Name": "Infusion (Left Hand)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01",
+        "SkillLevelGroup": 1520
     },
     "150107":
     {
         "Name": "Infusion (Right Hand)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01",
+        "SkillLevelGroup": 1520
     },
     "150110":
     {
         "Name": "Infusion (Double Infusion Extra)",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx01",
+        "SkillLevelGroup": 1520
     },
     "155101":
     {
@@ -2046,15 +2151,18 @@
     },
     "230801":
     {
-        "Name": "Rhapsody of Flame - Shape 1"
+        "Name": "Rhapsody of Flame - Shape 1",
+        "SkillLevelGroup": 2309
     },
     "230901":
     {
-        "Name": "Rhapsody of Flame - Shape 2"
+        "Name": "Rhapsody of Flame - Shape 2",
+        "SkillLevelGroup": 2309
     },
     "231001":
     {
-        "Name": "Rhapsody of Flame - Shape 3"
+        "Name": "Rhapsody of Flame - Shape 3",
+        "SkillLevelGroup": 2309
     },
     "300000":
     {
@@ -2215,21 +2323,46 @@
     "391007":
     {
         "Name": "Stunt! Frenzied Shot (Passive)",
-        "Desc": "Goblin Warrior"
+        "Desc": "Goblin Warrior",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_020",
+        "SkillLevelGroup": 3915,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391008":
     {
         "Name": "Stunt! Transform into Bee (Passive)",
-        "Desc": "Void Bzzar"
+        "Desc": "Void Bzzar",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_045",
+        "SkillLevelGroup": 3941,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391009":
     {
         "Name": "Arcane! Illusion Resonance: Thunder Tracers",
-        "Desc": "Dorothy"
+        "Desc": "Dorothy",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_053",
+        "SkillLevelGroup": 3949,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391301":
     {
-        "Name": "Stunt! Electro Bomb"
+        "Name": "Stunt! Electro Bomb",
+        "Desc": "Dark Mist Captain",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_010",
+        "SkillLevelGroup": 3913,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "391401":
     {
@@ -2489,6 +2622,10 @@
     {
         "Name": "Rend Wound"
     },
+    "883102":
+    {
+        "Name": "Sand Break"
+    },
     "883114":
     {
         "Name": "Mutant Yeti - Eclipse Zone"
@@ -2619,7 +2756,13 @@
     "1002440":
     {
         "Name": "Stunt! Super Critical",
-        "Desc": "Muku Warrior"
+        "Desc": "Muku Warrior",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_026",
+        "SkillLevelGroup": 3904,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1002801":
     {
@@ -2648,7 +2791,13 @@
     "1002830":
     {
         "Name": "Arcane! Frostquake",
-        "Desc": "Frost Ogre"
+        "Desc": "Frost Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_015",
+        "SkillLevelGroup": 3906,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1002850":
     {
@@ -2680,7 +2829,14 @@
     },
     "1005240":
     {
-        "Name": "Stunt! Predator Slash"
+        "Name": "Stunt! Predator Slash",
+        "Desc": "Muku Scout",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_031",
+        "SkillLevelGroup": 3928,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1005301":
     {
@@ -2825,7 +2981,13 @@
     "1006940":
     {
         "Name": "Arcane! Cocoon Tech",
-        "Desc": "Phantom Arachnocrab"
+        "Desc": "Phantom Arachnocrab",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_041",
+        "SkillLevelGroup": 3938,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1006999":
     {
@@ -2870,12 +3032,24 @@
     "1007740":
     {
         "Name": "Arcane! Poison Explosion",
-        "Desc": "Venobzzar Incubator"
+        "Desc": "Venobzzar Incubator",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_046",
+        "SkillLevelGroup": 3942,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1007741":
     {
-        "Name": "Arcane! Poison Explosion Avatar",
-        "Desc": "Venobzzar Incubator"
+        "Name": "Arcane! Poison Explosion (Avatar)",
+        "Desc": "Venobzzar Incubator",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_046",
+        "SkillLevelGroup": 3942,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1007798":
     {
@@ -2968,12 +3142,24 @@
     "1008440":
     {
         "Name": "Arcane! Azure Gale",
-        "Desc": "Celestial Flier"
+        "Desc": "Celestial Flier",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_048",
+        "SkillLevelGroup": 3944,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1008540":
     {
         "Name": "Arcane! Silent Tide",
-        "Desc": "Lizardman King"
+        "Desc": "Lizardman King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_049",
+        "SkillLevelGroup": 3945,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1008601":
     {
@@ -2982,12 +3168,24 @@
     "1008641":
     {
         "Name": "Stunt! Whirlwind Strike",
-        "Desc": "Storm Goblin Warrior"
+        "Desc": "Storm Goblin Warrior",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_044",
+        "SkillLevelGroup": 3940,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1010440":
     {
         "Name": "Stunt! Thunder Suppress",
-        "Desc": "Lizardman Hunter"
+        "Desc": "Lizardman Hunter",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_040",
+        "SkillLevelGroup": 3937,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1010705":
     {
@@ -3000,7 +3198,13 @@
     "1011011":
     {
         "Name": "Stunt! Lightning Smite (Active)",
-        "Desc": "Blackstone Commander"
+        "Desc": "Blackstone Commander",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_060",
+        "SkillLevelGroup": 3959,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1011301":
     {
@@ -3034,7 +3238,13 @@
     "1011906":
     {
         "Name": "Arcane! Blazing Flames",
-        "Desc": "Blackstone Captain"
+        "Desc": "Blackstone Captain",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_058",
+        "SkillLevelGroup": 3952,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1010901":
     {
@@ -3071,7 +3281,13 @@
     "1101304":
     {
         "Name": "Stunt! Healing Bomb (Active)",
-        "Desc": "Goblin Shaman"
+        "Desc": "Goblin Shaman",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_062",
+        "SkillLevelGroup": 3962,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1101403":
     {
@@ -3092,6 +3308,17 @@
     "1102301":
     {
         "Name": "Flamehorn - Normal Attack"
+    },
+    "1102306":
+    {
+        "Name": "Arcane! Flame Spirit's Fortune (Active)",
+        "Desc": "Flamehorn",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_070",
+        "SkillLevelGroup": 3956,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1205004":
     {
@@ -3200,7 +3427,13 @@
     "1700440":
     {
         "Name": "Arcane! Furious Hammer",
-        "Desc": "Muku Chief"
+        "Desc": "Muku Chief",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_005",
+        "SkillLevelGroup": 3923,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1700701":
     {
@@ -3428,11 +3661,26 @@
     },
     "2001740":
     {
-        "Name": "Stunt! Blink Ambush"
+        "Name": "Stunt! Blink Ambush",
+        "Desc": "Brigand Scout Leader",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_037",
+        "SkillLevelGroup": 3934,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
+    "2001811":
+    {
+        "Name": "Armor Up (Sand Break)"
     },
     "2001812":
     {
-        "Name": "Bite (Master)"
+        "Name": "Bite (Elite)"
+    },
+    "2001813":
+    {
+        "Name": "Bite (Normal)"
     },
     "2002212":
     {
@@ -3477,7 +3725,13 @@
     "2002440":
     {
         "Name": "Arcane! Thunderfall Grasp",
-        "Desc": "Tempest Ogre"
+        "Desc": "Tempest Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_014",
+        "SkillLevelGroup": 3902,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2002702":
     {
@@ -3530,7 +3784,13 @@
     "2002853":
     {
         "Name": "Stunt! Falling Star",
-        "Desc": "Inferno Goblin Mage"
+        "Desc": "Inferno Goblin Mage",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_008",
+        "SkillLevelGroup": 3907,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2002901":
     {
@@ -3567,17 +3827,35 @@
     "2110035":
     {
         "Name": "Stunt! Healing Bomb",
-        "Desc": "Goblin Shaman"
+        "Desc": "Goblin Shaman",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_062",
+        "SkillLevelGroup": 3962,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110062":
     {
         "Name": "Arcane! Goblin March (Roar Command)",
-        "Desc": "Goblin King"
+        "Desc": "Goblin King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_050",
+        "SkillLevelGroup": 3946,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110066":
     {
         "Name": "Stunt! Earth Shield",
-        "Desc": "Brigand Guard Captain"
+        "Desc": "Brigand Guard Captain",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_033",
+        "SkillLevelGroup": 3930,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110071":
     {
@@ -3598,17 +3876,35 @@
     "2110083":
     {
         "Name": "Arcane! Flame Roar",
-        "Desc": "Inferno Ogre"
+        "Desc": "Inferno Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_017",
+        "SkillLevelGroup": 3901,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110085":
     {
         "Name": "Arcane! Flash Execution (Seed of Lightning)",
-        "Desc": "Olvera"
+        "Desc": "Olvera",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_025",
+        "SkillLevelGroup": 3922,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110096":
     {
         "Name": "Arcane! Thunder Roar (Thunderstrike)",
-        "Desc": "Golden Juggernaut"
+        "Desc": "Golden Juggernaut",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_038",
+        "SkillLevelGroup": 3935,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110099":
     {
@@ -3617,27 +3913,57 @@
     "2110111":
     {
         "Name": "Arcane! Divine Reliance (Life Steal)",
-        "Desc": "Rorola"
+        "Desc": "Rorola",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_052",
+        "SkillLevelGroup": 3948,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110118":
     {
         "Name": "Arcane! Guardian's Boundary (Active)",
-        "Desc": "Fafala"
+        "Desc": "Fafala",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_054",
+        "SkillLevelGroup": 3951,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110130":
     {
         "Name": "Stunt! Lightning Smite (Armor Conversion)",
-        "Desc": "Blackstone Commander"
+        "Desc": "Blackstone Commander",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_060",
+        "SkillLevelGroup": 3959,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110131":
     {
         "Name": "Stunt! Healing Bomb (AOE Pulse)",
-        "Desc": "Goblin Shaman"
+        "Desc": "Goblin Shaman",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_062",
+        "SkillLevelGroup": 3962,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110133":
     {
-        "Name": "Arcane! Flame Spirit's Fortune (Active)",
-        "Desc": "Flamehorn"
+        "Name": "Arcane! Flame Spirit's Fortune (Explosion)",
+        "Desc": "Flamehorn",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_070",
+        "SkillLevelGroup": 3956,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2201070":
     {
@@ -3827,7 +4153,8 @@
     "2207431":
     {
         "Name": "Flame's Rampage (Healing)",
-        "Desc": "From Flame's Rampage talent, while in Rhapsody of Flame, each hit of Harmonic Anthem also heals 1 ally with lowest HP for 30% DMG dealt"
+        "Desc": "From Flame's Rampage talent, while in Rhapsody of Flame, each hit of Harmonic Anthem also heals 1 ally with lowest HP for 30% DMG dealt",
+        "SkillLevelGroup": 2309
     },
     "2207500":
     {
@@ -3853,17 +4180,35 @@
     "2900441":
     {
         "Name": "Arcane! Illusion Resonance: Charged Cannon",
-        "Desc": "Dorothy"
+        "Desc": "Dorothy",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_053",
+        "SkillLevelGroup": 3949,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2900540":
     {
         "Name": "Arcane! Flash Execution",
-        "Desc": "Olvera"
+        "Desc": "Olvera",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_025",
+        "SkillLevelGroup": 3922,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2900840":
     {
         "Name": "Arcane! Divine Reliance (Active)",
-        "Desc": "Rorola"
+        "Desc": "Rorola",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_052",
+        "SkillLevelGroup": 3948,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3002215":
     {
@@ -3986,7 +4331,13 @@
     "3081023":
     {
         "Name": "Stunt! Heavy Slash",
-        "Desc": "Shadow Commander"
+        "Desc": "Shadow Commander",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_022",
+        "SkillLevelGroup": 3917,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3081031":
     {
@@ -4003,42 +4354,90 @@
     "3200034":
     {
         "Name": "Stunt! Healing Bomb (Passive)",
-        "Desc": "Goblin Shaman"
+        "Desc": "Goblin Shaman",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_062",
+        "SkillLevelGroup": 3962,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210021":
     {
         "Name": "Arcane! Meteor Shower",
-        "Desc": "Storm Goblin King"
+        "Desc": "Storm Goblin King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_029",
+        "SkillLevelGroup": 3926,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210022":
     {
         "Name": "Arcane! Meteor Shower (Passive)",
-        "Desc": "Storm Goblin King"
+        "Desc": "Storm Goblin King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_029",
+        "SkillLevelGroup": 3926,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210031":
     {
         "Name": "Arcane! Thunderfall Grasp (Passive)",
-        "Desc": "Tempest Ogre"
+        "Desc": "Tempest Ogre",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_014",
+        "SkillLevelGroup": 3902,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210051":
     {
         "Name": "Arcane! Blazing Axe (Passive)",
-        "Desc": "Brigand Leader"
+        "Desc": "Brigand Leader",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_018",
+        "SkillLevelGroup": 3903,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210081":
     {
         "Name": "Stunt! Thunder Suppress (Passive)",
-        "Desc": "Lizardman Hunter"
+        "Desc": "Lizardman Hunter",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_040",
+        "SkillLevelGroup": 3937,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210092":
     {
         "Name": "Arcane! Silent Tide (Passive)",
-        "Desc": "Lizardman King"
+        "Desc": "Lizardman King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_049",
+        "SkillLevelGroup": 3945,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3210101":
     {
         "Name": "Arcane! Pulse Benediction (Passive Shield)",
-        "Desc": "Muku King"
+        "Desc": "Muku King",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_012",
+        "SkillLevelGroup": 3908,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3320109":
     {
@@ -4175,12 +4574,24 @@
     "3913001":
     {
         "Name": "Stunt! Electro Bomb",
-        "Desc": "Shadow Captain"
+        "Desc": "Shadow Captain",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_010",
+        "SkillLevelGroup": 3913,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3936001":
     {
         "Name": "Stunt! Water of Silence",
-        "Desc": "Lizardman Mage"
+        "Desc": "Lizardman Mage",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_039",
+        "SkillLevelGroup": 3936,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "4000201":
     {
