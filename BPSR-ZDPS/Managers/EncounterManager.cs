@@ -1098,6 +1098,8 @@ namespace BPSR_ZDPS
         // An OrderedDictionary automatically uses an int32 as the index lookup and using an int32 as the key overrides that
         // Whenever we want to perform a key-based (BuffUuid) lookup on this, cast to a ulong to make it work
         public ThreadSafeOrderedDictionary<ulong, BuffEvent> BuffEvents { get; set; } = new();
+        [JsonIgnore]
+        public ThreadSafeOrderedDictionary<ulong, BuffEvent> RecentBuffEventHistory { get; private set; } = new(6);
 
         // Monster specific variables
         // When -1, this is unset (non-Monsters will be at -1), when 1 this is Elite, when 2 it is a boss
@@ -1456,6 +1458,15 @@ namespace BPSR_ZDPS
         public void SetMonsterType(int type)
         {
             MonsterType = (EMonsterType)type;
+        }
+
+        public void AddRecentBuffEventHistory(int uuid, BuffEvent buffEvent)
+        {
+            if (RecentBuffEventHistory.Count > 5)
+            {
+                RecentBuffEventHistory.Remove(RecentBuffEventHistory.AsValueEnumerable().First().Key);
+            }
+            RecentBuffEventHistory[(ulong)uuid] = buffEvent;
         }
 
         public void RegisterSkillActivation(int skillId)
@@ -1827,6 +1838,7 @@ namespace BPSR_ZDPS
                 }
 
                 BuffEvents[(ulong)buffUuid] = buffEvent;
+                AddRecentBuffEventHistory(buffUuid, buffEvent);
             }
             else
             {
@@ -1846,6 +1858,7 @@ namespace BPSR_ZDPS
                 }
 
                 BuffEvents[(ulong)buffUuid] = buffEvent;
+                AddRecentBuffEventHistory(buffUuid, buffEvent);
             }
         }
 
