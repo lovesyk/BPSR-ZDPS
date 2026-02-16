@@ -488,7 +488,8 @@
     "2201":
     {
         "Name": "Bullseye",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "2240":
     {
@@ -519,7 +520,8 @@
     "2294":
     {
         "Name": "Quadraflare (Second Arrow)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "2295":
     {
@@ -884,7 +886,8 @@
     "55405":
     {
         "Name": "Aegis Ward",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx06"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx06",
+        "SkillLevelGroup": 2415
     },
     "2416":
     {
@@ -1009,6 +1012,12 @@
     "3701":
     {
         "Name": "Throw Thunder Arrows",
+        "Desc": "",
+        "Icon": ""
+    },
+    "3800":
+    {
+        "Name": "Shatterstone Shock",
         "Desc": "",
         "Icon": ""
     },
@@ -1211,7 +1220,8 @@
     "20301":
     {
         "Name": "Life Bloom",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh_skill_passive"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh_skill_passive",
+        "SkillLevelGroup": 1518
     },
     "21402":
     {
@@ -1221,12 +1231,14 @@
     "21404":
     {
         "Name": "Nourish",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx04"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx04",
+        "SkillLevelGroup": 1522
     },
     "21406":
     {
         "Name": "Grove Wish",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx02",
+        "SkillLevelGroup": 1521
     },
     "21414":
     {
@@ -1357,12 +1369,14 @@
     "55231":
     {
         "Name": "Blast Shot (Buff Explosion)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08",
+        "SkillLevelGroup": 2238
     },
     "55235":
     {
         "Name": "Photon Reforge - Quadraflare (AOE)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "55236":
     {
@@ -2074,22 +2088,26 @@
     "220101":
     {
         "Name": "Bullseye",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "220102":
     {
         "Name": "Torrent Volley",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx01"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx01",
+        "SkillLevelGroup": 2230
     },
     "220103":
     {
         "Name": "Bullseye - Final Blow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "220104":
     {
         "Name": "Storm Arrow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg01"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg01",
+        "SkillLevelGroup": 2220
     },
     "220105":
     {
@@ -2098,7 +2116,8 @@
     "220106":
     {
         "Name": "Double Arrow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg02"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg02",
+        "SkillLevelGroup": 2220
     },
     "220107":
     {
@@ -2111,17 +2130,20 @@
     "220109":
     {
         "Name": "Deter Shot",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx06"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx06",
+        "SkillLevelGroup": 2235
     },
     "220110":
     {
         "Name": "Blast Shot",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08",
+        "SkillLevelGroup": 2238
     },
     "220111":
     {
         "Name": "Photon Refroge - Quadraflare",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "220112":
     {
@@ -2134,7 +2156,8 @@
     "220203":
     {
         "Name": "Quadraflare (First Arrow)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "220301":
     {
@@ -2143,11 +2166,13 @@
     },
     "221101":
     {
-        "Name": "Bullseye - Lethal Skill Counter"
+        "Name": "Bullseye - Lethal Skill Counter",
+        "SkillLevelGroup": 2201
     },
     "230501":
     {
-        "Name": "Passive Effect Encore Damage"
+        "Name": "Passive Effect Encore Damage",
+        "SkillLevelGroup": 2315
     },
     "230801":
     {
@@ -2380,6 +2405,10 @@
     {
         "Name": "Void Stomp (Basic)"
     },
+    "420105":
+    {
+        "Name": "Eagle - Tornado"
+    },
     "420126":
     {
         "Name": "Void Punch Combo - Hands"
@@ -2441,6 +2470,10 @@
     "700006":
     {
         "Name": "Void Meteor 2"
+    },
+    "700008":
+    {
+        "Name": "Dreamflood Nappo Explosion"
     },
     "700013":
     {
@@ -2509,6 +2542,26 @@
     "823225":
     {
         "Name": "Watcher Attack"
+    },
+    "827209":
+    {
+        "Name": "Electrical Shock"
+    },
+    "827234":
+    {
+        "Name": "Path of Advance - Earth Pulse"
+    },
+    "827238":
+    {
+        "Name": "Illusory Bloom Small Explosion"
+    },
+    "827239":
+    {
+        "Name": "Illusory Bloom Large Explosion"
+    },
+    "833018":
+    {
+        "Name": "Nappo Bomb Self Destruct"
     },
     "840012":
     {
@@ -3191,6 +3244,10 @@
     {
         "Name": "Guard - Cleave Attack"
     },
+    "1010801":
+    {
+        "Name": "Block and Counterattack"
+    },
     "1010804":
     {
         "Name": "Front Slash"
@@ -3206,6 +3263,14 @@
             8
         ]
     },
+    "1011222":
+    {
+        "Name": "Spearblade Combo"
+    },
+    "1011224":
+    {
+        "Name": "Lightning Explosion AOE"
+    },
     "1011301":
     {
         "Name": "Whirlwind Slash"
@@ -3213,6 +3278,18 @@
     "1011304":
     {
         "Name": "Cabbage Swordsman Swing"
+    },
+    "1011307":
+    {
+        "Name": "Piercing Slash"
+    },
+    "1011309":
+    {
+        "Name": "Piercing Stab"
+    },
+    "1011403":
+    {
+        "Name": "Breakthrough Charge"
     },
     "1011601":
     {
@@ -3222,10 +3299,18 @@
     {
         "Name": "Lightning Strike"
     },
+    "1011604":
+    {
+        "Name": "Cabbage Boss - Basic Attack"
+    },
     "1011605":
     {
         "Name": "Lightning Kit (Light Pillar Buff)",
         "Desc": "Periodically strikes a random nearby enemy with lightning."
+    },
+    "1011606":
+    {
+        "Name": "Cabbage Boss - Hammer Smash (Shockwave)"
     },
     "1011805":
     {
@@ -3250,6 +3335,10 @@
     {
         "Name": "Lance Charged Thrust"
     },
+    "1090001":
+    {
+        "Name": "Nappo Dream Bomb"
+    },
     "1100101":
     {
         "Name": "Void Blast"
@@ -3261,6 +3350,14 @@
     "1100106":
     {
         "Name": "Flame Charge"
+    },
+    "1100501":
+    {
+        "Name": "Bite"
+    },
+    "1100530":
+    {
+        "Name": "Leap and Breath"
     },
     "1100599":
     {
@@ -4451,9 +4548,25 @@
     {
         "Name": "Corrosive Poison Bomb"
     },
+    "3330101":
+    {
+        "Name": "Slash"
+    },
+    "3330102":
+    {
+        "Name": "Slash 2"
+    },
     "3330103":
     {
         "Name": "Summon Cross"
+    },
+    "3330104":
+    {
+        "Name": "Teleport Combo Downward Slash"
+    },
+    "3330105":
+    {
+        "Name": "Stomp (Tankbuster)"
     },
     "3330106":
     {
@@ -4465,11 +4578,12 @@
     },
     "3330110":
     {
-        "Name": "Desolate Star + Sky-Shattering Slash"
+        "Name": "Malice Combo",
+        "Desc": "Desolate Star + Sky-Shattering Slash"
     },
     "3330112":
     {
-        "Name": "Jump Strike - AOE"
+        "Name": "Jump Strike (AOE)"
     },
     "3330177":
     {
@@ -4478,6 +4592,10 @@
     "3330180":
     {
         "Name": "Purification Pulse"
+    },
+    "3330183":
+    {
+        "Name": "Floating Sword Cleave 1"
     },
     "3340106":
     {
@@ -4780,11 +4898,15 @@
     },
     "6910210":
     {
-        "Name": "Flame Breath (Continous)"
+        "Name": "Flame Breath (Continuous)"
     },
     "8035624":
     {
         "Name": "Burrowing Rock Serpent"
+    },
+    "8110903":
+    {
+        "Name": "Dreamflood Spinning Ray"
     },
     "10010301":
     {
@@ -4833,6 +4955,46 @@
     "10100102":
     {
         "Name": "Boar Charge V2"
+    },
+    "10290102":
+    {
+        "Name": "Basic Attack Combo",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290105":
+    {
+        "Name": "Tankbuster",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290106":
+    {
+        "Name": "Withered Bloomshard - Enrage",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290111":
+    {
+        "Name": "Earthshatter Fist (Line Stack)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290112":
+    {
+        "Name": "Rock Ring (AOE)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290113":
+    {
+        "Name": "Shatterstone Storm",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290115":
+    {
+        "Name": "Ground Slam AOE",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290151":
+    {
+        "Name": "Rockfall",
+        "Desc": "Withered Bloomshard"
     },
     "11010101":
     {

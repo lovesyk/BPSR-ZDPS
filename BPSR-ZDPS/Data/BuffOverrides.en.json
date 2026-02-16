@@ -672,45 +672,59 @@
     "680101":
     {
         "Name": "Air Float",
+        "Desc": "Slowly ascend in mid-air",
         "BuffType": 1
     },
     "680201":
     {
         "Name": "Dash Jump",
+        "Desc": "Gain the ability to leap forward with special movement",
         "BuffType": 1
     },
     "680401":
     {
         "Name": "Wall Jump",
+        "Desc": "Kick walls to jump higher, consumes Stamina",
         "BuffType": 1
     },
     "680501":
     {
         "Name": "Wall Running",
+        "Desc": "Gain ability to run on walls.\nRunning slowly consumes Stamina, standing still consumes no Stamina",
         "BuffType": 1
     },
     "680701":
     {
         "Name": "Auto Vault",
+        "Desc": "Automatically climb over obstacles without Stamina cost",
         "BuffType": 1
     },
     "681701":
     {
         "Name": "Skills Disabled In City"
     },
+    "682201":
+    {
+        "Name": "Dash Jump Timing Gauge",
+        "Desc": "After landing, a Timing Gauge appears",
+        "BuffType": 1
+    },
     "682501":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 3 jumps",
         "BuffType": 1
     },
     "682503":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 4 jumps",
         "BuffType": 1
     },
     "682505":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 5 jumps",
         "BuffType": 1
     },
     "683104":
@@ -755,6 +769,11 @@
     {
         "Name": "Deploy Pulse Fountain",
         "Desc": "Place a Pulse Fountain that launches players into the air"
+    },
+    "827208":
+    {
+        "Name": "Legacy Device Hit",
+        "Desc": "Legacy Device has been hit and released defense system Electrical Shocks"
     },
     "882811":
     {
