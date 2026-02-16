@@ -1,0 +1,389 @@
+﻿using BPSR_ZDPS.DataTypes;
+using Hexa.NET.ImGui;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Zproto;
+
+namespace BPSR_ZDPS.Windows
+{
+    public static class GearInspector
+    {
+        public const string LAYER = "GearInspectorLayer";
+        public static string TITLE_ID = "###GearInspectorWindow";
+        public static string TITLE = "Gear Inspector";
+
+        public static Entity? LoadedEntity { get; set; }
+        static List<Zproto.EquipNine> LoadedEquipList = new();
+        static Dictionary<int, EquipAttrData> Attributes = new();
+
+        public static bool IsOpened = false;
+
+        static int RunOnceDelayed = 0;
+
+        static bool ShowBasicAttributes = false;
+        static bool ShowAdvancedAttributes = true;
+
+        static Dictionary<string, int> GearSlots = new()
+        {
+            { "Weapon", 200 },
+            { "Head", 201 },
+            { "Chest", 202 },
+            { "Hands", 203 },
+            { "Boots", 204 },
+            { "Earring", 205 },
+            { "Necklace", 206 },
+            { "Ring", 207 },
+            { "Bracelet (L)", 208 },
+            { "Bracelet (R)", 209 },
+            { "Charm", 210 },
+        };
+
+        public static void Open()
+        {
+            RunOnceDelayed = 0;
+            ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
+            IsOpened = true;
+            ImGui.PopID();
+        }
+
+        public static void LoadEntity(Entity entity)
+        {
+            Attributes.Clear();
+            Attributes = new();
+            LoadedEntity = entity;
+        }
+
+        public static void Draw(MainWindow mainWindow)
+        {
+            if (LoadedEntity == null)
+            {
+                return;
+            }
+
+            if (!IsOpened)
+            {
+                return;
+            }
+
+            ImGui.SetNextWindowSize(new Vector2(600, 600), ImGuiCond.FirstUseEver);
+
+            ImGui.SetNextWindowSizeConstraints(new Vector2(400, 150), new Vector2(ImGui.GETFLTMAX()));
+
+            ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
+
+            string entityName = "";
+            if (!string.IsNullOrEmpty(LoadedEntity.Name))
+            {
+                entityName = $"{LoadedEntity.Name} [{LoadedEntity.UID}]";
+            }
+            else
+            {
+                entityName = $"[{LoadedEntity.UID}]";
+            }
+
+            if (ImGui.Begin($"{TITLE} - {entityName}{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
+            {
+                if (RunOnceDelayed == 0)
+                {
+                    RunOnceDelayed++;
+                }
+                else if (RunOnceDelayed == 1)
+                {
+                    RunOnceDelayed++;
+                    Utils.SetCurrentWindowIcon();
+                    Utils.BringWindowToFront();
+                }
+
+                var attrEquipData = LoadedEntity.GetAttrKV("AttrEquipData");
+                if (attrEquipData != null)
+                {
+                    if (attrEquipData is Newtonsoft.Json.Linq.JArray)
+                    {
+                        attrEquipData = ((Newtonsoft.Json.Linq.JArray)attrEquipData).ToObject<List<Zproto.EquipNine>>();
+                    }
+
+                    if (attrEquipData is List<Zproto.EquipNine>)
+                    {
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Show Basic Attributes: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowBasicAttributes", ref ShowBasicAttributes);
+
+                        ImGui.SameLine();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Show Advanced Attributes: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowAdvancedAttributes", ref ShowAdvancedAttributes);
+
+                        var equipInfo = (List<Zproto.EquipNine>)attrEquipData;
+
+                        if (Attributes.Count == 0 || !LoadedEquipList.Equals(equipInfo))
+                        {
+                            LoadedEquipList = equipInfo;
+                            RebuildGearData(equipInfo);
+                        }
+
+                        foreach (var entry in Attributes)
+                        {
+                            ImGui.BeginChild($"GearSlot_{entry.Key}", ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY);
+
+                            ImGui.TextUnformatted($"Slot ({entry.Key}): {entry.Value.SlotName}");
+
+                            if (entry.Value.Item == null)
+                            {
+                                ImGui.TextUnformatted($"Item: <UNKNOWN>");
+                                continue;
+                            }
+
+                            Vector4 qualityColor = Colors.White;
+                            int itemQuality = entry.Value.Item.Quality;
+                            if (itemQuality == 1)
+                            {
+                                qualityColor = Colors.Green;
+                            }
+                            else if (itemQuality == 2)
+                            {
+                                qualityColor = Colors.Blue;
+                            }
+                            else if (itemQuality == 3)
+                            {
+                                qualityColor = Colors.Purple;
+                            }
+                            else if (itemQuality == 4)
+                            {
+                                qualityColor = Colors.Gold;
+                            }
+                            else if (itemQuality == 5)
+                            {
+                                qualityColor = Colors.Red;
+                            }
+
+                            if (itemQuality < 4)
+                            {
+                                ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed);
+                                ImGui.TextUnformatted("Note: Items below Mythic and Legendary Quality may have wrong Advanced Attributes");
+                                ImGui.PopStyleColor();
+                            }
+                            if (LoadedEntity.SubProfessionId == 0 && itemQuality == 5)
+                            {
+                                ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed);
+                                ImGui.TextUnformatted("Note: Unknown player spec, showing first spec attribute list");
+                                ImGui.PopStyleColor();
+                            }
+                            ImGui.PushStyleColor(ImGuiCol.Text, qualityColor);
+                            ImGui.TextUnformatted($"Item ({entry.Value.Equip.Id}): {entry.Value.Item.Name}");
+                            ImGui.PopStyleColor();
+                            ImGui.SameLine();
+                            ImGui.TextUnformatted($"GS: {entry.Value.Equip.EquipGs}");
+
+                            if (ShowBasicAttributes)
+                            {
+                                ImGui.TextUnformatted("Basic Attributes");
+                                ImGui.Indent();
+                                foreach (var basicAttr in entry.Value.BasicAttrList)
+                                {
+                                    ImGui.TextUnformatted($"{basicAttr.name}");
+                                    ImGui.SameLine();
+                                    ImGui.TextDisabled($"({basicAttr.min} - {basicAttr.max})");
+                                }
+                                ImGui.Unindent();
+                            }
+                            
+                            if (ShowAdvancedAttributes)
+                            {
+                                ImGui.TextUnformatted("Advanced Attributes");
+                                ImGui.Indent();
+                                ImGui.TextDisabled("Rare Attribute: <UNKNOWN>"); // (Enchant) Purple Line
+                                foreach (var advancedAttr in entry.Value.AdvancedAttrList)
+                                {
+                                    ImGui.TextUnformatted($"{advancedAttr.name}");
+                                    ImGui.SameLine();
+                                    ImGui.TextDisabled($"({advancedAttr.min} - {advancedAttr.max})");
+                                }
+                                ImGui.TextDisabled("Reforged Attribute: <UNKNOWN>"); // (Recast) Reforge Line
+                                ImGui.Unindent();
+                            }
+
+                            ImGui.EndChild();
+                        }
+                    }
+                    else
+                    {
+                        ImGui.TextUnformatted("No Gear Data Format Invalid");
+                    }
+                }
+                else
+                {
+                    ImGui.TextUnformatted("No Gear Data To Load");
+                }
+
+                ImGui.End();
+
+                ImGui.PopID();
+            }
+        }
+
+        public static void RebuildGearData(List<Zproto.EquipNine> equipInfo)
+        {
+            if (equipInfo.Count < 11)
+            {
+                System.Diagnostics.Debug.WriteLine($"RebuildGearData equipInfos.Count == {equipInfo.Count}");
+                return;
+            }
+
+            foreach (var gearSlot in GearSlots)
+            {
+                Attributes[gearSlot.Value] = new();
+                Attributes[gearSlot.Value].SlotName = gearSlot.Key;
+                Attributes[gearSlot.Value].SlotId = gearSlot.Value;
+
+                var equip = equipInfo.Where(x => x.Slot == gearSlot.Value).First();
+                if (equip == null)
+                {
+                    continue;
+                }
+
+                if (HelperMethods.DataTables.Equips.Data.TryGetValue(equip.EquipId.ToString(), out var equipData))
+                {
+                    if (HelperMethods.DataTables.Items.Data.TryGetValue(equip.EquipId.ToString(), out var itemData))
+                    {
+                        
+                        ResolveAttrsForEquip(equipData, Attributes[gearSlot.Value]);
+                        Attributes[gearSlot.Value].Equip = equipData;
+                        Attributes[gearSlot.Value].Item = itemData;
+                    }
+                }
+            }
+        }
+
+        public static void ResolveAttrsForEquip(Equip equipData, EquipAttrData equipAttrData)
+        {
+            Dictionary<int, EquipAttrLib> basicAttrs = BuildAttrListFromLibIds(equipData.BasicAttrLibId, equipData.EquipPart);
+
+            equipAttrData.BasicAttrs = basicAttrs;
+            equipAttrData.BasicAttrList = BuildTypeAttrList(basicAttrs);
+
+            Dictionary<int, EquipAttrLib> advancedAttrs = BuildAttrListFromLibIds(equipData.AdvancedAttrLibId, equipData.EquipPart);
+
+            equipAttrData.AdvancedAttrs = advancedAttrs;
+            equipAttrData.AdvancedAttrList = BuildTypeAttrList(advancedAttrs);
+        }
+
+        public static Dictionary<int, EquipAttrLib> BuildAttrListFromLibIds(List<int> libIds, int equipPart)
+        {
+            Dictionary<int, EquipAttrLib> attrs = new();
+            int libVersion = 1;
+            if (libIds.Count > 0)
+            {
+                libVersion = libIds[0];
+            }
+            int idx = 0;
+            foreach (var attr in libIds)
+            {
+                if (idx == 0)
+                {
+                    idx++;
+                    continue;
+                }
+                if (libVersion == 1)
+                {
+                    var matched = HelperMethods.DataTables.EquipAttrLibs.Data.Where(x => x.Value.AttrLibId == attr && x.Value.AllowPart.Contains(equipPart)).FirstOrDefault();
+                    if (matched.Value != null && matched.Value != default)
+                    {
+                        attrs.Add(attr, matched.Value);
+                    }
+                }
+                else if (libVersion == 2)
+                {
+                    var matched = HelperMethods.DataTables.EquipAttrSchoolLibs.Data.Where(x => {
+                        if (x.Value.AttrLibId == attr && x.Value.AllowPart.Contains(equipPart))
+                        {
+                            if (LoadedEntity.SubProfessionId > 0)
+                            {
+                                if (x.Value.TalentSchoolId.Contains(Professions.GetTalentIdFromSubProfessionId(LoadedEntity.SubProfessionId)))
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                        return false;
+                        }).FirstOrDefault();
+                    if (matched.Value != null && matched.Value != default)
+                    {
+                        // We're converting down to the more basic type since we don't care about the 2 extra fields the School version has
+                        attrs.Add(attr, matched.Value.ToEquipAttrLib());
+                    }
+                }
+                idx++;
+            }
+
+            return attrs;
+        }
+
+        public static List<(string name, int min, int max)> BuildTypeAttrList(Dictionary<int, EquipAttrLib> typeAttrs)
+        {
+            List<(string name, int min, int max)> attrs = new();
+            foreach (var attr in typeAttrs)
+            {
+                int effectIdx = 0;
+                foreach (var attrEffect in attr.Value.AttrEffect)
+                {
+                    int attrType = 1;
+                    if(attrEffect.Count > 0)
+                    {
+                        attrType = attrEffect[0];
+                    }
+
+                    if (attrType == 1)
+                    {
+                        foreach (var fightAttr in HelperMethods.DataTables.FightAttrs.Data)
+                        {
+                            if (fightAttr.Value.AttrAdd == attrEffect[1])
+                            {
+                                int valueMin = attr.Value.AttrEffectConfig[effectIdx][0];
+                                int valueMax = attr.Value.AttrEffectConfig[effectIdx][1];
+                                attrs.Add((fightAttr.Value.OfficialName, valueMin, valueMax));
+                            }
+                        }
+                    }
+                    else if (attrType == 3)
+                    {
+                        if (HelperMethods.DataTables.Buffs.Data.TryGetValue(attrEffect[1].ToString(), out var buff))
+                        {
+                            int valueMin = attr.Value.AttrEffectConfig[effectIdx][0];
+                            int valueMax = attr.Value.AttrEffectConfig[effectIdx][1];
+                            attrs.Add((buff.Desc, valueMin, valueMax));
+                        }
+                    }
+                    effectIdx++;
+                }
+            }
+            return attrs;
+        }
+    }
+
+    public class EquipAttrData
+    {
+        public string SlotName { get; set; }
+        public int SlotId { get; set; }
+
+        public Dictionary<int, EquipAttrLib> BasicAttrs = new();
+        public List<(string name, int min, int max)> BasicAttrList = new();
+        public Dictionary<int, EquipAttrLib> AdvancedAttrs = new();
+        public List<(string name, int min, int max)> AdvancedAttrList = new();
+
+        public DataTypes.Equip? Equip;
+        public DataTypes.Item? Item;
+    }
+}

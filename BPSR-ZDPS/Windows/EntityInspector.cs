@@ -51,6 +51,8 @@ namespace BPSR_ZDPS.Windows
         static float[] SkillSnapshotsHits = [];
         static Dictionary<string, ScatterPlotSkillMap> SkillScatterMap = new();
 
+        static ImGuiWindowClassPtr TopMostWindowClass = ImGui.ImGuiWindowClass();
+
         public enum ETableFilterMode : int
         {
             SkillsDamage,
@@ -71,6 +73,7 @@ namespace BPSR_ZDPS.Windows
             //ImGui.OpenPopup("###EntityInspectorWindow");
             IsOpened = true;
             IsPinned = false;
+            TopMostWindowClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost;
             ImGui.PopID();
         }
 
@@ -204,7 +207,17 @@ namespace BPSR_ZDPS.Windows
                     }
                     ImGui.TextUnformatted($"Profession: {LoadedEntity.Profession}");
                     ImGui.TextUnformatted($"ProfessionSpec: {LoadedEntity.SubProfession}");
+                    ImGui.AlignTextToFramePadding();
                     ImGui.TextUnformatted($"EntityType: {LoadedEntity.EntityType.ToString()}");
+                    if (LoadedEntity.EntityType == Zproto.EEntityType.EntChar)
+                    {
+                        ImGui.SameLine();
+                        if (ImGui.Button("View Gear"))
+                        {
+                            GearInspector.LoadEntity(LoadedEntity);
+                            GearInspector.Open();
+                        }
+                    }
 
                     ImGui.TableNextColumn();
 
@@ -569,6 +582,7 @@ namespace BPSR_ZDPS.Windows
                             {
 
                             }
+                            ImGui.SetNextWindowClass(TopMostWindowClass);
                             if (ImGui.BeginPopupContextItem())
                             {
                                 if (ImGui.MenuItem("Copy Skill ID"))
@@ -748,19 +762,21 @@ namespace BPSR_ZDPS.Windows
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.LightRed);
                                     }
                                     ImGui.TextUnformatted(snapshot.Timestamp.Value.Subtract(startTime.Value).ToString());
-                                    if (TableFilterMode == ETableFilterMode.SkillsTaken)
+                                    ImGui.SetNextWindowClass(TopMostWindowClass);
+                                    if (ImGui.IsItemHovered() && ImGui.BeginItemTooltip())
                                     {
-                                        if (ImGui.IsItemHovered() && ImGui.BeginItemTooltip())
+                                        if (EntityCache.Instance.Cache.Lines.TryGetValue(snapshot.OtherUUID, out var cachedOther))
                                         {
-                                            if (EntityCache.Instance.Cache.Lines.TryGetValue(snapshot.OtherUUID, out var cachedOther))
+                                            if (!string.IsNullOrEmpty(cachedOther.Name))
                                             {
-                                                if (!string.IsNullOrEmpty(cachedOther.Name))
-                                                {
-                                                    ImGui.TextUnformatted($"{cachedOther.Name}");
-                                                }
+                                                ImGui.TextUnformatted($"{cachedOther.Name}");
                                             }
-                                            ImGui.EndTooltip();
+                                            else
+                                            {
+                                                ImGui.TextUnformatted($"UUID: {cachedOther.UUID} (UID: {cachedOther.UID})");
+                                            }
                                         }
+                                        ImGui.EndTooltip();
                                     }
 
                                     ImGui.TableNextColumn();

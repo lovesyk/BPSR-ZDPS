@@ -54,6 +54,7 @@ namespace BPSR_ZDPS
         public static Vector4 Wheat = new Vector4(0.96078f, 0.87059f, 0.70196f, 1.0f);
         public static Vector4 Orchid = new Vector4(0.85490f, 0.43922f, 0.83922f, 1.0f);
         public static Vector4 PaleVioletRed = new Vector4(0.85882f, 0.43922f, 0.57647f, 1.0f);
+        public static Vector4 Purple = new Vector4(0.74901f, 0.0f, 1.0f, 1.0f);
         public static Vector4 Pink = new Vector4(1.0f, 0.75294f, 0.79608f, 1.0f);
         public static Vector4 Magenta = new Vector4(1.00000f, 0.0f, 1.00000f, 1.0f);
         public static Vector4 Magenta_Transparent = new Vector4(1.00000f, 0.0f, 1.00000f, 0.75f);

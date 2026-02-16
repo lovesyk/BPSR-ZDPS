@@ -253,6 +253,62 @@ namespace BPSR_ZDPS
                 Log.Information("Loaded SceneEventDuneonConfigTable.json");
             }
 
+            string fightAttrTableFile = Path.Combine(Utils.DATA_DIR_NAME, "FightAttrTable.json");
+            if (File.Exists(fightAttrTableFile))
+            {
+                var fightAttrs = JsonConvert.DeserializeObject<Dictionary<string, FightAttr>>(File.ReadAllText(fightAttrTableFile));
+                HelperMethods.DataTables.FightAttrs.Data = fightAttrs;
+                Log.Information("Loaded FightAttrTable.json");
+            }
+
+            string itemTableFile = Path.Combine(Utils.DATA_DIR_NAME, "ItemTable.json");
+            if (File.Exists(itemTableFile))
+            {
+                var items = JsonConvert.DeserializeObject<Dictionary<string, Item>>(File.ReadAllText(itemTableFile));
+                HelperMethods.DataTables.Items.Data = items;
+                Log.Information("Loaded ItemTable.json");
+            }
+
+            string equipTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipTable.json");
+            if (File.Exists(equipTableFile))
+            {
+                var equips = JsonConvert.DeserializeObject<Dictionary<string, Equip>>(File.ReadAllText(equipTableFile));
+                HelperMethods.DataTables.Equips.Data = equips;
+                Log.Information("Loaded EquipTable.json");
+            }
+
+            string equipAttrLibTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipAttrLibTable.json");
+            if (File.Exists(equipAttrLibTableFile))
+            {
+                var equipAttrLibs = JsonConvert.DeserializeObject<Dictionary<string, EquipAttrLib>>(File.ReadAllText(equipAttrLibTableFile));
+                HelperMethods.DataTables.EquipAttrLibs.Data = equipAttrLibs;
+                Log.Information("Loaded EquipAttrLibTable.json");
+            }
+
+            string equipAttrSchoolLibTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipAttrSchoolLibTable.json");
+            if (File.Exists(equipAttrSchoolLibTableFile))
+            {
+                var equipAttrSchoolLib = JsonConvert.DeserializeObject<Dictionary<string, EquipAttrSchoolLib>>(File.ReadAllText(equipAttrSchoolLibTableFile));
+                HelperMethods.DataTables.EquipAttrSchoolLibs.Data = equipAttrSchoolLib;
+                Log.Information("Loaded EquipAttrSchoolLibTable.json");
+            }
+
+            string equipEnchantTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipEnchantTable.json");
+            if (File.Exists(equipEnchantTableFile))
+            {
+                var equipEnchants = JsonConvert.DeserializeObject<Dictionary<string, EquipEnchant>>(File.ReadAllText(equipEnchantTableFile));
+                HelperMethods.DataTables.EquipEnchants.Data = equipEnchants;
+                Log.Information("Loaded EquipEnchantTable.json");
+            }
+
+            string equipPerfectLibTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipPerfectLibTable.json");
+            if (File.Exists(equipEnchantTableFile))
+            {
+                var equipPerfectLibs = JsonConvert.DeserializeObject<Dictionary<string, EquipPerfectLib>>(File.ReadAllText(equipPerfectLibTableFile));
+                HelperMethods.DataTables.EquipPerfectLibs.Data = equipPerfectLibs;
+                Log.Information("Loaded EquipPerfectLibTable.json");
+            }
+
             try
             {
                 System.Reflection.FieldInfo fi = typeof(Managers.External.BPTimerManager).GetField(Encoding.UTF8.GetString([0x41, 0x50, 0x49, 0x5f, 0x4b, 0x45, 0x59]),

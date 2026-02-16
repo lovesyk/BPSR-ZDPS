@@ -101,6 +101,36 @@ namespace BPSR_ZDPS.DataTypes
             _ => (int)EProfessionId.Profession_Unknown
         };
 
+        public static int GetTalentIdFromSubProfessionId(int subProfessionId) => subProfessionId switch
+        {
+            (int)SubProfessionId.SubProfession_Unknown => (int)ETalentId.Unknown,
+            (int)EProfessionId.Profession_Stormblade => (int)ETalentId.Profession_Stormblade,
+            (int)SubProfessionId.SubProfession_Iaido => (int)ETalentId.SubProfession_Iaido,
+            (int)SubProfessionId.SubProfession_Moonstrike => (int)ETalentId.SubProfession_Moonstrike,
+            (int)EProfessionId.Profession_FrostMage => (int)ETalentId.Profession_FrostMage,
+            (int)SubProfessionId.SubProfession_Icicle => (int)ETalentId.SubProfession_Icicle,
+            (int)SubProfessionId.SubProfession_Frostbeam => (int)ETalentId.SubProfession_Frostbeam,
+            (int)EProfessionId.Profession_WindKnight => (int)ETalentId.Profession_WindKnight,
+            (int)SubProfessionId.SubProfession_Vanguard => (int)ETalentId.SubProfession_Vanguard,
+            (int)SubProfessionId.SubProfession_Skyward => (int)ETalentId.SubProfession_Skyward,
+            (int)EProfessionId.Profession_VerdantOracle => (int)ETalentId.Profession_VerdantOracle,
+            (int)SubProfessionId.SubProfession_Smite => (int)ETalentId.SubProfession_Smite,
+            (int)SubProfessionId.SubProfession_Lifebind => (int)ETalentId.SubProfession_Lifebind,
+            (int)EProfessionId.Profession_HeavyGuardian => (int)ETalentId.Profession_HeavyGuardian,
+            (int)SubProfessionId.SubProfession_Earthfort => (int)ETalentId.SubProfession_Earthfort,
+            (int)SubProfessionId.SubProfession_Block => (int)ETalentId.SubProfession_Block,
+            (int)EProfessionId.Profession_Marksman => (int)ETalentId.Profession_Marksman,
+            (int)SubProfessionId.SubProfession_Wildpack => (int)ETalentId.SubProfession_Wildpack,
+            (int)SubProfessionId.SubProfession_Falconry => (int)ETalentId.SubProfession_Falconry,
+            (int)EProfessionId.Profession_ShieldKnight => (int)ETalentId.Profession_ShieldKnight,
+            (int)SubProfessionId.SubProfession_Recovery => (int)ETalentId.SubProfession_Recovery,
+            (int)SubProfessionId.SubProfession_Shield => (int)ETalentId.SubProfession_Shield,
+            (int)EProfessionId.Profession_BeatPerformer => (int)ETalentId.Profession_BeatPerformer,
+            (int)SubProfessionId.SubProfession_Dissonance => (int)ETalentId.SubProfession_Dissonance,
+            (int)SubProfessionId.SubProfession_Concerto => (int)ETalentId.SubProfession_Concerto,
+            _ => (int)ETalentId.Unknown
+        };
+
         public static int GetBaseProfessionIdBySkillId(int skillId) => skillId switch
         {
             1701 or 1705 or 1713 or 1714 or 1715 or 1716 or 1717 or 1718 or 1719 or 1720 or 1724 or 1728 or 1730 or 1731 => 1, // Stormblade

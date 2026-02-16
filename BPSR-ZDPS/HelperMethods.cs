@@ -31,6 +31,13 @@ namespace BPSR_ZDPS
             public static ModLinkEffectTable ModLinkEffects = new ModLinkEffectTable();
             public static SkillFightLevelTable SkillFightLevels = new SkillFightLevelTable();
             public static SceneEventDungeonConfigTable SceneEventDungeonConfigs = new SceneEventDungeonConfigTable();
+            public static FightAttrTable FightAttrs = new FightAttrTable();
+            public static ItemTable Items = new ItemTable();
+            public static EquipTable Equips = new EquipTable();
+            public static EquipAttrLibTable EquipAttrLibs = new EquipAttrLibTable();
+            public static EquipAttrSchoolLibTable EquipAttrSchoolLibs = new EquipAttrSchoolLibTable();
+            public static EquipEnchantTable EquipEnchants = new EquipEnchantTable();
+            public static EquipPerfectLibTable EquipPerfectLibs = new EquipPerfectLibTable();
         }
     }
 }

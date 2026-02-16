@@ -54,5 +54,42 @@ namespace BPSR_ZDPS.DataTypes.Enums
             SubProfession_Dissonance = 13_00_01,
             SubProfession_Concerto = 13_00_02,
         }
+
+        public enum ETalentId : int
+        {
+            Unknown = 000,
+
+            Profession_Stormblade = 011,
+            SubProfession_Iaido = 012,
+            SubProfession_Moonstrike = 013,
+
+            Profession_FrostMage = 021,
+            SubProfession_Icicle = 022,
+            SubProfession_Frostbeam = 023,
+
+            Profession_WindKnight = 041,
+            SubProfession_Vanguard = 042,
+            SubProfession_Skyward = 043,
+
+            Profession_VerdantOracle = 051,
+            SubProfession_Smite = 052,
+            SubProfession_Lifebind = 053,
+
+            Profession_HeavyGuardian = 091,
+            SubProfession_Earthfort = 092,
+            SubProfession_Block = 093,
+
+            Profession_Marksman = 111,
+            SubProfession_Wildpack = 112,
+            SubProfession_Falconry = 113,
+
+            Profession_ShieldKnight = 121,
+            SubProfession_Recovery = 122,
+            SubProfession_Shield = 123,
+
+            Profession_BeatPerformer = 131,
+            SubProfession_Dissonance = 132,
+            SubProfession_Concerto = 133,
+        }
     }
 }

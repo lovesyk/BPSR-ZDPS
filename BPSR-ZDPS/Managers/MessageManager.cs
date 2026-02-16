@@ -741,6 +741,19 @@ namespace BPSR_ZDPS
                     case EAttrType.AttrDeadTime:
                         EncounterManager.Current.SetAttrKV(uuid, "AttrDeadTime", reader.ReadInt64());
                         break;
+                    case EAttrType.AttrEquipData:
+                        List<Zproto.EquipNine> equipNineList = new();
+                        while (!reader.IsAtEnd)
+                        {
+                            int len = reader.ReadLength();
+
+                            Zproto.EquipNine info = new();
+
+                            reader.ReadMessage(info);
+                            equipNineList.Add(info);
+                        }
+                        EncounterManager.Current.SetAttrKV(uuid, "AttrEquipData", equipNineList);
+                        break;
                     default:
                         string attr_name = ((EAttrType)attr.Id).ToString();
                         EncounterManager.Current.SetAttrKV(uuid, attr_name, reader.ReadInt32());
@@ -1257,10 +1270,24 @@ namespace BPSR_ZDPS
 
             if (vData.Equip != null)
             {
+                List<Zproto.EquipNine> playerEquips = new();
                 foreach (var equip in vData.Equip.EquipList_)
                 {
                     System.Diagnostics.Debug.WriteLine($"{playerUid} :: equip::slot={equip.Value.EquipSlot},refinelvl={equip.Value.EquipSlotRefineLevel}");
+                    // 1 = Items
+                    // 2 = Gear
+                    // 5 = Modules
+                    // 6 = Battle Imagines
+                    foreach (var item in vData.ItemPackage.Packages[2].Items)
+                    {
+                        if ((ulong)item.Key == equip.Value.ItemUuid)
+                        {
+                            playerEquips.Add(new EquipNine() { EquipId = item.Value.ConfigId, Slot = equip.Value.EquipSlot });
+                            break;
+                        }
+                    }
                 }
+                EncounterManager.Current.SetAttrKV(playerUuid, "AttrEquipData", playerEquips);
             }
         }
 

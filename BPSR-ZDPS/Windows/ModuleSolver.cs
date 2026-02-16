@@ -647,7 +647,7 @@ namespace BPSR_ZDPS
 
         static Vector2 MOD_ICON_SIZE = new Vector2(80, 80);
         static Vector2 MOD_DISPLAY_SIZE = new Vector2(410, 105);
-        public static void DrawModule(PlayerModDataSave modInv, long id, Item item, bool showId = false)
+        public static void DrawModule(PlayerModDataSave modInv, long id, Zproto.Item item, bool showId = false)
         {
             var modTypeData = HelperMethods.DataTables.Modules.Data[item.ConfigId];
             var modInfo = modInv.Mod.ModInfos[id];

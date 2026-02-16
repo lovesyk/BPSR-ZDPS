@@ -55,6 +55,7 @@ namespace BPSR_ZDPS.Windows
             SettingsWindow.Draw(this);
             EncounterHistoryWindow.Draw(this);
             entityInspector.Draw(this);
+            GearInspector.Draw(this);
             NetDebug.Draw();
             DebugDungeonTracker.Draw(this);
             RaidManagerCooldownsWindow.Draw(this);
