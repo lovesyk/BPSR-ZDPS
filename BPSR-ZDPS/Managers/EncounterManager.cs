@@ -899,7 +899,7 @@ namespace BPSR_ZDPS
             long overhealing = 0;
             long effectiveHealing = 0;
 
-            if ((currentHp != null && maxHp != null && maxHp > 0 && currentHp >= 0) && (currentHp + damage > maxHp))
+            if ((currentHp != null && maxHp != null && maxHp > 0 && currentHp >= 0 && currentHp <= maxHp) && (currentHp + damage > maxHp))
             {
                 effectiveHealing = (long)(maxHp - currentHp);
                 if (damage >= effectiveHealing)
