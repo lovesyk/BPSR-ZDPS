@@ -25,6 +25,7 @@ namespace BPSR_ZDPS.Windows
         public static EEntityFilterMode EntityFilterMode = EEntityFilterMode.All;
         public static bool HideEntitiesWithNoDamageDealt = false;
         public static bool HidePlayerSummons = false;
+        public static bool ShowTotalsRow = false;
 
         static List<Encounter> Encounters = new();
         static List<Battle> Battles = new();
@@ -569,6 +570,11 @@ namespace BPSR_ZDPS.Windows
                             }
                         }
 
+                        if (ShowTotalsRow)
+                        {
+                            DrawTotalsRow(entities, encounters[SelectedEncounterIndex]);
+                        }
+
                         ImGui.PopStyleVar();
 
                         if (SelectedEncounterIndex > -1 && ImGui.BeginPopupContextWindow("##ReportContextMenu"))
@@ -601,6 +607,16 @@ namespace BPSR_ZDPS.Windows
                             {
                                 HidePlayerSummons = !HidePlayerSummons;
                             }
+
+                            ImGui.Separator();
+
+                            if (ImGui.MenuItem("Toggle Totals Row", ShowTotalsRow))
+                            {
+                                ShowTotalsRow = !ShowTotalsRow;
+                            }
+                            ImGui.SetItemTooltip("Totals Row will disappear when selecting a different Encounter.");
+
+                            ImGui.Separator();
 
                             if (ImGui.MenuItem("Show In Meters UI"))
                             {
@@ -655,6 +671,180 @@ namespace BPSR_ZDPS.Windows
             ImGui.PopID();
         }
 
+        static void DrawTotalsRow(Entity[] entities, Encounter encounter)
+        {
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+
+            var playerEntities = entities.AsValueEnumerable().Where(x => x.EntityType == Zproto.EEntityType.EntChar);
+
+            ImGui.Selectable("##TotalsRowSelectable", true, ImGuiSelectableFlags.SpanAllColumns);
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted("Totals");
+
+            ImGui.TableNextColumn();
+            // Name
+            ImGui.TextUnformatted("(Players)");
+
+            ImGui.TableNextColumn();
+            // Profession
+
+            ImGui.TableNextColumn();
+            var avgAbilityScore = playerEntities.Select(x => x.AbilityScore);
+            try
+            {
+                ImGui.TextUnformatted($"~{Math.Round(avgAbilityScore.Average(), 0)}");
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            var avgSeasonStrength = playerEntities.Select(x => x.SeasonStrength);
+            try
+            {
+                ImGui.TextUnformatted($"~{Math.Round(avgSeasonStrength.Average(), 0)}");
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted(Utils.NumberToShorthand(encounter.TotalDamage));
+
+            ImGui.TableNextColumn();
+            var adps = playerEntities.Select(x => x.DamageStats.ValuePerSecondActive);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(adps.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            var edps = playerEntities.Select(x => x.DamageStats.ValuePerSecond);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(edps.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            // Shield Break
+
+            ImGui.TableNextColumn();
+            // Crit Rate
+
+            ImGui.TableNextColumn();
+            // Lucky Rate
+
+            ImGui.TableNextColumn();
+            // Crit Damage
+            var critDmg = playerEntities.Select(x => x.DamageStats.ValueCritTotal);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(critDmg.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+
+            ImGui.TableNextColumn();
+            // Lucky Damage
+            var luckyDmg = playerEntities.Select(x => x.DamageStats.ValueLuckyTotal);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(luckyDmg.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+
+            ImGui.TableNextColumn();
+            // Crit Lucky Damage
+            var critLuckyDmg = playerEntities.Select(x => x.DamageStats.ValueCritLuckyTotal);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(critLuckyDmg.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            // Max Single Damage
+
+            ImGui.TableNextColumn();
+            // Shield Gain
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted(Utils.NumberToShorthand(encounter.TotalHealing));
+
+            ImGui.TableNextColumn();
+            var hps = playerEntities.Select(x => x.HealingStats.ValuePerSecond);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(hps.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            var effectiveHealing = playerEntities.Select(x => x.TotalHealing - x.TotalOverhealing);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(effectiveHealing.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            var overhealing = playerEntities.Select(x => x.TotalOverhealing);
+            try
+            {
+                ImGui.TextUnformatted(Utils.NumberToShorthand(overhealing.Sum()));
+            }
+            catch (Exception ex)
+            {
+                ImGui.TextUnformatted("ERROR");
+            }
+
+            ImGui.TableNextColumn();
+            // Crit Healing
+
+            ImGui.TableNextColumn();
+            // Lucky Healing
+
+            ImGui.TableNextColumn();
+            // Crit Lucky Healing
+
+            ImGui.TableNextColumn();
+            // Max Single Heal
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted(Utils.NumberToShorthand(encounter.TotalTakenDamage));
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted(encounter.TotalDeaths.ToString());
+        }
+
         private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, int dungeonDifficulty, int idx)
         {
             var encounterStartTime = startTime.ToString("yyyy-MM-dd HH:mm:ss");
@@ -669,6 +859,7 @@ namespace BPSR_ZDPS.Windows
 
         public static void HandleEncounterSelection()
         {
+            ShowTotalsRow = false;
             if (SelectedEncounterIndex > -1)
             {
                 Task.Run(() =>
