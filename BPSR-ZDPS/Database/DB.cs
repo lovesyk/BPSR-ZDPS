@@ -211,6 +211,12 @@ namespace BPSR_ZDPS
         public static List<Encounter> LoadEncounterSummaries()
         {
             var encounters = DbConn.Query<Encounter>(DBSchema.Encounter.SelectAll).ToList();
+            foreach (var encounter in encounters)
+            {
+                var decompressedEncEx = Decompressor.Unwrap(encounter.ExDataBlob);
+                ProtoBuf.Serializer.Deserialize<EncounterExData>(decompressedEncEx, encounter.ExData);
+                encounter.ExDataBlob = null;
+            }
             return encounters;
         }
 
