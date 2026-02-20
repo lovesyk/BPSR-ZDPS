@@ -59,37 +59,37 @@ namespace BPSR_ZDPS.DataTypes.Enums
         {
             Unknown = 000,
 
-            Profession_Stormblade = 011,
-            SubProfession_Iaido = 012,
-            SubProfession_Moonstrike = 013,
+            Profession_Stormblade = 100,
+            SubProfession_Iaido = 101,
+            SubProfession_Moonstrike = 102,
 
-            Profession_FrostMage = 021,
-            SubProfession_Icicle = 022,
-            SubProfession_Frostbeam = 023,
+            Profession_FrostMage = 103,
+            SubProfession_Icicle = 104,
+            SubProfession_Frostbeam = 105,
 
-            Profession_WindKnight = 041,
-            SubProfession_Vanguard = 042,
-            SubProfession_Skyward = 043,
+            Profession_WindKnight = 106,
+            SubProfession_Vanguard = 107,
+            SubProfession_Skyward = 108,
 
-            Profession_VerdantOracle = 051,
-            SubProfession_Smite = 052,
-            SubProfession_Lifebind = 053,
+            Profession_VerdantOracle = 109,
+            SubProfession_Smite = 110,
+            SubProfession_Lifebind = 111,
 
-            Profession_HeavyGuardian = 091,
-            SubProfession_Earthfort = 092,
-            SubProfession_Block = 093,
+            Profession_HeavyGuardian = 112,
+            SubProfession_Earthfort = 113,
+            SubProfession_Block = 114,
 
-            Profession_Marksman = 111,
-            SubProfession_Wildpack = 112,
-            SubProfession_Falconry = 113,
+            Profession_Marksman = 115,
+            SubProfession_Wildpack = 116,
+            SubProfession_Falconry = 117,
 
             Profession_ShieldKnight = 121,
             SubProfession_Recovery = 122,
             SubProfession_Shield = 123,
 
-            Profession_BeatPerformer = 131,
-            SubProfession_Dissonance = 132,
-            SubProfession_Concerto = 133,
+            Profession_BeatPerformer = 118,
+            SubProfession_Dissonance = 119,
+            SubProfession_Concerto = 120,
         }
     }
 }
