@@ -185,6 +185,14 @@ namespace BPSR_ZDPS
                 Log.Information("Loaded SceneTable.json");
             }
 
+            string dungeonsTableFile = Path.Combine(Utils.DATA_DIR_NAME, "DungeonsTable.json");
+            if (File.Exists(dungeonsTableFile))
+            {
+                var dungeons = JsonConvert.DeserializeObject<Dictionary<string, Dungeons>>(File.ReadAllText(dungeonsTableFile));
+                HelperMethods.DataTables.Dungeons.Data = dungeons;
+                Log.Information("Loaded DungeonsTable.json");
+            }
+
             string buffTableFile = Path.Combine(Utils.DATA_DIR_NAME, "BuffTable.json");
             if (File.Exists(buffTableFile))
             {

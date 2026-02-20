@@ -694,8 +694,14 @@ namespace BPSR_ZDPS.Windows
                     subName = $" ({EncounterManager.Current.SceneSubName})";
                 }
 
+                string difficulty = "";
+                if (EncounterManager.Current.ExData.DungeonDifficulty > 0)
+                {
+                    difficulty = $" (Master {EncounterManager.Current.ExData.DungeonDifficulty})";
+                }
+
                 // We don't need to prefix with a space due to actual item spacing handling it for us
-                ImGui.TextUnformatted($"- {EncounterManager.Current.SceneName}{subName}");
+                ImGui.TextUnformatted($"- {EncounterManager.Current.SceneName}{subName}{difficulty}");
             }
 
             if (Settings.Instance.ShowChannelLineNumberInStatus)

@@ -25,6 +25,7 @@ namespace BPSR_ZDPS
             public static SkillTable Skills = new SkillTable();
             public static TargetTable Targets = new TargetTable();
             public static SceneTable Scenes = new SceneTable();
+            public static DungeonsTable Dungeons = new DungeonsTable();
             public static BuffTable Buffs = new BuffTable();
             public static ModTable Modules = new ModTable();
             public static ModEffectTable ModEffects = new ModEffectTable();

@@ -345,13 +345,22 @@ namespace BPSR_ZDPS
             LevelMapId = levelMapId;
             if (levelMapId > 0)
             {
-                if (HelperMethods.DataTables.Scenes.Data.TryGetValue(levelMapId.ToString(), out var scene))
+                HelperMethods.DataTables.Dungeons.Data.TryGetValue(LevelMapId.ToString(), out var dungeon);
+
+                if (dungeon != null && dungeon.PlayType == 17)
                 {
-                    SceneName = scene.Name;
+                    SceneName = dungeon.Name;
                 }
                 else
                 {
-                    SceneName = "";
+                    if (HelperMethods.DataTables.Scenes.Data.TryGetValue(levelMapId.ToString(), out var scene))
+                    {
+                        SceneName = scene.Name;
+                    }
+                    else
+                    {
+                        SceneName = "";
+                    }
                 }
             }
             else
