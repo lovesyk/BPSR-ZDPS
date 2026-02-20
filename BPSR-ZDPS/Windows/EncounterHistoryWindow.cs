@@ -218,8 +218,8 @@ namespace BPSR_ZDPS.Windows
                 else if (SelectedEncounterIndex != -1)
                 {
                     var selectedEncounter = encounters[SelectedEncounterIndex];
-                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.SceneName, SelectedEncounterIndex);
-                    selectedPreviewText = $"[{(SelectedViewMode == 0 ? selectedEncounter.EncounterId : SelectedEncounterIndex + 1)}] {selectedTuple.Item1} ({selectedTuple.Item2}) {selectedTuple.Item3}";
+                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.SceneName, selectedEncounter.ExData.DungeonDifficulty, SelectedEncounterIndex);
+                    selectedPreviewText = $"[{(SelectedViewMode == 0 ? selectedEncounter.EncounterId : SelectedEncounterIndex + 1)}] {selectedTuple.TimeRange} ({selectedTuple.Duration}) {selectedTuple.Name}{selectedTuple.Difficulty}";
                 }
                 else
                 {
@@ -244,7 +244,7 @@ namespace BPSR_ZDPS.Windows
                         bool isSelected = SelectedEncounterIndex == i;
 
                         string encounterIndexText = $"[{(SelectedViewMode == 0 ? encounters[i].EncounterId : i + 1)}]##HistoricalEncounterSelectable_{i+1}";
-                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, i);
+                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, encounters[i].ExData.DungeonDifficulty, i);
                         if (ImGui.Selectable(encounterIndexText, isSelected, ImGuiSelectableFlags.SpanAllColumns))
                         {
                             AppState.OpenedHistoricalEncounter = null;
@@ -272,11 +272,11 @@ namespace BPSR_ZDPS.Windows
                         }
 
                         ImGui.SameLine();
-                        ImGui.TextUnformatted(encounterTuple.Item1);
+                        ImGui.TextUnformatted(encounterTuple.TimeRange);
                         ImGui.SameLine();
-                        ImGui.TextColored(Colors.Wheat, $"({encounterTuple.Item2})");
+                        ImGui.TextColored(Colors.Wheat, $"({encounterTuple.Duration})");
                         ImGui.SameLine();
-                        ImGui.TextColored(Colors.LightBlue, $"{encounterTuple.Item3}");
+                        ImGui.TextColored(Colors.LightBlue, $"{encounterTuple.Name}{encounterTuple.Difficulty}");
                         if (encounters[i].IsWipe)
                         {
                             ImGui.SameLine();
@@ -645,15 +645,16 @@ namespace BPSR_ZDPS.Windows
             ImGui.PopID();
         }
 
-        private static (string, string, string) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, int idx)
+        private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, int dungeonDifficulty, int idx)
         {
             var encounterStartTime = startTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterEndTime = endTime.ToString("HH:mm:ss"); // endTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterDuration = (endTime - startTime).ToString("hh\\:mm\\:ss");
-            var encounterSceneName = $" {sceneName}" ?? "";
-            var text = $"[{idx + 1}] {encounterStartTime} - {encounterEndTime} ({encounterDuration}){encounterSceneName}##EncounterHistoryItem_{idx}";
+            var encounterSceneName = !string.IsNullOrEmpty(sceneName) ? $" {sceneName}" : "";
+            var encounterDifficulty = dungeonDifficulty > 0 ? $" (Master {dungeonDifficulty})" : "";
+            var text = $"[{idx + 1}] {encounterStartTime} - {encounterEndTime} ({encounterDuration}){encounterSceneName}{encounterDifficulty}##EncounterHistoryItem_{idx}";
 
-            return ($"{encounterStartTime} - {encounterEndTime}", encounterDuration, encounterSceneName);
+            return ($"{encounterStartTime} - {encounterEndTime}", encounterDuration, encounterSceneName, encounterDifficulty);
         }
 
         public static void HandleEncounterSelection()
