@@ -24,6 +24,7 @@ namespace BPSR_ZDPS.Windows
         public static int SelectedViewMode = 0;
         public static EEntityFilterMode EntityFilterMode = EEntityFilterMode.All;
         public static bool HideEntitiesWithNoDamageDealt = false;
+        public static bool HidePlayerSummons = false;
 
         static List<Encounter> Encounters = new();
         static List<Battle> Battles = new();
@@ -426,6 +427,11 @@ namespace BPSR_ZDPS.Windows
                                 continue;
                             }
 
+                            if (HidePlayerSummons && entity.SummonerEntityType == Zproto.EEntityType.EntChar)
+                            {
+                                continue;
+                            }
+
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
 
@@ -590,6 +596,10 @@ namespace BPSR_ZDPS.Windows
                             if (ImGui.MenuItem("Hide Entities With No Damage", HideEntitiesWithNoDamageDealt))
                             {
                                 HideEntitiesWithNoDamageDealt = !HideEntitiesWithNoDamageDealt;
+                            }
+                            if (ImGui.MenuItem("Hide Player Summons", HidePlayerSummons))
+                            {
+                                HidePlayerSummons = !HidePlayerSummons;
                             }
 
                             if (ImGui.MenuItem("Show In Meters UI"))

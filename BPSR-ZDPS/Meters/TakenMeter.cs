@@ -70,25 +70,25 @@ namespace BPSR_ZDPS.Meters
                     activeEncounter = AppState.ActiveEncounter;
                 }
 
-                var playerList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
+                var entityList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster && (Settings.Instance.ShowPlayerSummonsInMeters ? x.Value.SummonerEntityType != Zproto.EEntityType.EntChar : true)).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
 
                 ulong topTotalValue = 0;
 
-                if (playerList.Count() > 0)
+                if (entityList.Count() > 0)
                 {
                     if (Settings.Instance.NormalizeMeterContributions)
                     {
-                        topTotalValue = playerList.First().Value.TotalTakenDamage;
+                        topTotalValue = entityList.First().Value.TotalTakenDamage;
                     }
                 }
 
                 ImGuiListClipper clipper = new();
-                clipper.Begin(playerList.Count());
+                clipper.Begin(entityList.Count());
                 while (clipper.Step())
                 {
                     for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
                     {
-                        var player = playerList[i];
+                        var player = entityList[i];
 
                         var entity = player.Value;
 

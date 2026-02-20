@@ -714,6 +714,14 @@ namespace BPSR_ZDPS
                 
                 entity.SetThreatList(threatInfoList);
             }
+            else if (key == "AttrTopSummonerId")
+            {
+                if (entity.EntityType == EEntityType.EntMonster)
+                {
+                    var summoner = GetOrCreateEntity((long)value);
+                    entity.SummonerEntityType = summoner.EntityType;
+                }
+            }
         }
 
         public void UpdateCasterSkillTierLevel(long casterUuid, Entity summoned, int skillTierLevel = -1)
@@ -1113,6 +1121,8 @@ namespace BPSR_ZDPS
         public ConcurrentQueue<List<ThreatInfo>> RecentThreatInfoListHistory { get; private set; } = new();
 
         public Dictionary<string, object> Attributes { get; set; } = new();
+
+        public EEntityType SummonerEntityType { get; set; } = EEntityType.EntErrType;
 
         public delegate void SkillActivatedEventHandler(object sender, SkillActivatedEventArgs e);
         public event SkillActivatedEventHandler SkillActivated;

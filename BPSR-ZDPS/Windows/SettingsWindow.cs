@@ -27,6 +27,7 @@ namespace BPSR_ZDPS.Windows
         static bool showAbilityScoreInMeters;
         static bool showSeasonStrengthInMeters;
         static bool showSubProfessionNameInMeters;
+        static bool showPlayerSummonsInMeters;
         static bool useAutomaticWipeDetection;
         static bool skipTeleportStateCheckInAutomaticWipeDetection;
         static bool disableWipeRecalculationOverwriting;
@@ -519,15 +520,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
-                        ImGui.AlignTextToFramePadding();
-                        ImGui.Text("Skip Teleport State Check In Automatic Wipe Detection: ");
-                        ImGui.SameLine();
-                        ImGui.Checkbox("##SkipTeleportStateCheckInAutomaticWipeDetection", ref skipTeleportStateCheckInAutomaticWipeDetection);
-                        ImGui.Indent();
-                        ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed.\nYou probably want this Disabled.");
-                        ImGui.EndDisabled();
-                        ImGui.Unindent();
+                        ImGui.BeginDisabled(!useAutomaticWipeDetection);
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Use Legacy Wipe Detection: ");
@@ -535,7 +528,24 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Checkbox("##UseLegacyWipeDetection", ref useLegacyWipeDetection);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, uses the old legacy methods for detecting wipes. You probably do not want to enable this.");
+                        ImGui.TextWrapped("When enabled, uses the old legacy methods for detecting wipes.\nYou probably want this Disabled.");
+                        if (useLegacyWipeDetection)
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                            ImGui.TextWrapped("Note: [Legacy Wipe Detection] is known to not always correctly detect wipes. You likely do not want this old behavior Enabled.");
+                            ImGui.PopStyleColor();
+                        }
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.BeginDisabled(!useLegacyWipeDetection);
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Skip Teleport State Check In Automatic Wipe Detection: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##SkipTeleportStateCheckInAutomaticWipeDetection", ref skipTeleportStateCheckInAutomaticWipeDetection);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed.\nYou probably want this Disabled.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -549,6 +559,9 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextWrapped("When enabled, the new Wipe Recalcuation logic will be Disabled and the original method will be used (if 'Use Automatic Wipe Detection' if still Enabled).");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
+                        ImGui.EndDisabled();
+
+                        ImGui.EndDisabled();
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Split Encounters On New Phases: ");
@@ -556,7 +569,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Checkbox("##SplitEncountersOnNewPhases", ref splitEncountersOnNewPhases);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, encounters are automatically split across phase changes. This allows bosses to be split from the rest of a dungeon. It also splits raid boss phases. This probably should be enabled.");
+                        ImGui.TextWrapped("When enabled, encounters are automatically split across phase changes. This allows bosses to be split from the rest of a dungeon. It also splits raid boss phases.\nThis probably should be Enabled.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -658,6 +671,16 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("When enabled, allows showing the detected Sub Profession name in the meters. If no Sub Profession is detected, just the base class name is shown. If no base class is found, 'Unknown' is shown.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Show Player Summons In 'NPC Taken' Meter: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowPlayerSummonsInMeters", ref showPlayerSummonsInMeters);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, Summons (such as Battle Imagine entities or specific skill entities) will be shown in the NPC Taken Meter.\nNote: This does not impact any data recording or Entity Inspector data.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1531,6 +1554,7 @@ namespace BPSR_ZDPS.Windows
             showAbilityScoreInMeters = Settings.Instance.ShowAbilityScoreInMeters;
             showSeasonStrengthInMeters = Settings.Instance.ShowSeasonStrengthInMeters;
             showSubProfessionNameInMeters = Settings.Instance.ShowSubProfessionNameInMeters;
+            showPlayerSummonsInMeters = Settings.Instance.ShowPlayerSummonsInMeters;
             useAutomaticWipeDetection = Settings.Instance.UseAutomaticWipeDetection;
             skipTeleportStateCheckInAutomaticWipeDetection = Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection;
             disableWipeRecalculationOverwriting = Settings.Instance.DisableWipeRecalculationOverwriting;
@@ -1637,6 +1661,7 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.ShowAbilityScoreInMeters = showAbilityScoreInMeters;
             Settings.Instance.ShowSeasonStrengthInMeters = showSeasonStrengthInMeters;
             Settings.Instance.ShowSubProfessionNameInMeters = showSubProfessionNameInMeters;
+            Settings.Instance.ShowPlayerSummonsInMeters = showPlayerSummonsInMeters;
             Settings.Instance.UseAutomaticWipeDetection = useAutomaticWipeDetection;
             Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection = skipTeleportStateCheckInAutomaticWipeDetection;
             Settings.Instance.DisableWipeRecalculationOverwriting = disableWipeRecalculationOverwriting;
