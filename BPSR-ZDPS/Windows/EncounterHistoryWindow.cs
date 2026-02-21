@@ -334,7 +334,7 @@ namespace BPSR_ZDPS.Windows
                 if (SelectedEncounterIndex != -1)
                 {
                     ImGuiTableFlags tableFlags = ImGuiTableFlags.ScrollX;
-                    int columnsCount = 27;
+                    int columnsCount = 28;
                     if (ImGui.BeginTable("##HistoricalEncounterStatsTable", columnsCount, tableFlags, new Vector2(-1, -1)))
                     {
                         ImGui.TableSetupColumn("#");
@@ -362,6 +362,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TableSetupColumn("Lucky Healing");
                         ImGui.TableSetupColumn("Crit Lucky Healing");
                         ImGui.TableSetupColumn("Max Single HPS");
+                        ImGui.TableSetupColumn("Max HP");
                         ImGui.TableSetupColumn("Damage Taken");
                         ImGui.TableSetupColumn("Deaths");
                         ImGui.TableHeadersRow();
@@ -544,6 +545,9 @@ namespace BPSR_ZDPS.Windows
 
                             ImGui.TableNextColumn();
                             ImGui.TextUnformatted($"{Utils.NumberToShorthand(entity.HealingStats.ValueMax)}");
+
+                            ImGui.TableNextColumn();
+                            ImGui.TextUnformatted($"{Utils.NumberToShorthand(entity.MaxHp)}");
 
                             ImGui.TableNextColumn();
                             string totalDamageTaken = Utils.NumberToShorthand(entity.TotalTakenDamage);
@@ -837,6 +841,9 @@ namespace BPSR_ZDPS.Windows
 
             ImGui.TableNextColumn();
             // Max Single Heal
+
+            ImGui.TableNextColumn();
+            // Max HP
 
             ImGui.TableNextColumn();
             ImGui.TextUnformatted(Utils.NumberToShorthand(encounter.TotalTakenDamage));

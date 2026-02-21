@@ -27,6 +27,7 @@ namespace BPSR_ZDPS.Windows
 
         static bool ShowBasicAttributes = false;
         static bool ShowAdvancedAttributes = true;
+        static bool ShowUnknownAttributes = false;
 
         static Dictionary<string, int> GearSlots = new()
         {
@@ -70,7 +71,7 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(600, 600), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(640, 600), ImGuiCond.FirstUseEver);
 
             ImGui.SetNextWindowSizeConstraints(new Vector2(400, 150), new Vector2(ImGui.GETFLTMAX()));
 
@@ -120,6 +121,13 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextUnformatted("Show Advanced Attributes: ");
                         ImGui.SameLine();
                         ImGui.Checkbox("##ShowAdvancedAttributes", ref ShowAdvancedAttributes);
+
+                        ImGui.SameLine();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Show Unknown Attributes: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowUnknownAttributes", ref ShowUnknownAttributes);
 
                         var equipInfo = (List<Zproto.EquipNine>)attrEquipData;
 
@@ -199,14 +207,31 @@ namespace BPSR_ZDPS.Windows
                             {
                                 ImGui.TextUnformatted("Advanced Attributes");
                                 ImGui.Indent();
-                                ImGui.TextDisabled("Rare Attribute: <UNKNOWN>"); // (Enchant) Purple Line
+                                if (ShowUnknownAttributes)
+                                {
+                                    ImGui.PushStyleColor(ImGuiCol.Text, Colors.Purple_Transparent);
+                                    ImGui.TextUnformatted("Rare Attribute:"); // (Enchant) Purple Line
+                                    ImGui.PopStyleColor();
+                                    ImGui.SameLine();
+                                    ImGui.TextDisabled("<UNKNOWN>");
+                                }
+                                
                                 foreach (var advancedAttr in entry.Value.AdvancedAttrList)
                                 {
                                     ImGui.TextUnformatted($"{advancedAttr.name}");
                                     ImGui.SameLine();
                                     ImGui.TextDisabled($"({advancedAttr.min} - {advancedAttr.max})");
                                 }
-                                ImGui.TextDisabled("Reforged Attribute: <UNKNOWN>"); // (Recast) Reforge Line
+
+                                if (ShowUnknownAttributes)
+                                {
+                                    ImGui.PushStyleColor(ImGuiCol.Text, Colors.Yellow_Transparent);
+                                    ImGui.TextUnformatted("Reforged Attribute:"); // (Recast) Reforge Line
+                                    ImGui.PopStyleColor();
+                                    ImGui.SameLine();
+                                    ImGui.TextDisabled("<UNKNOWN>");
+                                }
+                                
                                 ImGui.Unindent();
                             }
 

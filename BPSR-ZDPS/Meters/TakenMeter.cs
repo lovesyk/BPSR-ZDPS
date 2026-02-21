@@ -70,7 +70,7 @@ namespace BPSR_ZDPS.Meters
                     activeEncounter = AppState.ActiveEncounter;
                 }
 
-                var entityList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster && (Settings.Instance.ShowPlayerSummonsInMeters ? x.Value.SummonerEntityType != Zproto.EEntityType.EntChar : true)).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
+                var entityList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster && (!Settings.Instance.ShowPlayerSummonsInMeters ? x.Value.SummonerEntityType != Zproto.EEntityType.EntChar : true)).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
 
                 ulong topTotalValue = 0;
 
