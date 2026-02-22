@@ -326,17 +326,49 @@ namespace BPSR_ZDPS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.SetForegroundWindow((IntPtr)viewport.Value.PlatformHandleRaw);
         }
-        
+
+        public static void BringWindowToFront(IntPtr platformHandleRaw)
+        {
+            User32.SetForegroundWindow(platformHandleRaw);
+        }
+
+        public static bool IsWindowMinimized_GLFW(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return GLFW.GetWindowAttrib((GLFWwindowPtr)viewport.Value.PlatformHandle, GLFW.GLFW_ICONIFIED) > 0 ? true : false;
+        }
+
+        public static bool IsWindowMinimized(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return User32.IsIconic((IntPtr)viewport.Value.PlatformHandleRaw);
+        }
+
+        public static bool IsWindowMinimized(IntPtr platformHandleRaw)
+        {
+            return User32.IsIconic(platformHandleRaw);
+        }
+
         public static void MinimizeWindow(ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.ShowWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.SW_MINIMIZE);
         }
 
+        public static void MinimizeWindow(IntPtr platformHandleRaw)
+        {
+            User32.ShowWindow(platformHandleRaw, User32.SW_MINIMIZE);
+        }
+
         public static void RestoreWindow(ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.ShowWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.SW_RESTORE);
+        }
+
+        public static void RestoreWindow(IntPtr platformHandleRaw)
+        {
+            User32.ShowWindow(platformHandleRaw, User32.SW_RESTORE);
         }
 
         public static void SetWindowTopmost(IntPtr hWnd)

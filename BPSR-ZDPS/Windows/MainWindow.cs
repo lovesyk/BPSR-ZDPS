@@ -752,6 +752,19 @@ namespace BPSR_ZDPS.Windows
             AppState.MousePassthrough = !AppState.MousePassthrough;
         }
 
+        public void ToggleWindowMinimize()
+        {
+            if (Utils.IsWindowMinimized(HelperMethods.MainWindowPlatformHandleRaw))
+            {
+                Utils.RestoreWindow(HelperMethods.MainWindowPlatformHandleRaw);
+                Utils.BringWindowToFront(HelperMethods.MainWindowPlatformHandleRaw);
+            }
+            else
+            {
+                Utils.MinimizeWindow(HelperMethods.MainWindowPlatformHandleRaw);
+            }
+        }
+
         public void SetDbWorkComplete()
         {
             ResumeFromDbWork = true;

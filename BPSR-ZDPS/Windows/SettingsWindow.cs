@@ -68,6 +68,9 @@ namespace BPSR_ZDPS.Windows
         static bool IsBindingPinnedWindowClickthroughKey = false;
         static uint PinnedWindowClickthroughKey;
         static string PinnedWindowClickthroughKeyName = "";
+        static bool IsBindingToggleWindowMinimizeKey = false;
+        static uint ToggleWindowMinimizeKey;
+        static string ToggleWindowMinimizeKeyName = "";
 
         static SharpPcap.LibPcap.LibPcapLiveDeviceList? NetworkDevices;
         static EGameCapturePreference GameCapturePreference;
@@ -349,6 +352,13 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("This allows your mouse input to go 'through' the pinned (Top Most) window, ignoring it, and interacting with whatever may be behind it such as the game or another application.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        RebindKeyButton("Toggle Window Minimize", ref ToggleWindowMinimizeKey, ref ToggleWindowMinimizeKeyName, ref IsBindingToggleWindowMinimizeKey);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("This will let you minimize, or restore, the Main Window with a key press.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1529,6 +1539,16 @@ namespace BPSR_ZDPS.Windows
                         PinnedWindowClickthroughKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)PinnedWindowClickthroughKey));
                     }
 
+                    ToggleWindowMinimizeKey = Settings.Instance.HotkeysToggleWindowMinimize;
+                    if (ToggleWindowMinimizeKey == 0)
+                    {
+                        ToggleWindowMinimizeKeyName = "[UNBOUND]";
+                    }
+                    else
+                    {
+                        ToggleWindowMinimizeKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)ToggleWindowMinimizeKey));
+                    }
+
                     RegisterAllHotkeys(mainWindow);
 
                     ImGui.CloseCurrentPopup();
@@ -1785,6 +1805,16 @@ namespace BPSR_ZDPS.Windows
             {
                 PinnedWindowClickthroughKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)PinnedWindowClickthroughKey));
             }
+
+            ToggleWindowMinimizeKey = Settings.Instance.HotkeysToggleWindowMinimize;
+            if (ToggleWindowMinimizeKey == 0)
+            {
+                ToggleWindowMinimizeKeyName = "[UNBOUND]";
+            }
+            else
+            {
+                ToggleWindowMinimizeKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)ToggleWindowMinimizeKey));
+            }
         }
 
         static void RegisterAllHotkeys(MainWindow mainWindow)
@@ -1800,6 +1830,12 @@ namespace BPSR_ZDPS.Windows
                 HotKeyManager.RegisterKey("PinnedWindowClickthrough", mainWindow.ToggleMouseClickthrough, PinnedWindowClickthroughKey);
             }
             Settings.Instance.HotkeysPinnedWindowClickthrough = PinnedWindowClickthroughKey;
+
+            if (ToggleWindowMinimizeKey != 0)
+            {
+                HotKeyManager.RegisterKey("ToggleWindowMinimize", mainWindow.ToggleWindowMinimize, ToggleWindowMinimizeKey);
+            }
+            Settings.Instance.HotkeysToggleWindowMinimize = ToggleWindowMinimizeKey;
         }
 
         public static void RebindKeyButton(string bindingName, ref uint bindingVariable, ref string bindingVariableName, ref bool bindingState)

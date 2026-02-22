@@ -85,6 +85,7 @@ public class Settings
 
     public uint HotkeysEncounterReset { get; set; }
     public uint HotkeysPinnedWindowClickthrough { get; set; }
+    public uint HotkeysToggleWindowMinimize { get; set; }
 
     public uint FixedFramerateScale { get; set; } = 1;
 
@@ -107,6 +108,11 @@ public class Settings
         if (HotkeysPinnedWindowClickthrough > 0)
         {
             HotKeyManager.RegisterKey("PinnedWindowClickthrough", mainWindow.ToggleMouseClickthrough, HotkeysPinnedWindowClickthrough);
+        }
+
+        if (HotkeysToggleWindowMinimize > 0)
+        {
+            HotKeyManager.RegisterKey("ToggleWindowMinimize", mainWindow.ToggleWindowMinimize, HotkeysToggleWindowMinimize);
         }
     }
 
