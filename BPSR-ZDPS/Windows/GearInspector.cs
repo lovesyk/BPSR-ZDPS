@@ -198,7 +198,19 @@ namespace BPSR_ZDPS.Windows
                                 {
                                     ImGui.TextUnformatted($"{basicAttr.name}");
                                     ImGui.SameLine();
-                                    ImGui.TextDisabled($"({basicAttr.min} - {basicAttr.max})");
+                                    float minValue = basicAttr.min;
+                                    float maxValue = basicAttr.max;
+                                    string formatSymbol = "";
+                                    if (basicAttr.numFormat == 1)
+                                    {
+                                        minValue = MathF.Round(minValue / 100.0f, 0);
+                                        maxValue = MathF.Round(maxValue / 100.0f, 0);
+                                        formatSymbol = "%";
+                                    }
+
+                                    ImGui.BeginDisabled();
+                                    ImGui.TextUnformatted($"({minValue}{formatSymbol} - {maxValue}{formatSymbol})");
+                                    ImGui.EndDisabled();
                                 }
                                 ImGui.Unindent();
                             }
@@ -220,7 +232,19 @@ namespace BPSR_ZDPS.Windows
                                 {
                                     ImGui.TextUnformatted($"{advancedAttr.name}");
                                     ImGui.SameLine();
-                                    ImGui.TextDisabled($"({advancedAttr.min} - {advancedAttr.max})");
+                                    float minValue = advancedAttr.min;
+                                    float maxValue = advancedAttr.max;
+                                    string formatSymbol = "";
+                                    if (advancedAttr.numFormat == 1)
+                                    {
+                                        minValue = MathF.Round(minValue / 100.0f, 0);
+                                        maxValue = MathF.Round(maxValue / 100.0f, 0);
+                                        formatSymbol = "%";
+                                    }
+
+                                    ImGui.BeginDisabled();
+                                    ImGui.TextUnformatted($"({minValue}{formatSymbol} - {maxValue}{formatSymbol})");
+                                    ImGui.EndDisabled();
                                 }
 
                                 if (ShowUnknownAttributes)
@@ -356,9 +380,9 @@ namespace BPSR_ZDPS.Windows
             return attrs;
         }
 
-        public static List<(string name, int min, int max)> BuildTypeAttrList(Dictionary<int, EquipAttrLib> typeAttrs)
+        public static List<(string name, int min, int max, int numFormat)> BuildTypeAttrList(Dictionary<int, EquipAttrLib> typeAttrs)
         {
-            List<(string name, int min, int max)> attrs = new();
+            List<(string name, int min, int max, int numFormat)> attrs = new();
             foreach (var attr in typeAttrs)
             {
                 int effectIdx = 0;
@@ -376,9 +400,10 @@ namespace BPSR_ZDPS.Windows
                         {
                             if (fightAttr.Value.AttrAdd == attrEffect[1])
                             {
+                                // fightAttr.Value.AttrNumType 0 = Raw Number, 1 = Percent (Divide value by 100)
                                 int valueMin = attr.Value.AttrEffectConfig[effectIdx][0];
                                 int valueMax = attr.Value.AttrEffectConfig[effectIdx][1];
-                                attrs.Add((fightAttr.Value.OfficialName, valueMin, valueMax));
+                                attrs.Add((fightAttr.Value.OfficialName, valueMin, valueMax, fightAttr.Value.AttrNumType));
                             }
                         }
                     }
@@ -388,7 +413,7 @@ namespace BPSR_ZDPS.Windows
                         {
                             int valueMin = attr.Value.AttrEffectConfig[effectIdx][0];
                             int valueMax = attr.Value.AttrEffectConfig[effectIdx][1];
-                            attrs.Add((buff.Desc, valueMin, valueMax));
+                            attrs.Add((buff.Desc, valueMin, valueMax, 0));
                         }
                     }
                     effectIdx++;
@@ -404,9 +429,9 @@ namespace BPSR_ZDPS.Windows
         public int SlotId { get; set; }
 
         public Dictionary<int, EquipAttrLib> BasicAttrs = new();
-        public List<(string name, int min, int max)> BasicAttrList = new();
+        public List<(string name, int min, int max, int numFormat)> BasicAttrList = new();
         public Dictionary<int, EquipAttrLib> AdvancedAttrs = new();
-        public List<(string name, int min, int max)> AdvancedAttrList = new();
+        public List<(string name, int min, int max, int numFormat)> AdvancedAttrList = new();
 
         public DataTypes.Equip? Equip;
         public DataTypes.Item? Item;
