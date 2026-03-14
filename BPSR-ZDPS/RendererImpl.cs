@@ -48,6 +48,7 @@ namespace BPSR_ZDPS
         private unsafe static void OnCreateWindow(ImGuiViewportPtr viewport)
         {
             var rdata = (ViewportRendererData*)NativeMemory.Alloc((nuint)sizeof(ViewportRendererData));
+            rdata->ClearColor = new Vector4(0, 0, 0, 0);
 
             SwapChainDesc1 desc = new()
             {
