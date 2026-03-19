@@ -399,6 +399,16 @@ namespace BPSR_ZDPS
             }
         }
 
+        public static void SetWindowCopyToGDIEveryNthFrame(int frameNum, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->CopyToGDIEveryNthFrame = frameNum;
+            }
+        }
+
         public static ViewportRendererData* GetViewportRenderData(ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();

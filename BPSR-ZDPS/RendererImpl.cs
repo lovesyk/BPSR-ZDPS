@@ -23,6 +23,8 @@ namespace BPSR_ZDPS
             public int DesiredRenderFPS;
             public bool LimitFPS;
             public DateTime LastRenderTime;
+            public int FrameCount;
+            public int CopyToGDIEveryNthFrame;
 
             public void Init()
             {
@@ -36,11 +38,14 @@ namespace BPSR_ZDPS
                     DesiredRenderFPS = -1;
                     LimitFPS = false;
                     LastRenderTime = DateTime.Now;
+                    FrameCount = 0;
+                    CopyToGDIEveryNthFrame = 2;
                 }
             }
         }
 
         private unsafe static void* OldRendererCreateWindow;
+        public static bool EnableGDIBackBufferCopyCompatibility = false;
 
 
         public unsafe static void Init(ImGuiContextPtr context)
@@ -79,10 +84,15 @@ namespace BPSR_ZDPS
                 BufferUsage = DXGI.UsageRenderTargetOutput,
                 SampleDesc = new(1, 0),
                 Scaling = Scaling.Stretch,
-                SwapEffect = SwapEffect.FlipSequential,
-                Flags = (uint)(SwapChainFlag.AllowModeSwitch | SwapChainFlag.AllowTearing),
+                SwapEffect = SwapEffect.FlipDiscard,
+                Flags = (uint)(SwapChainFlag.AllowTearing),
                 AlphaMode = AlphaMode.Premultiplied
             };
+
+            if (EnableGDIBackBufferCopyCompatibility)
+            {
+                desc.Flags |= (uint)SwapChainFlag.GdiCompatible;
+            }
 
             SwapChainFullscreenDesc fullscreenDesc = new()
             {
@@ -166,13 +176,20 @@ namespace BPSR_ZDPS
             );
 
             backBuffer->Release();
+            backBuffer = null;
+
+            uint flags = (uint)SwapChainFlag.AllowTearing;
+            if (EnableGDIBackBufferCopyCompatibility)
+            {
+                flags |= (uint)SwapChainFlag.GdiCompatible;
+            }
 
             int code = rdata->SwapChain.ResizeBuffers(
                 0,
                 (uint)size.X,
                 (uint)size.Y,
                 Format.FormatUnknown,
-                (uint)(SwapChainFlag.AllowModeSwitch | SwapChainFlag.AllowTearing)
+                flags
             );
 
             rdata->SwapChain.GetBuffer(
@@ -211,6 +228,12 @@ namespace BPSR_ZDPS
                 double elapsedMs = (end - start) * 1000.0 / Stopwatch.Frequency;
                 rdata->LastRenderTime = DateTime.Now;
 
+                if (EnableGDIBackBufferCopyCompatibility && (rdata->FrameCount++ == rdata->CopyToGDIEveryNthFrame))
+                {
+                    CopyBackBufferToGDI(viewport, rdata);
+                    rdata->FrameCount = 0;
+                }
+
                 if (rdata->LimitFPS)
                 {
                     int sleep = (int)(fpsMs - elapsedMs);
@@ -230,6 +253,31 @@ namespace BPSR_ZDPS
             {
                 rdata->SwapChain.Present(rdata->SyncInterval, 0);
             }
+        }
+
+        // Copy the swapchain surface to the GDI bitmap, this is for compatibility with BitBlit capture programs
+        // like OBS older window capture mode, this avoid the new capture having the yellow border that users may not like
+        // this is not great 
+        private unsafe static void CopyBackBufferToGDI(ImGuiViewportPtr viewport, ViewportRendererData* rdata)
+        {
+            //var sw = Stopwatch.StartNew();
+            IDXGISurface1* surface;
+            var surfaceGUID = IDXGISurface1.Guid;
+            rdata->SwapChain.Handle->GetBuffer(0, &surfaceGUID, (void**)&surface);
+
+            nint hdc;
+            surface->GetDC(false, &hdc);
+
+            var hdc2 = User32.GetDC((nint)viewport.PlatformHandleRaw);
+            Gdi32.BitBlt(hdc2, 0, 0, (int)viewport.Size.X, (int)viewport.Size.Y, hdc, 0, 0, Gdi32.SRCCOPY);
+            User32.ReleaseDC((nint)viewport.PlatformHandleRaw, hdc2);
+
+            surface->ReleaseDC(null);
+            surface->Release();
+
+            //sw.Stop();
+
+            //Debug.WriteLine($"Copying to GDI took: {sw.ElapsedMilliseconds}ms");
         }
     }
 }
