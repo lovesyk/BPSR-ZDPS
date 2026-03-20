@@ -292,6 +292,19 @@ namespace BPSR_ZDPS
             GLFW.SetWindowAttrib((GLFWwindowPtr)ImGui.GetWindowViewport().PlatformHandle, GLFW.GLFW_VISIBLE, 1);
         }
 
+        public static bool CheckIfViewportValid(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            unsafe
+            {
+                if (viewport != null && !viewport.Value.IsNull && viewport.Value.PlatformHandle != null && viewport.Value.PlatformHandleRaw != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// This likely will not actually do anything. Instead consider using ImGuiWindowFlags.NoInputs or ImGuiViewportFlags.NoInputs.
         /// </summary>

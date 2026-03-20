@@ -78,6 +78,8 @@ public class User32
         public int bottom;
     }
 
+    public static uint COLORREF(byte r, byte g, byte b) => (uint)(r | (g << 8) | (b << 16));
+
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -85,7 +87,10 @@ public class User32
     
     [DllImport("user32.dll")]
     public static extern bool SetForegroundWindow(IntPtr hWnd);
-    
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
     [DllImport("user32.dll")]
     public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
