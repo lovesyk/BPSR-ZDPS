@@ -21,7 +21,7 @@ namespace BPSR_ZDPS
             ImGui.ProgressBar(percent, new Vector2(width, height), "");
             var progSize = ImGui.GetItemRectSize();
             ImGui.SetCursorPos(new Vector2(labelX, cursorPos.Y + (ImGui.GetItemRectSize().Y - textSize.Y) * alignment));
-            ImGui.Text(text);
+            ImGui.TextUnformatted(text);
 
             ImGui.EndGroup();
         }
