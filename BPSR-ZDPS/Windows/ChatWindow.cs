@@ -27,6 +27,8 @@ namespace BPSR_ZDPS.Windows
         static string EntityNameFilter = "";
         static KeyValuePair<long, EntityCacheLine>[]? EntityFilterMatches = [];
 
+        static int LastSetOpacity = 100;
+
         static ChatWindow()
         {
             if (Settings.Instance.WindowSettings.ChatWindow.ChatTabs == null || Settings.Instance.WindowSettings.ChatWindow.ChatTabs.Count() == 0)
@@ -110,7 +112,7 @@ namespace BPSR_ZDPS.Windows
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(17 / 255.0f, 17 / 255.0f, 17 / 255.0f, 0.0f));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
             if (ImGui.Begin($"Chat##ChatWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse |
-                                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoScrollbar))
+                                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground))
             {
                 if (RunOnceDelayed == 0)
                 {
@@ -130,19 +132,15 @@ namespace BPSR_ZDPS.Windows
                     {
                         Utils.SetWindowTopmost();
                     }
+
+                    if (windowSettings.Opacity != LastSetOpacity)
+                    {
+                        Utils.SetWindowOpacity(windowSettings.Opacity * 0.01f);
+                        LastSetOpacity = windowSettings.Opacity;
+                    }
                 }
 
-                unsafe
-                {
-                    // This is how we support transparency effects of just the background and not the text content.
-                    // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
-                    // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
-                    Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
-                    Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
-                    User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00111111, (byte)(windowSettings.Opacity == 100 ? 255 : 210), User32.LWA_COLORKEY | User32.LWA_ALPHA);
-                }
-
-                ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.Opacity * 0.01f));
+                ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.BackgroundOpacity));
                 if (ImGui.BeginChild("##ChatWindowChild", new Vector2(0, windowSettings.WindowSize.Y - 8), ImGuiChildFlags.AutoResizeY))
                 {
                     DrawChatTabs();
@@ -265,7 +263,7 @@ namespace BPSR_ZDPS.Windows
             var windowViewport = ImGui.GetWindowViewport();
             bool openBlockedUsersPopup = false;
 
-            ImGui.SetCursorPosX(ImGui.GetWindowSize().X - (25));
+            ImGui.SetCursorPosX(ImGui.GetWindowSize().X - (ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.X));
             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
             if (ImGui.Button($"{FASIcons.Gear}##OptionsMenu"))
             {
@@ -281,7 +279,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.TextUnformatted("Chat Settings");
                 ImGui.Separator();
 
-                /*
+                
                 //ImGui.SetCursorPosX(ImGui.GetCursorPosX() - 200);
                 float backgroundOpacity = chatWindowSettings.BackgroundOpacity;
                 ImGui.AlignTextToFramePadding();
@@ -295,7 +293,7 @@ namespace BPSR_ZDPS.Windows
                     chatWindowSettings.BackgroundOpacity = MathF.Round(backgroundOpacity, 2);
                 }
                 ImGui.PopStyleColor(2);
-                */
+                
                 int opacity = chatWindowSettings.Opacity;
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted("Window Opacity:");
@@ -308,7 +306,7 @@ namespace BPSR_ZDPS.Windows
                 if (ImGui.SliderInt("##Opacity", ref opacity, 10, 100, $"{opacity}%%", ImGuiSliderFlags.ClampOnInput))
                 {
                     chatWindowSettings.Opacity = opacity;
-                    //Utils.SetWindowOpacity(chatWindowSettings.Opacity * 0.01f, windowViewport);
+                    Utils.SetWindowOpacity(chatWindowSettings.Opacity * 0.01f, windowViewport);
                 }
                 ImGui.PopStyleColor(2);
 
