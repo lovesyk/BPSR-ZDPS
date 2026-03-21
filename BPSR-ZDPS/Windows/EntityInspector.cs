@@ -458,6 +458,17 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Text($"Total Average Damage: {Utils.NumberToShorthand(combatStats.ValueAverage)}");
                         ImGui.SetItemTooltip($"{combatStats.ValueAverage:N0}");
                         ImGui.Text($"Total Casts: {LoadedEntity.TotalCasts}");
+                        TimeSpan? activeDuration = (LoadedEntity.LastCombatActionTime - LoadedEntity.FirstCombatActionTime);
+                        if (activeDuration != null && activeDuration.Value.TotalSeconds > 0.0f)
+                        {
+                            double activeSeconds = activeDuration.Value.TotalSeconds;
+                            double activeMinutes = activeDuration.Value.TotalMinutes;
+
+                            double CastsPerSecond = Math.Round((double)LoadedEntity.TotalCasts / activeSeconds, 2);
+                            double CastsPerMinute = Math.Round((double)LoadedEntity.TotalCasts / activeMinutes, 2);
+                            ImGui.Text($"Casts Per Min: {CastsPerMinute} ({CastsPerSecond})");
+                            ImGui.SetItemTooltip($"Average number of Casts performed during Entity's Active Time\nFormat: CastsPerMinute (CastsPerSecond)\nActive Time Minutes: {activeDuration.Value.ToString("mm\\:ss")}");
+                        }
 
                         ImGui.EndTable();
                     }
@@ -668,6 +679,10 @@ namespace BPSR_ZDPS.Windows
                             if (ImGui.IsItemHovered() && ImGui.BeginTooltip())
                             {
                                 ImGui.TextUnformatted($"{stat.Value.ValueTotal:N0}");
+                                if (TableFilterMode == ETableFilterMode.SkillsHealing)
+                                {
+                                    ImGui.TextUnformatted($"Overheal: {stat.Value.HpLessenTotal:N0}");
+                                }
                                 ImGui.TextUnformatted($"Type: {stat.Value.DamageMode}\nElement: {Utils.DamagePropertyToString(stat.Value.DamageElement)}");
                                 if (shieldBreakTotal > 0)
                                 {
@@ -790,7 +805,7 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TextUnformatted($"Hit: {snapshotIdx + 1}");
 
                                     ImGui.TableNextColumn();
-                                    ImGui.TextUnformatted($"Crit: {snapshot.IsCrit}");
+                                    ImGui.TextUnformatted($"{(snapshot.IsCrit ? "Crit" : "")}{(snapshot.IsCauseLucky || snapshot.IsLucky ? "Lucky" : "")}");
 
                                     ImGui.TableNextColumn(); // AVG Column
 
@@ -1474,7 +1489,7 @@ namespace BPSR_ZDPS.Windows
                     entityName = $"[{LoadedEntity.UID}]";
                 }
 
-                ImGui.Text($"{TITLE} - {entityName}");
+                ImGui.TextUnformatted($"{TITLE} - {entityName}");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 2));
                 ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
