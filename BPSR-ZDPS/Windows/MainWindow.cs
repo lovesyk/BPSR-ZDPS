@@ -117,6 +117,12 @@ namespace BPSR_ZDPS.Windows
                 exWindowFlags |= ImGuiWindowFlags.NoInputs;
             }
 
+            bool modifiedBackground = windowSettings.BackgroundOpacity != 100;
+            if (modifiedBackground)
+            {
+                exWindowFlags |= ImGuiWindowFlags.NoBackground;
+            }
+
             ImGuiWindowFlags window_flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDocking | exWindowFlags;
             
             if (!p_open)
@@ -343,6 +349,12 @@ namespace BPSR_ZDPS.Windows
                 ImGui.PopStyleColor();
             }
 
+            if (modifiedBackground)
+            {
+                ImGui.PushStyleColor(ImGuiCol.FrameBg, new Vector4(0, 0, 0, 0));
+                ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.BackgroundOpacity * 0.01f));
+            }
+            
             ImGui.BeginChild("MeterChild", new Vector2(0, - ImGui.GetFrameHeightWithSpacing()));
 
             if (SelectedTabIndex > -1)
@@ -351,6 +363,11 @@ namespace BPSR_ZDPS.Windows
             }
 
             ImGui.EndChild();
+
+            if (modifiedBackground)
+            {
+                ImGui.PopStyleColor(2);
+            }
 
             DrawStatusBar();
 
@@ -774,5 +791,6 @@ namespace BPSR_ZDPS.Windows
     public class MainWindowWindowSettings : WindowSettingsBase
     {
         public float MeterBarScale = 1.0f;
+        public int BackgroundOpacity = 100;
     }
 }

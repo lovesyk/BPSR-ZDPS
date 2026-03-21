@@ -744,6 +744,20 @@ namespace BPSR_ZDPS.Windows
                             ImGui.EndDisabled();
                             ImGui.Unindent();
 
+                            ImGui.SetNextItemWidth(-1);
+                            ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                            ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                            if (ImGui.SliderInt("##MainWindowBackgroundOpacity", ref windowSettings.MainWindow.BackgroundOpacity, 0, 100, $"{windowSettings.MainWindow.BackgroundOpacity}%%", ImGuiSliderFlags.ClampOnInput))
+                            {
+                                windowSettings.MainWindow.BackgroundOpacity = windowSettings.MainWindow.BackgroundOpacity;
+                            }
+                            ImGui.PopStyleColor(2);
+                            ImGui.Indent();
+                            ImGui.BeginDisabled(true);
+                            ImGui.TextWrapped("How transparent the Main Window Background is. Applied even when not pinned.");
+                            ImGui.EndDisabled();
+                            ImGui.Unindent();
+
                             ImGui.AlignTextToFramePadding();
                             ImGui.Text("Cooldown Priority Tracker Window: ");
                             ImGui.SetNextItemWidth(-1);
