@@ -158,7 +158,7 @@ namespace BPSR_ZDPS.Meters
                             }
                         }
 
-                        if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter || !hasHpData)
+                        if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter)
                         {
                             ImGui.ProgressBar((float)contributionProgressBar / 100.0f, new Vector2(-1, 0), $"##TakenEntryContribution_{i}");
                         }
