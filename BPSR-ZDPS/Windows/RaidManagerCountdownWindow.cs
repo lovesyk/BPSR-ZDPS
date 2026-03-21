@@ -145,7 +145,7 @@ namespace BPSR_ZDPS.Windows
 
                     ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(1 / 255.0f, 1 / 255.0f, 1 / 255.0f, 0.0f));
                     ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
-                    if (ImGui.Begin("Countdown", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoInputs))
+                    if (ImGui.Begin("Countdown", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoBackground))
                     {
                         if (CountdownRunOnceDelayed == 0)
                         {
@@ -154,15 +154,6 @@ namespace BPSR_ZDPS.Windows
                         else if (CountdownRunOnceDelayed <= 2)
                         {
                             CountdownRunOnceDelayed++;
-                            unsafe
-                            {
-                                // This is how we support transparency effects of just the background and not the text content.
-                                // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
-                                // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
-                                Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
-                                Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
-                                User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00010101, 255, User32.LWA_COLORKEY | User32.LWA_ALPHA);
-                            }
                         }
                         else if (CountdownRunOnceDelayed < 3)
                         {
