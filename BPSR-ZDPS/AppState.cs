@@ -47,6 +47,9 @@ namespace BPSR_ZDPS
 
         public static void LoadDataTables()
         {
+            System.Diagnostics.Stopwatch loadTime = new();
+            loadTime.Start();
+
             // Load table data for resolving with in the future
             string appStringsFile = Path.Combine(Utils.DATA_DIR_NAME, "AppStrings.json");
             if (File.Exists(appStringsFile))
@@ -118,6 +121,7 @@ namespace BPSR_ZDPS
                     if (HelperMethods.DataTables.Skills.Data.TryGetValue(item.Key, out var skill))
                     {
                         skill.Name = string.IsNullOrEmpty(item.Value.Name) ? skill.Name : item.Value.Name;
+                        skill.Desc = string.IsNullOrEmpty(item.Value.Desc) ? skill.Name : item.Value.Desc;
                         skill.Icon = string.IsNullOrEmpty(item.Value.Icon) ? skill.Icon : item.Value.Icon;
                         if (item.Value.SkillLevelGroup > 0)
                         {
@@ -133,6 +137,7 @@ namespace BPSR_ZDPS
                     {
                         skill = new Skill();
                         skill.Name = item.Value.Name;
+                        skill.Desc = item.Value.Desc;
                         skill.Icon = item.Value.Icon;
                         if (item.Value.Id != 0)
                         {
@@ -310,11 +315,35 @@ namespace BPSR_ZDPS
             }
 
             string equipPerfectLibTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipPerfectLibTable.json");
-            if (File.Exists(equipEnchantTableFile))
+            if (File.Exists(equipPerfectLibTableFile))
             {
                 var equipPerfectLibs = JsonConvert.DeserializeObject<Dictionary<string, EquipPerfectLib>>(File.ReadAllText(equipPerfectLibTableFile));
                 HelperMethods.DataTables.EquipPerfectLibs.Data = equipPerfectLibs;
                 Log.Information("Loaded EquipPerfectLibTable.json");
+            }
+
+            string equipBreakThroughTableFile = Path.Combine(Utils.DATA_DIR_NAME, "EquipBreakThroughTable.json");
+            if (File.Exists(equipBreakThroughTableFile))
+            {
+                var equipBreakThroughs = JsonConvert.DeserializeObject<Dictionary<string, EquipBreakThrough>>(File.ReadAllText(equipBreakThroughTableFile));
+                HelperMethods.DataTables.EquipBreakThroughs.Data = equipBreakThroughs;
+                Log.Information("Loaded EquipBreakThroughTable.json");
+            }
+
+            string dbmTableFile = Path.Combine(Utils.DATA_DIR_NAME, "DbmTable.json");
+            if (File.Exists(dbmTableFile))
+            {
+                var dbms = JsonConvert.DeserializeObject<Dictionary<string, Dbm>>(File.ReadAllText(dbmTableFile));
+                HelperMethods.DataTables.Dbms.Data = dbms;
+                Log.Information("Loaded DbmTable.json");
+            }
+
+            string tempAttrTableFile = Path.Combine(Utils.DATA_DIR_NAME, "TempAttrTable.json");
+            if (File.Exists(tempAttrTableFile))
+            {
+                var tempAttrs = JsonConvert.DeserializeObject<Dictionary<string, TempAttr>>(File.ReadAllText(tempAttrTableFile));
+                HelperMethods.DataTables.TempAttrs.Data = tempAttrs;
+                Log.Information("Loaded TempAttrTable.json");
             }
 
             try
@@ -328,9 +357,16 @@ namespace BPSR_ZDPS
                 Log.Error(ex, "Reflection Error");
             }
 
+            var startupTime = loadTime.Elapsed.TotalSeconds;
+            Serilog.Log.Debug($"Took {Math.Round(startupTime, 4)}s to load DataTables.");
+
             // Load up our offline entity cache if it exists to help with initial data resolving when we're not given all the required details
             EntityCache.Instance.Load();
             //EntityCache.Instance.PortToDB();
+
+            Serilog.Log.Debug($"Took {Math.Round(loadTime.Elapsed.TotalSeconds - startupTime, 4)}s to load EntityCache.");
+
+            loadTime.Stop();
         }
     }
 }

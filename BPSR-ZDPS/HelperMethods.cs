@@ -39,6 +39,9 @@ namespace BPSR_ZDPS
             public static EquipAttrSchoolLibTable EquipAttrSchoolLibs = new EquipAttrSchoolLibTable();
             public static EquipEnchantTable EquipEnchants = new EquipEnchantTable();
             public static EquipPerfectLibTable EquipPerfectLibs = new EquipPerfectLibTable();
+            public static EquipBreakThroughTable EquipBreakThroughs = new EquipBreakThroughTable();
+            public static DbmTable Dbms = new DbmTable();
+            public static TempAttrTable TempAttrs = new TempAttrTable();
         }
     }
 }
