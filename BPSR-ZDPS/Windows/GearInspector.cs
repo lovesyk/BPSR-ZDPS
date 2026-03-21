@@ -131,7 +131,7 @@ namespace BPSR_ZDPS.Windows
 
                         var equipInfo = (List<Zproto.EquipNine>)attrEquipData;
 
-                        if (Attributes.Count == 0 || !LoadedEquipList.Equals(equipInfo))
+                        if (Attributes.Count == 0 || CheckIfGearChanged(equipInfo))
                         {
                             LoadedEquipList = equipInfo;
                             RebuildGearData(equipInfo);
@@ -146,6 +146,7 @@ namespace BPSR_ZDPS.Windows
                             if (entry.Value.Item == null)
                             {
                                 ImGui.TextUnformatted($"Item: <UNKNOWN>");
+                                ImGui.EndChild();
                                 continue;
                             }
 
@@ -190,11 +191,48 @@ namespace BPSR_ZDPS.Windows
                             ImGui.SameLine();
                             ImGui.TextUnformatted($"GS: {entry.Value.Equip.EquipGs}");
 
+                            if (entry.Value.BreakThroughs.Any())
+                            {
+                                ImGui.AlignTextToFramePadding();
+                                ImGui.TextUnformatted("Break Through:");
+                                ImGui.SameLine();
+
+                                string previewText = "";
+                                if (entry.Value.SelectedBreakThroughLevel == 0)
+                                {
+                                    previewText = $"0 [GS: {entry.Value.Equip.EquipGs}]";
+                                }
+                                else if (entry.Value.SelectedBreakThroughLevel > 0)
+                                {
+                                    previewText = $"{entry.Value.SelectedBreakThroughLevel} [GS: {entry.Value.BreakThroughs[entry.Value.SelectedBreakThroughLevel].EquipGs}]";
+                                }
+                                if (ImGui.BeginCombo($"##GearBreakThrough_{entry.Key}", previewText))
+                                {
+                                    if (ImGui.Selectable($"0 [GS: {entry.Value.Equip.EquipGs}]", entry.Value.SelectedBreakThroughLevel == 0, ImGuiSelectableFlags.SpanAllColumns))
+                                    {
+                                        entry.Value.SelectedBreakThroughLevel = 0;
+                                    }
+
+                                    foreach (var breakthrough in entry.Value.BreakThroughs)
+                                    {
+                                        bool isSelected = entry.Value.SelectedBreakThroughLevel == breakthrough.Key;
+
+                                        if (ImGui.Selectable($"{breakthrough.Key} [GS: {breakthrough.Value.EquipGs}]", isSelected, ImGuiSelectableFlags.SpanAllColumns))
+                                        {
+                                            entry.Value.SelectedBreakThroughLevel = breakthrough.Key;
+                                        }
+                                    }
+                                    ImGui.EndCombo();
+                                }
+                            }
+
                             if (ShowBasicAttributes)
                             {
                                 ImGui.TextUnformatted("Basic Attributes");
                                 ImGui.Indent();
-                                foreach (var basicAttr in entry.Value.BasicAttrList)
+                                var basicAttrList = entry.Value.SelectedBreakThroughLevel > 0 ? entry.Value.BreakThroughs[entry.Value.SelectedBreakThroughLevel].BasicAttrList : entry.Value.BasicAttrList;
+
+                                foreach (var basicAttr in basicAttrList)
                                 {
                                     ImGui.TextUnformatted($"{basicAttr.name}");
                                     ImGui.SameLine();
@@ -227,8 +265,10 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.SameLine();
                                     ImGui.TextDisabled("<UNKNOWN>");
                                 }
-                                
-                                foreach (var advancedAttr in entry.Value.AdvancedAttrList)
+
+                                var advancedAttrList = entry.Value.SelectedBreakThroughLevel > 0 ? entry.Value.BreakThroughs[entry.Value.SelectedBreakThroughLevel].AdvancedAttrList : entry.Value.AdvancedAttrList;
+
+                                foreach (var advancedAttr in advancedAttrList)
                                 {
                                     ImGui.TextUnformatted($"{advancedAttr.name}");
                                     ImGui.SameLine();
@@ -278,12 +318,38 @@ namespace BPSR_ZDPS.Windows
             }
         }
 
+        public static bool CheckIfGearChanged(List<EquipNine>? equipInfo)
+        {
+            if (equipInfo == null)
+            {
+                return true;
+            }
+
+            if (LoadedEquipList.Count != equipInfo.Count)
+            {
+                return true;
+            }
+            for (int i = 0; i < LoadedEquipList.Count; i++)
+            {
+                if (LoadedEquipList[i].Slot != equipInfo[i].Slot)
+                {
+                    return true;
+                }
+                if (LoadedEquipList[i].EquipId != equipInfo[i].EquipId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void RebuildGearData(List<Zproto.EquipNine> equipInfo)
         {
             if (equipInfo.Count < 11)
             {
                 System.Diagnostics.Debug.WriteLine($"RebuildGearData equipInfos.Count == {equipInfo.Count}");
-                return;
+                //return;
             }
 
             foreach (var gearSlot in GearSlots)
@@ -292,7 +358,7 @@ namespace BPSR_ZDPS.Windows
                 Attributes[gearSlot.Value].SlotName = gearSlot.Key;
                 Attributes[gearSlot.Value].SlotId = gearSlot.Value;
 
-                var equip = equipInfo.Where(x => x.Slot == gearSlot.Value).First();
+                var equip = equipInfo.Where(x => x.Slot == gearSlot.Value).FirstOrDefault();
                 if (equip == null)
                 {
                     continue;
@@ -306,12 +372,40 @@ namespace BPSR_ZDPS.Windows
                         ResolveAttrsForEquip(equipData, Attributes[gearSlot.Value]);
                         Attributes[gearSlot.Value].Equip = equipData;
                         Attributes[gearSlot.Value].Item = itemData;
+
+                        var breakthroughs = HelperMethods.DataTables.EquipBreakThroughs.Data.Where(x => x.Value.EquipId == equip.EquipId);
+                        if (breakthroughs != null)
+                        {
+                            foreach (var breakthrough in breakthroughs)
+                            {
+                                var tempEquipData = new Equip()
+                                {
+                                    Id = breakthrough.Value.EquipId,
+                                    EquipPart = equipData.EquipPart,
+                                    EquipProfession = equipData.EquipProfession,
+                                    EquipGs = breakthrough.Value.EquipGs,
+                                    BasicAttrLibId = breakthrough.Value.BasicAttrLibId,
+                                    AdvancedAttrLibId = breakthrough.Value.AdvancedAttrLibId
+                                };
+
+                                var newBreakthrough = new BreakThroughData()
+                                {
+                                    Id = breakthrough.Value.Id,
+                                    EquipGs = breakthrough.Value.EquipGs,
+                                    BreakThroughTime = breakthrough.Value.BreakThroughTime
+                                };
+
+                                ResolveAttrsForEquip(tempEquipData, newBreakthrough);
+
+                                Attributes[gearSlot.Value].BreakThroughs.Add(breakthrough.Value.BreakThroughTime, newBreakthrough);
+                            }
+                        }
                     }
                 }
             }
         }
 
-        public static void ResolveAttrsForEquip(Equip equipData, EquipAttrData equipAttrData)
+        public static void ResolveAttrsForEquip(Equip equipData, AttrData equipAttrData)
         {
             Dictionary<int, EquipAttrLib> basicAttrs = BuildAttrListFromLibIds(equipData.BasicAttrLibId, equipData.EquipPart);
 
@@ -423,17 +517,30 @@ namespace BPSR_ZDPS.Windows
         }
     }
 
-    public class EquipAttrData
+    public class AttrData
     {
-        public string SlotName { get; set; }
-        public int SlotId { get; set; }
-
         public Dictionary<int, EquipAttrLib> BasicAttrs = new();
         public List<(string name, int min, int max, int numFormat)> BasicAttrList = new();
         public Dictionary<int, EquipAttrLib> AdvancedAttrs = new();
         public List<(string name, int min, int max, int numFormat)> AdvancedAttrList = new();
+    }
+
+    public class EquipAttrData : AttrData
+    {
+        public string SlotName { get; set; }
+        public int SlotId { get; set; }
+
+        public Dictionary<int, BreakThroughData> BreakThroughs = new();
+        public int SelectedBreakThroughLevel = 0;
 
         public DataTypes.Equip? Equip;
         public DataTypes.Item? Item;
+    }
+
+    public class BreakThroughData : AttrData
+    {
+        public int Id = 0;
+        public int EquipGs = 0;
+        public int BreakThroughTime = 0;
     }
 }
