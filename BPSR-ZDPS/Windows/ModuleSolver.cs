@@ -203,6 +203,12 @@ namespace BPSR_ZDPS
                                 Settings.Instance.WindowSettings.ModuleWindow.LastUsedPreset.Config.ValueAllStats = val;
                             });
 
+                            AddSettingRow("Num Modules in a Set:", () =>
+                            {
+                                ImGui.SetNextItemWidth(300);
+                                ImGui.SliderInt("##NumModules", ref SolverConfig.NumModules, 1, 5);
+                            });
+
                             ImGui.EndTable();
                         }
 
@@ -469,6 +475,7 @@ namespace BPSR_ZDPS
                                         DrawModuleStat(stat.Id, stat.Value);
                                     }
 
+                                    bool needsToNewLine = false;
                                     bool isCtrlPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl);
                                     var mods = modsResult.ModuleSet.Mods;
                                     for (int i1 = 0; i1 < mods.Length; i1++)
@@ -478,6 +485,7 @@ namespace BPSR_ZDPS
                                             break;
                                         }
 
+                                        needsToNewLine = false;
                                         var modId = FilteredModules[mods[i1]];
                                         var modItem = ResultsPlayerModData.ModulesPackage.Items[modId];
                                         DrawModule(ResultsPlayerModData, modId, modItem, isCtrlPressed);
@@ -486,7 +494,13 @@ namespace BPSR_ZDPS
                                             ImGui.SameLine();
                                             ImGui.Dummy(new Vector2(20, 0));
                                             ImGui.SameLine();
+                                            needsToNewLine = true;
                                         }
+                                    }
+
+                                    if (needsToNewLine)
+                                    {
+                                        ImGui.NewLine();
                                     }
                                 }
                             }
@@ -865,12 +879,18 @@ namespace BPSR_ZDPS
 
     public struct ModuleSet
     {
-        public int Mod1;
-        public int Mod2;
-        public int Mod3;
-        public int Mod4;
+        public ModuleSet()
+        {
 
-        public int[] Mods => [Mod1, Mod2, Mod3, Mod4];
+        }
+
+        public int Mod1 = -1;
+        public int Mod2 = -1;
+        public int Mod3 = -1;
+        public int Mod4 = -1;
+        public int Mod5 = -1;
+
+        public int[] Mods => [Mod1, Mod2, Mod3, Mod4, Mod5];
     }
 
     public struct ModComboResult

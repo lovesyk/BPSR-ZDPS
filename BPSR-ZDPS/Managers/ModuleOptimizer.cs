@@ -370,13 +370,17 @@ namespace BPSR_ZDPS.Managers
             }
 
             var numMods = filtered.Count;
-            var numLoops = Math.Min(numMods, 4);
+            var numLoops = Math.Min(numMods, config.NumModules);
             var bestMods = new List<ModComboResult>();
             Parallel.For(0, numMods - (numLoops - 1), i =>
             {
                 ModComboResult[] topBest = new ModComboResult[10];
 
-                if (numLoops == 4)
+                if (numLoops == 5)
+                {
+                    FiveModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                }
+                else if (numLoops == 4)
                 {
                     FourModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
                 }
@@ -433,6 +437,15 @@ namespace BPSR_ZDPS.Managers
 
                 var reslovedModSet = numLoops switch
                 {
+                    5 => new ModuleSet()
+                    {
+                        Mod1 = (int)filtered[mods[0]],
+                        Mod2 = (int)filtered[mods[1]],
+                        Mod3 = (int)filtered[mods[2]],
+                        Mod4 = (int)filtered[mods[3]],
+                        Mod5 = (int)filtered[mods[4]]
+                    },
+
                     4 => new ModuleSet()
                     {
                         Mod1 = (int)filtered[mods[0]],
@@ -478,6 +491,42 @@ namespace BPSR_ZDPS.Managers
             };
 
             return result;
+        }
+
+        private static void FiveModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        {
+            for (int j = i + 1; j < numMods - 3; j++)
+            {
+                for (int k = j + 1; k < numMods - 2; k++)
+                {
+                    for (int l = k + 1; l < numMods - 1; l++)
+                    {
+                        for (int a = l + 1; a < numMods; a++)
+                        {
+                            var combo = new ModuleSet()
+                            {
+                                Mod1 = (ushort)i,
+                                Mod2 = (ushort)j,
+                                Mod3 = (ushort)k,
+                                Mod4 = (ushort)l,
+                                Mod5 = (ushort)a,
+                            };
+
+                            var sums = (modStatValues[(int)i] +
+                                modStatValues[j] +
+                                modStatValues[k] +
+                                modStatValues[l] +
+                                modStatValues[1]);
+
+                            bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+                            if (!keepGoing)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static void FourModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
