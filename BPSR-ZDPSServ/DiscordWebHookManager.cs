@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BPSR_DeepsServ
 {
-    public class DiscordWebHookManager(IOptions<Settings> settings) : DedupeManager(settings)
+    public class DiscordWebHookManager(IOptions<Settings> settings, ILogger<DiscordWebHookManager> logger) : DedupeManager(settings)
     {
         private readonly HttpClient HttpClient = new ();
 
@@ -43,6 +43,53 @@ namespace BPSR_DeepsServ
             var hashUlong = hash.GetCurrentHashAsUInt64();
 
             return hashUlong;
+        }
+
+        public async Task ForwardChatMessage(ChatMessageRequest chatMessage)
+        {
+            try
+            {
+            var webhookUrl = settings.Value.ChatDiscordWebhookUrl;
+            if (string.IsNullOrEmpty(webhookUrl))
+                return;
+
+            var filter = settings.Value.ChatAllowedChannels;
+            var allowed = chatMessage.Channel switch
+            {
+                "ChannelNull"       => filter.ChannelNull,
+                "ChannelWorld"      => filter.ChannelWorld,
+                "ChannelScene"      => filter.ChannelScene,
+                "ChannelTeam"       => filter.ChannelTeam,
+                "ChannelUnion"      => filter.ChannelUnion,
+                "ChannelPrivate"    => filter.ChannelPrivate,
+                "ChannelGroup"      => filter.ChannelGroup,
+                "ChannelTopNotice"  => filter.ChannelTopNotice,
+                "ChannelSystem"     => filter.ChannelSystem,
+                _                   => false
+            };
+            if (!allowed)
+                return;
+
+            var (label, emoji) = chatMessage.Channel switch
+            {
+                "ChannelWorld" => ("ワールド", "🟣"),
+                "ChannelUnion" => ("ギルド",   "🟢"),
+                "ChannelTeam"  => ("パーティ", "🔵"),
+                _              => ("その他",   "🟡")
+            };
+            var discordPayload = new DiscordChatPayload
+            {
+                Content = $"{(string.IsNullOrEmpty(chatMessage.SenderName) ? "" : $"**{chatMessage.SenderName}** ")}{chatMessage.Timestamp:HH:mm}\n[{emoji}{label}]{chatMessage.Text}"
+            };
+            var discordJson = System.Text.Json.JsonSerializer.Serialize(discordPayload, AppJsonSerializerContext.Default.DiscordChatPayload);
+
+                using var content = new StringContent(discordJson, Encoding.UTF8, "application/json");
+                await HttpClient.PostAsync(webhookUrl, content);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to forward chat message to Discord webhook");
+            }
         }
 
         private async Task<HttpResponseMessage> SendWebhook(string url, string payload, IFormFileCollection files)
