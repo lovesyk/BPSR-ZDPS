@@ -50,6 +50,11 @@ public class NetCap
             CaptureDevice = new CaptureFileReaderDevice(DebugCaptureFile);
             CaptureDevice.Open();
         }
+        else if (Config.UseRemoteCapture)
+        {
+            CaptureDevice = GetRemoteCaptureDevice();
+            CaptureDevice.Open(new DeviceConfiguration { ReadTimeout = 500 });
+        }
         else
         {
             CaptureDevice = GetCaptureDevice();
@@ -62,7 +67,10 @@ public class NetCap
         TcpReassempler = new TcpReassembler();
         TcpReassempler.OnNewConnection += OnNewConnection;
 
-        CaptureDevice.Filter = "tcp and not portrange 0-1000";
+        string captureFilter = "tcp and not portrange 0-1000";
+        if (Config.UseRemoteCapture && !string.IsNullOrWhiteSpace(Config.RemoteCaptureFilter))
+            captureFilter += $" and {Config.RemoteCaptureFilter}";
+        CaptureDevice.Filter = captureFilter;
         CaptureDevice.OnPacketArrival += DeviceOnOnPacketArrival;
         CaptureDevice.StartCapture();
 
@@ -127,7 +135,7 @@ public class NetCap
         if (tcpPacket.DestinationPort <= 1000 || tcpPacket.SourcePort <= 1000)
             return;
 
-        if (IsDebugCaptureFileMode) {
+        if (IsDebugCaptureFileMode || Config.UseRemoteCapture) {
             TcpReassempler.AddPacket(ipv4, tcpPacket, rawPacket.Timeval);
             return;
         }
@@ -389,6 +397,20 @@ public class NetCap
         var device = devices[0];
         Log.Information("No matched capture device, using first found: {DeviceName}, {FriendlyName}", device.Name, ((LibPcapLiveDevice)device).Interface?.FriendlyName);
         return device;
+    }
+
+    private ICaptureDevice GetRemoteCaptureDevice()
+    {
+        var remoteInterfaces = PcapInterface.GetAllPcapInterfaces($"rpcap://{Config.RemoteCaptureHost}:{Config.RemoteCapturePort}/", null);
+
+        foreach (var iface in remoteInterfaces)
+        {
+            Log.Information("Remote capture interface: {Interface}", iface.ToString());
+        }
+
+        var selected = remoteInterfaces[Config.RemoteCaptureDeviceIndex];
+        Log.Information("Using remote capture interface [{Index}]: {Interface}", Config.RemoteCaptureDeviceIndex, selected.ToString());
+        return new LibPcapLiveDevice(selected);
     }
 
     public string GetFilterString(IEnumerable<TcpHelper.TcpRow> conns)

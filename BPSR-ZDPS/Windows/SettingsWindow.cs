@@ -76,6 +76,13 @@ namespace BPSR_ZDPS.Windows
 
         static SharpPcap.LibPcap.LibPcapLiveDeviceList? NetworkDevices;
         static EGameCapturePreference GameCapturePreference;
+
+        static bool useRemoteCapture;
+        static string remoteCaptureHostAndPort = "192.168.1.100:2002";
+        static int remoteCaptureDeviceIdx;
+        static List<string> remoteCaptureDevices = new();
+        static string remoteCaptureRefreshError = "";
+        static string remoteCaptureFilter = "";
         static string gameCaptureCustomExeName;
 
         static bool saveEncounterReportToFile;
@@ -206,50 +213,130 @@ namespace BPSR_ZDPS.Windows
                         ImGui.BeginChild("##GeneralTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Network Device");
-                        ImGui.Text("Select the network device to read from:");
 
-                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-
-                        string network_device_preview = "";
-                        if (SelectedNetworkDeviceIdx > -1 && NetworkDevices?.Count > 0)
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Network Device Type: ");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(150);
+                        if (ImGui.BeginCombo("##NetworkDeviceType", useRemoteCapture ? "Remote" : "Local", ImGuiComboFlags.None))
                         {
-                            network_device_preview = NetworkDevices[SelectedNetworkDeviceIdx].Description;
-                        }
-
-                        if (ImGui.BeginCombo("##NetworkDeviceCombo", network_device_preview, ImGuiComboFlags.HeightLarge))
-                        {
-                            for (int i = 0; i < NetworkDevices?.Count; i++)
-                            {
-                                bool isSelected = (SelectedNetworkDeviceIdx == i);
-                                var device = NetworkDevices[i];
-
-                                string friendlyName = "";
-                                if (!string.IsNullOrEmpty(device.Interface?.FriendlyName))
-                                {
-                                    friendlyName = $"{device.Interface?.FriendlyName}\n";
-                                }
-
-                                if (ImGui.Selectable($"{friendlyName}{device.Description}\n{device.Name}", isSelected))
-                                {
-                                    SelectedNetworkDeviceIdx = i;
-                                }
-
-                                if (isSelected)
-                                {
-                                    ImGui.SetItemDefaultFocus();
-                                }
-
-                                ImGui.Separator();
-                            }
-
-                            if (NetworkDevices == null || NetworkDevices?.Count == 0)
-                            {
-                                ImGui.Selectable("<No Network Devices Found>");
-                            }
-
+                            if (ImGui.Selectable("Local", !useRemoteCapture))
+                                useRemoteCapture = false;
+                            if (ImGui.Selectable("Remote", useRemoteCapture))
+                                useRemoteCapture = true;
                             ImGui.EndCombo();
                         }
 
+                        if (!useRemoteCapture)
+                        {
+                            ImGui.Text("Select the network device to read from:");
+                            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+
+                            string network_device_preview = "";
+                            if (SelectedNetworkDeviceIdx > -1 && NetworkDevices?.Count > 0)
+                            {
+                                network_device_preview = NetworkDevices[SelectedNetworkDeviceIdx].Description;
+                            }
+
+                            if (ImGui.BeginCombo("##NetworkDeviceCombo", network_device_preview, ImGuiComboFlags.HeightLarge))
+                            {
+                                for (int i = 0; i < NetworkDevices?.Count; i++)
+                                {
+                                    bool isSelected = (SelectedNetworkDeviceIdx == i);
+                                    var device = NetworkDevices[i];
+
+                                    string friendlyName = "";
+                                    if (!string.IsNullOrEmpty(device.Interface?.FriendlyName))
+                                    {
+                                        friendlyName = $"{device.Interface?.FriendlyName}\n";
+                                    }
+
+                                    if (ImGui.Selectable($"{friendlyName}{device.Description}\n{device.Name}", isSelected))
+                                    {
+                                        SelectedNetworkDeviceIdx = i;
+                                    }
+
+                                    if (isSelected)
+                                    {
+                                        ImGui.SetItemDefaultFocus();
+                                    }
+
+                                    ImGui.Separator();
+                                }
+
+                                if (NetworkDevices == null || NetworkDevices?.Count == 0)
+                                {
+                                    ImGui.Selectable("<No Network Devices Found>");
+                                }
+
+                                ImGui.EndCombo();
+                            }
+                        }
+                        else
+                        {
+                            ImGui.AlignTextToFramePadding();
+                            ImGui.TextUnformatted("Remote Host: ");
+                            ImGui.SameLine();
+                            ImGui.SetNextItemWidth(200);
+                            ImGui.InputText("##RemoteCaptureHost", ref remoteCaptureHostAndPort, 256);
+                            ImGui.SameLine();
+                            if (ImGui.Button("Refresh Devices"))
+                            {
+                                remoteCaptureRefreshError = "";
+                                try
+                                {
+                                    var remoteInterfaces = SharpPcap.LibPcap.PcapInterface.GetAllPcapInterfaces($"rpcap://{remoteCaptureHostAndPort}/", null);
+                                    remoteCaptureDevices = remoteInterfaces
+                                        .Select(iface => iface.FriendlyName ?? iface.Description ?? iface.Name)
+                                        .ToList();
+                                    Settings.Instance.RemoteCaptureDeviceNames = new List<string>(remoteCaptureDevices);
+                                    Settings.Save();
+                                }
+                                catch (Exception ex)
+                                {
+                                    remoteCaptureRefreshError = ex.Message;
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(remoteCaptureRefreshError))
+                            {
+                                ImGui.PushStyleColor(ImGuiCol.Text, new System.Numerics.Vector4(1, 0.3f, 0.3f, 1));
+                                ImGui.TextWrapped(remoteCaptureRefreshError);
+                                ImGui.PopStyleColor();
+                            }
+
+                            if (remoteCaptureDevices.Count > 0)
+                            {
+                                ImGui.Text("Select the network device to read from:");
+                                string remoteDevicePreview = (remoteCaptureDeviceIdx >= 0 && remoteCaptureDeviceIdx < remoteCaptureDevices.Count)
+                                    ? remoteCaptureDevices[remoteCaptureDeviceIdx]
+                                    : "";
+                                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                                if (ImGui.BeginCombo("##RemoteNetworkDeviceCombo", remoteDevicePreview, ImGuiComboFlags.HeightLarge))
+                                {
+                                    for (int i = 0; i < remoteCaptureDevices.Count; i++)
+                                    {
+                                        bool isSelected = (remoteCaptureDeviceIdx == i);
+                                        if (ImGui.Selectable(remoteCaptureDevices[i], isSelected))
+                                            remoteCaptureDeviceIdx = i;
+                                        if (isSelected)
+                                            ImGui.SetItemDefaultFocus();
+                                        ImGui.Separator();
+                                    }
+                                    ImGui.EndCombo();
+                                }
+                            }
+
+                            ImGui.AlignTextToFramePadding();
+                            ImGui.TextUnformatted("Capture Filter: ");
+                            ImGui.SameLine();
+                            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                            ImGui.InputText("##RemoteCaptureFilter", ref remoteCaptureFilter, 512);
+                            ImGui.SetItemTooltip("BPF filter appended to the default capture filter and sent to rpcapd. Leave empty for no extra filter.");
+                        }
+
+                        if (!useRemoteCapture)
+                        {
                         ImGui.AlignTextToFramePadding();
                         ImGui.TextUnformatted("Game Capture Preference: ");
                         ImGui.SameLine();
@@ -308,7 +395,7 @@ namespace BPSR_ZDPS.Windows
                         if (GameCapturePreference == EGameCapturePreference.Custom)
                         {
                             ImGui.Indent();
-                            
+
                             ImGui.AlignTextToFramePadding();
                             ImGui.Text("Custom BPSR Executable Name: ");
                             ImGui.SameLine();
@@ -325,6 +412,7 @@ namespace BPSR_ZDPS.Windows
 
                             ImGui.Unindent();
                         }
+                        } // !useRemoteCapture
 
                         ImGui.SeparatorText("Keybinds");
 
@@ -1671,6 +1759,12 @@ namespace BPSR_ZDPS.Windows
             GameCapturePreference = Settings.Instance.GameCapturePreference;
             gameCaptureCustomExeName = Settings.Instance.GameCaptureCustomExeName;
 
+            useRemoteCapture = Settings.Instance.UseRemoteCapture;
+            remoteCaptureHostAndPort = $"{Settings.Instance.RemoteCaptureHost}:{Settings.Instance.RemoteCapturePort}";
+            remoteCaptureDeviceIdx = Settings.Instance.RemoteCaptureDeviceIndex;
+            remoteCaptureDevices = new List<string>(Settings.Instance.RemoteCaptureDeviceNames);
+            remoteCaptureFilter = Settings.Instance.RemoteCaptureFilter;
+
             playNotificationSoundOnMatchmake = Settings.Instance.PlayNotificationSoundOnMatchmake;
             matchmakeNotificationSoundPath = Settings.Instance.MatchmakeNotificationSoundPath;
             loopNotificationSoundOnMatchmake = Settings.Instance.LoopNotificationSoundOnMatchmake;
@@ -1714,14 +1808,34 @@ namespace BPSR_ZDPS.Windows
         private static void Save(MainWindow mainWindow)
         {
             var io = ImGui.GetIO();
-            if (SelectedNetworkDeviceIdx != PreviousSelectedNetworkDeviceIdx || GameCapturePreference != Settings.Instance.GameCapturePreference)
+            ParseRemoteHostAndPort(remoteCaptureHostAndPort, out var remoteHost, out var remotePort);
+            bool captureSettingsChanged =
+                SelectedNetworkDeviceIdx != PreviousSelectedNetworkDeviceIdx ||
+                GameCapturePreference != Settings.Instance.GameCapturePreference ||
+                useRemoteCapture != Settings.Instance.UseRemoteCapture ||
+                remoteCaptureDeviceIdx != Settings.Instance.RemoteCaptureDeviceIndex ||
+                remoteHost != Settings.Instance.RemoteCaptureHost ||
+                remotePort != Settings.Instance.RemoteCapturePort ||
+                remoteCaptureFilter != Settings.Instance.RemoteCaptureFilter;
+
+            if (captureSettingsChanged)
             {
                 PreviousSelectedNetworkDeviceIdx = SelectedNetworkDeviceIdx;
 
                 MessageManager.StopCapturing();
 
-                Settings.Instance.NetCaptureDeviceName = NetworkDevices[SelectedNetworkDeviceIdx].Name;
-                MessageManager.NetCaptureDeviceName = NetworkDevices[SelectedNetworkDeviceIdx].Name;
+                if (!useRemoteCapture && NetworkDevices?.Count > 0 && SelectedNetworkDeviceIdx >= 0)
+                {
+                    Settings.Instance.NetCaptureDeviceName = NetworkDevices[SelectedNetworkDeviceIdx].Name;
+                    MessageManager.NetCaptureDeviceName = NetworkDevices[SelectedNetworkDeviceIdx].Name;
+                }
+
+                Settings.Instance.UseRemoteCapture = useRemoteCapture;
+                Settings.Instance.RemoteCaptureHost = remoteHost;
+                Settings.Instance.RemoteCapturePort = remotePort;
+                Settings.Instance.RemoteCaptureDeviceIndex = remoteCaptureDeviceIdx;
+                Settings.Instance.RemoteCaptureDeviceNames = new List<string>(remoteCaptureDevices);
+                Settings.Instance.RemoteCaptureFilter = remoteCaptureFilter;
 
                 Settings.Instance.GameCapturePreference = GameCapturePreference;
                 Settings.Instance.GameCaptureCustomExeName = gameCaptureCustomExeName;
@@ -1986,6 +2100,24 @@ namespace BPSR_ZDPS.Windows
             }
             ImGui.EndDisabled();
             ImGui.SetItemTooltip("Clear Keybinding.");
+        }
+
+        private static void ParseRemoteHostAndPort(string hostAndPort, out string host, out int port)
+        {
+            host = "192.168.1.100";
+            port = 2002;
+            if (string.IsNullOrWhiteSpace(hostAndPort))
+                return;
+            var lastColon = hostAndPort.LastIndexOf(':');
+            if (lastColon > 0 && int.TryParse(hostAndPort[(lastColon + 1)..], out var parsedPort))
+            {
+                host = hostAndPort[..lastColon];
+                port = parsedPort;
+            }
+            else
+            {
+                host = hostAndPort;
+            }
         }
 
         public static void RecalculateRefreshRates()

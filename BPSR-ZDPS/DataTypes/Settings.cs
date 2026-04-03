@@ -83,6 +83,13 @@ public class Settings
     // Settings specific to an individual window
     public WindowSettings WindowSettings { get; set; } = new();
 
+    public bool UseRemoteCapture { get; set; } = false;
+    public string RemoteCaptureHost { get; set; } = "192.168.1.100";
+    public int RemoteCapturePort { get; set; } = 2002;
+    public int RemoteCaptureDeviceIndex { get; set; } = 0;
+    public List<string> RemoteCaptureDeviceNames { get; set; } = new();
+    public string RemoteCaptureFilter { get; set; } = string.Empty;
+
     public bool LowPerformanceMode { get; set; } = false;
 
     public uint HotkeysEncounterReset { get; set; }

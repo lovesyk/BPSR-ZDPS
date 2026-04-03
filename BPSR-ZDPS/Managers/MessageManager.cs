@@ -35,7 +35,12 @@ namespace BPSR_ZDPS
             netCap.Init(new NetCapConfig()
             {
                 CaptureDeviceName = Settings.Instance.NetCaptureDeviceName,
-                ExeNames = Utils.GameCapturePreferenceToExeNames(Settings.Instance.GameCapturePreference)
+                ExeNames = Utils.GameCapturePreferenceToExeNames(Settings.Instance.GameCapturePreference),
+                UseRemoteCapture = Settings.Instance.UseRemoteCapture,
+                RemoteCaptureHost = Settings.Instance.RemoteCaptureHost,
+                RemoteCapturePort = Settings.Instance.RemoteCapturePort,
+                RemoteCaptureDeviceIndex = Settings.Instance.RemoteCaptureDeviceIndex,
+                RemoteCaptureFilter = Settings.Instance.RemoteCaptureFilter,
             });
 
             netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.EnterScene, ProcessEnterScene);
