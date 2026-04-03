@@ -1,6 +1,7 @@
 using BPSR_DeepsServ.Models;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace BPSR_DeepsServ
 {
     public class Program
@@ -37,6 +38,11 @@ namespace BPSR_DeepsServ
                 app.MapGet("/dedupecheck/{teamId}", HandleDedupeRequest).DisableAntiforgery();
             }
 
+            if (zdpsSetings?.EnableChatForwarding ?? false)
+            {
+                app.MapPost("/chat", HandleChatMessage).DisableAntiforgery();
+            }
+
             app.Run();
         }
 
@@ -44,6 +50,19 @@ namespace BPSR_DeepsServ
         {
             var isDupe = dedupeManager.IsDupe(teamId);
             return Results.Ok(new DedupeResp() { CanSend = !isDupe });
+        }
+
+        static async Task<IResult> HandleChatMessage([FromBody] ChatMessageRequest chatMessage, DiscordWebHookManager discordWebHooks)
+        {
+            try
+            {
+                await discordWebHooks.ForwardChatMessage(chatMessage);
+                return Results.Ok();
+            }
+            catch (Exception)
+            {
+                return Results.InternalServerError();
+            }
         }
 
         static async Task<IResult> HandleDiscordReport([FromRoute] string id, [FromRoute] string token, [FromForm] string payload_json, [FromForm] IFormFileCollection files, HttpRequest request, DiscordWebHookManager discordWebHooks)

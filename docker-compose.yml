@@ -1,0 +1,15 @@
+services:
+  serv:
+    build:
+      context: .
+      dockerfile: BPSR-ZDPSServ/Dockerfile
+    network_mode: host
+    volumes:
+      - ./BPSR-ZDPSServ/appsettings.json:/app/appsettings.json:ro
+  messenger:
+    build:
+      context: .
+      dockerfile: BPSR-ZDPSMessenger/Dockerfile
+    network_mode: host
+    volumes:
+      - ./BPSR-ZDPSMessenger/appsettings.json:/app/appsettings.json:ro
