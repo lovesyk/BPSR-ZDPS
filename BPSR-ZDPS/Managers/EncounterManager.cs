@@ -518,6 +518,10 @@ namespace BPSR_ZDPS
         public event HpUpdatedEventHandler EntityHpUpdated; // Used for all Entities
         public delegate void ThreatListUpdatedEventHandler(object sender, ThreatListUpdatedEventArgs e);
         public event ThreatListUpdatedEventHandler EntityThreatListUpdated; // This is not a real list, just the current target and their threat value
+        public delegate void BuffUpdatedEventHandler(object sender, BuffUpdatedEventArgs e);
+        public event BuffUpdatedEventHandler BuffUpdated;
+        public delegate void AttributeUpdatedEventHandler(object sender, AttributeUpdatedEventArgs e);
+        public event AttributeUpdatedEventHandler AttributeUpdated;
 
         public EncounterExData ExData { get; set; } = new();
         public byte[] ExDataBlob { get; set; }
@@ -750,6 +754,9 @@ namespace BPSR_ZDPS
                     var summoner = GetOrCreateEntity((long)value);
                     entity.SummonerEntityType = summoner.EntityType;
                 }
+            }
+
+            OnAttributeUpdated(this, new AttributeUpdatedEventArgs() { EntityUuid = uuid, Entity = entity, AttributeName = key, AttributeValue = value });
             }
         }
 
@@ -1000,6 +1007,21 @@ namespace BPSR_ZDPS
                     entityCasterName = caster.Name;
                 }
             }
+
+            OnBuffUpdated(this, new BuffUpdatedEventArgs()
+            {
+                EntityUuid = entityUuid,
+                BuffEventType = buffEventType,
+                BuffUuid = buffUuid,
+                BaseId = baseId,
+                Level = level,
+                FireUuid = fireUuid,
+                Layer = layer,
+                Duration = duration,
+                SourceConfigId = sourceConfigId,
+                EntityCasterName = entityCasterName,
+                UpdateDateTime = extraPacketData.ArrivalTime,
+            });
             GetOrCreateEntity(entityUuid).NotifyBuffEvent(buffEventType, buffUuid, baseId, level, fireUuid, entityCasterName, layer, duration, sourceConfigId, DateTime.Now.Subtract(EncounterManager.Current.StartTime));
         }
 
@@ -1052,6 +1074,16 @@ namespace BPSR_ZDPS
             EntityThreatListUpdated?.Invoke(sender, e);
         }
 
+        protected virtual void OnBuffUpdated(object sender, BuffUpdatedEventArgs e)
+        {
+            BuffUpdated?.Invoke(sender, e);
+        }
+
+        protected virtual void OnAttributeUpdated(object sender, AttributeUpdatedEventArgs e)
+        {
+            AttributeUpdated?.Invoke(sender, e);
+        }
+
         public void RemoveEntityHandlers()
         {
             foreach (var entity in Entities)
@@ -1065,6 +1097,8 @@ namespace BPSR_ZDPS
             SkillActivated = null;
             BossHpUpdated = null;
             EntityHpUpdated = null;
+            BuffUpdated = null;
+            AttributeUpdated = null;
 
             RemoveEntityHandlers();
         }
@@ -1501,7 +1535,7 @@ namespace BPSR_ZDPS
 
         public void AddRecentBuffEventHistory(int uuid, BuffEvent buffEvent)
         {
-            if (RecentBuffEventHistory.Count > 5)
+            if (RecentBuffEventHistory.Count > 10)
             {
                 RecentBuffEventHistory.Remove(RecentBuffEventHistory.AsValueEnumerable().First().Key);
             }
@@ -2121,6 +2155,29 @@ namespace BPSR_ZDPS
     {
         public long EntityUuid { get; set; }
         public List<ThreatInfo> ThreatInfoList { get; set; } = new();
+    }
+
+    public class BuffUpdatedEventArgs : EventArgs
+    {
+        public long EntityUuid { get; set; }
+        public EBuffEventType BuffEventType { get; set; }
+        public int BuffUuid { get; set; }
+        public int BaseId { get; set; }
+        public int Level { get; set; }
+        public long FireUuid { get; set; }
+        public int Layer { get; set; }
+        public int Duration { get; set; }
+        public int SourceConfigId { get; set; }
+        public string EntityCasterName { get; set; }
+        public DateTime UpdateDateTime { get; set; }
+    }
+
+    public class AttributeUpdatedEventArgs : EventArgs
+    {
+        public long EntityUuid { get; set; }
+        public Entity? Entity { get; set; }
+        public string AttributeName { get; set; }
+        public object AttributeValue { get; set; }
     }
 
     public enum ESkillType : int
