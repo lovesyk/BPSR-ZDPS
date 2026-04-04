@@ -220,7 +220,7 @@ namespace BPSR_ZDPS.Windows
                 else if (SelectedEncounterIndex != -1)
                 {
                     var selectedEncounter = encounters[SelectedEncounterIndex];
-                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.SceneName, selectedEncounter.ExData.DungeonDifficulty, SelectedEncounterIndex);
+                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.SceneName, selectedEncounter.ExData, SelectedEncounterIndex);
                     selectedPreviewText = $"[{(SelectedViewMode == 0 ? selectedEncounter.EncounterId : SelectedEncounterIndex + 1)}] {selectedTuple.TimeRange} ({selectedTuple.Duration}) {selectedTuple.Name}{selectedTuple.Difficulty}";
                 }
                 else
@@ -246,7 +246,7 @@ namespace BPSR_ZDPS.Windows
                         bool isSelected = SelectedEncounterIndex == i;
 
                         string encounterIndexText = $"[{(SelectedViewMode == 0 ? encounters[i].EncounterId : i + 1)}]##HistoricalEncounterSelectable_{i+1}";
-                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, encounters[i].ExData.DungeonDifficulty, i);
+                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, encounters[i].ExData, i);
                         if (ImGui.Selectable(encounterIndexText, isSelected, ImGuiSelectableFlags.SpanAllColumns))
                         {
                             AppState.OpenedHistoricalEncounter = null;
@@ -852,16 +852,21 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted(encounter.TotalDeaths.ToString());
         }
 
-        private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, int dungeonDifficulty, int idx)
+        private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, EncounterExData exData, int idx)
         {
             var encounterStartTime = startTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterEndTime = endTime.ToString("HH:mm:ss"); // endTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterDuration = (endTime - startTime).ToString("hh\\:mm\\:ss");
             var encounterSceneName = !string.IsNullOrEmpty(sceneName) ? $" {sceneName}" : "";
-            var encounterDifficulty = dungeonDifficulty > 0 ? $" (Master {dungeonDifficulty})" : "";
-            var text = $"[{idx + 1}] {encounterStartTime} - {encounterEndTime} ({encounterDuration}){encounterSceneName}{encounterDifficulty}##EncounterHistoryItem_{idx}";
+            var encounterDifficulty = exData.DungeonDifficulty > 0 ? $" (Master {exData.DungeonDifficulty})" : "";
+            string benchmarkText = "";
+            if (exData.BenchmarkTime > 0)
+            {
+                benchmarkText = " [BENCHMARK]";
+            }
+            var text = $"[{idx + 1}] {encounterStartTime} - {encounterEndTime} ({encounterDuration}){encounterSceneName}{benchmarkText}{encounterDifficulty}##EncounterHistoryItem_{idx}";
 
-            return ($"{encounterStartTime} - {encounterEndTime}", encounterDuration, encounterSceneName, encounterDifficulty);
+            return ($"{encounterStartTime} - {encounterEndTime}", encounterDuration, $"{encounterSceneName}{benchmarkText}", encounterDifficulty);
         }
 
         public static void HandleEncounterSelection()
