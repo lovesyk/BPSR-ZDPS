@@ -1026,6 +1026,7 @@ namespace BPSR_ZDPS
             long buffBasedShieldBreakValue = 0;
             
             List<int> EventHandledBuffs = new();
+            List<int> LogicHandledBuffs = new();
             if (delta.BuffEffect != null)
             {
                 //System.Diagnostics.Debug.WriteLine($"delta.BuffEffect={delta.BuffEffect.BuffEffects.Count}");
@@ -1042,6 +1043,8 @@ namespace BPSR_ZDPS
                     {
                         for (int logicIdx = 0; logicIdx < buffEffect.LogicEffect.Count; logicIdx++)
                         {
+                            LogicHandledBuffs.Add(buffEffect.BuffUuid);
+
                             var logicEffect = buffEffect.LogicEffect[logicIdx];
                             var reader = new Google.Protobuf.CodedInputStream(logicEffect.RawData.ToByteArray());
                             if (logicEffect.EffectType == EBuffEffectLogicPbType.BuffEffectAddBuff)
@@ -1068,7 +1071,10 @@ namespace BPSR_ZDPS
                     {
                         // Most commonly appears to include EBuffEventType.BuffEventRemove, EBuffEventType.BuffEventAddTo, EBuffEventType.BuffEventRemoveLayer
                         //System.Diagnostics.Debug.WriteLine($"No Logic Effect {buffEffect}");
+                        if (!LogicHandledBuffs.Contains(buffEffect.BuffUuid))
+                        {
                         EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, extraData);
+                    }
                     }
 
                     if (buffEffect.Type == EBuffEventType.BuffEventRemove)
