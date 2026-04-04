@@ -28,7 +28,7 @@ namespace BPSR_ZDPS
         public static string SceneName { get; private set; }
         public delegate void BattleStartEventHandler(EventArgs e);
         public static event BattleStartEventHandler BattleStart;
-        public delegate void EncounterStartEventHandler(EventArgs e);
+        public delegate void EncounterStartEventHandler(EncounterStartEventArgs e);
         public static event EncounterStartEventHandler EncounterStart;
         public delegate void EncounterEndEventHandler(EventArgs e);
         public static event EncounterEndEventHandler EncounterEnd;
@@ -239,7 +239,7 @@ namespace BPSR_ZDPS
 
             AllowSceneUpdate = true;
             Serilog.Log.Debug("EncounterManager sending OnEncounterStart event");
-            OnEncounterStart(new EventArgs());
+            OnEncounterStart(new EncounterStartEventArgs() { Reason = reason });
         }
 
         public static void StopEncounter(bool isKnownFinal = false, EncounterStartReason reason = EncounterStartReason.None)
@@ -450,7 +450,7 @@ namespace BPSR_ZDPS
             BattleStart?.Invoke(e);
         }
 
-        static void OnEncounterStart(EventArgs e)
+        static void OnEncounterStart(EncounterStartEventArgs e)
         {
             EncounterStart?.Invoke(e);
         }
@@ -477,6 +477,11 @@ namespace BPSR_ZDPS
         BenchmarkStart = 6,
         BenchmarkEnd = 7,
         DungeonStateEnd = 8,
+    }
+
+    public class EncounterStartEventArgs : EventArgs
+    {
+        public EncounterStartReason Reason;
     }
 
     public class Encounter
