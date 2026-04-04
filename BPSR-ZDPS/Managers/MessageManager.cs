@@ -696,8 +696,7 @@ namespace BPSR_ZDPS
                         break;
                     case EAttrType.AttrSkillId:
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? 0 : reader.ReadInt32());
-                            break;
-                        }
+                        break;
                     case EAttrType.AttrProfessionId:
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? 0 : reader.ReadInt32());
                         break;
@@ -1073,8 +1072,8 @@ namespace BPSR_ZDPS
                         //System.Diagnostics.Debug.WriteLine($"No Logic Effect {buffEffect}");
                         if (!LogicHandledBuffs.Contains(buffEffect.BuffUuid))
                         {
-                        EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, extraData);
-                    }
+                            EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, extraData);
+                        }
                     }
 
                     if (buffEffect.Type == EBuffEventType.BuffEventRemove)
@@ -1385,10 +1384,10 @@ namespace BPSR_ZDPS
 
                 /*if (vData.CharBase.TeamInfo != null)
                 {
-                if (vData.CharBase.TeamInfo.TeamId != 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("vData.CharBase.TeamInfo.TeamId != 0");
-                }
+                    if (vData.CharBase.TeamInfo.TeamId != 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("vData.CharBase.TeamInfo.TeamId != 0");
+                    }
                 }*/
             }
 
@@ -1601,6 +1600,11 @@ namespace BPSR_ZDPS
 
             if (currentUserUuid != 0)
             {
+                if (!EncounterManager.Current.HasStatsBeenRecorded())
+                {
+                    return;
+                }
+
                 if (EncounterManager.Current.IsWipe)
                 {
                     // TODO: This is a workaround for some encounters instantly running the wipe detection while still in a dead state
@@ -1609,9 +1613,14 @@ namespace BPSR_ZDPS
                         System.Diagnostics.Debug.WriteLine("EncounterManager.Current Duration was under 2 seconds, correcting the Wipe State to false");
                         EncounterManager.Current.SetWipeState(false);
                     }
+
+                    if (!EncounterManager.Current.HasStatsBeenRecorded())
+                    {
+                        EncounterManager.Current.SetWipeState(false);
+                    }
                     // This Encounter already has been reported as a wipe and should be in the processing of ending already
                     System.Diagnostics.Debug.WriteLine("EncounterManager.Current.IsWipe already true");
-                    return;
+                    //return;
                 }
 
                 var playerEntity = EncounterManager.Current.GetOrCreateEntity(currentUserUuid);
@@ -1656,9 +1665,13 @@ namespace BPSR_ZDPS
                             {
                                 if (recentBuff.Value.BaseId == 510072)
                                 {
+                                    // Mark the Encounter as being in a Wipe State before forcing the end of it
+                                    // This allows us to handle cases of a New Objective being sent at the same time as the Wipe Buff (such as Season 2 Raids)
+                                    EncounterManager.Current.SetWipeState(true);
+
                                     // This buff indicates a wipe is actively occurring.
-                                    // There are a few events that will occur over the next 3 seconds so we delay to let them register into the current event
-                                    if (recentBuff.Value.EventAddTime.Add(TimeSpan.FromSeconds(3.1)).TotalSeconds <= currentEncounterDuration.TotalSeconds)
+                                    // There are a few events that will occur over the next several seconds so we delay to let them register into the current event
+                                    if (recentBuff.Value.EventAddTime.Add(TimeSpan.FromSeconds(1.0)).TotalSeconds <= currentEncounterDuration.TotalSeconds)
                                     {
                                         Log.Debug($"Encounter Wipe Reset buff was found and duration was hit, creating a new Encounter now");
                                         EncounterManager.Current.SetWipeState(true);
