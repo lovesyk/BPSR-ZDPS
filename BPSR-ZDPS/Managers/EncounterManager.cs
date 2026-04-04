@@ -2436,6 +2436,7 @@ namespace BPSR_ZDPS
         public double CritRate { get; private set; }
         
         public uint LuckyCount { get; private set; }
+        public uint LuckyHitCount { get; private set; }
         public double LuckyRate { get; private set; }
 
         public uint CritLuckyCount { get; private set; }
@@ -2597,6 +2598,7 @@ namespace BPSR_ZDPS
                 }
                 if (isLucky)
                 {
+                    LuckyHitCount++;
                     AddLuckyValue(value);
                 }
 
@@ -2621,7 +2623,7 @@ namespace BPSR_ZDPS
 
             ValueAverage = HitsCount > 0 ? Math.Round(((double)ValueTotal / (double)HitsCount), 0) : 0.0;
             CritRate = HitsCount > 0 ? Math.Round(((double)CritCount / (double)HitsCount) * 100.0, 0) : 0.0;
-            LuckyRate = HitsCount > 0 ? Math.Round(((double)LuckyCount / (double)HitsCount) * 100.0, 0) : 0.0;
+            LuckyRate = HitsCount > 0 && HitsCount >= LuckyHitCount ? Math.Round(((double)LuckyHitCount / Math.Clamp((double)(HitsCount - LuckyHitCount), 1, double.MaxValue)) * 100.0, 0) : 0.0;
 
             if (StartTime != null && EndTime != null && StartTime <= EndTime)
             {
@@ -2729,6 +2731,7 @@ namespace BPSR_ZDPS
             MissCount += newCombatStats.MissCount;
             CritCount += newCombatStats.CritCount;
             LuckyCount += newCombatStats.LuckyCount;
+            LuckyHitCount += newCombatStats.LuckyHitCount;
             CritLuckyCount += newCombatStats.CritLuckyCount;
             NormalCount += newCombatStats.NormalCount;
             KillCount += newCombatStats.KillCount;
@@ -2738,7 +2741,7 @@ namespace BPSR_ZDPS
 
             ValueAverage = HitsCount > 0 ? Math.Round(((double)ValueTotal / (double)HitsCount), 0) : 0.0;
             CritRate = HitsCount > 0 ? Math.Round(((double)CritCount / (double)HitsCount) * 100.0, 0) : 0.0;
-            LuckyRate = HitsCount > 0 ? Math.Round(((double)LuckyCount / (double)HitsCount) * 100.0, 0) : 0.0;
+            LuckyRate = HitsCount > 0 && HitsCount >= LuckyHitCount ? Math.Round(((double)LuckyHitCount / Math.Clamp((double)(HitsCount - LuckyHitCount), 1, double.MaxValue)) * 100.0, 0) : 0.0;
 
             if (MissCount > 0 && HitsCount == 0)
             {
