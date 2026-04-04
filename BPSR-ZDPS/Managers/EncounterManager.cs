@@ -639,6 +639,18 @@ namespace BPSR_ZDPS
                     UpdateEncounterBossData(entity, (int)value);
                 }
             }
+            else if (key == "AttrName")
+            {
+                entity.SetName((string)value);
+            }
+            else if (key == "AttrProfessionId")
+            {
+                entity.SetProfessionId((int)value);
+            }
+            else if (key == "AttrFightPoint")
+            {
+                entity.SetAbilityScore((int)value);
+            }
             else if (key == "AttrLevel")
             {
                 entity.SetLevel((int)value);
