@@ -23,6 +23,8 @@ namespace BPSR_ZDPS
 
         public static int CurrentBattleId = 0;
         public static uint LevelMapId { get; private set; }
+        public static bool AllowSceneUpdate = true;
+
         public static string SceneName { get; private set; }
         public delegate void BattleStartEventHandler(EventArgs e);
         public static event BattleStartEventHandler BattleStart;
@@ -63,7 +65,7 @@ namespace BPSR_ZDPS
                     Current.SetEndTime(DateTime.MinValue);
                     if (LevelMapId > 0)
                     {
-                        SetSceneId(LevelMapId);
+                        SetSceneId(LevelMapId, true);
                     }
                     return;
                 }
@@ -211,7 +213,7 @@ namespace BPSR_ZDPS
             // Reuse last sceneId as our current one (it may not always be right but hopefully is right enough)
             if (LevelMapId > 0)
             {
-                SetSceneId(LevelMapId);
+                SetSceneId(LevelMapId, true);
                 Current.SetDungeonDifficulty(currentDifficulty);
             }
 
@@ -234,6 +236,7 @@ namespace BPSR_ZDPS
                 }
             }
 
+            AllowSceneUpdate = true;
             Serilog.Log.Debug("EncounterManager sending OnEncounterStart event");
             OnEncounterStart(new EventArgs());
         }
@@ -340,8 +343,13 @@ namespace BPSR_ZDPS
         }
 
         // While we technically use the 'LevelMapId' and not the 'SceneId' field, it's just another type of SceneId ultimately
-        public static void SetSceneId(uint levelMapId)
+        public static void SetSceneId(uint levelMapId, bool force = false)
         {
+            if (!AllowSceneUpdate && !force)
+            {
+                return;
+            }
+
             LevelMapId = levelMapId;
             if (levelMapId > 0)
             {

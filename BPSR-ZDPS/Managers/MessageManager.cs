@@ -81,6 +81,8 @@ namespace BPSR_ZDPS
 
             netCap.RegisterNotifyHandler((ulong)EServiceId.ChitChatNtf, (uint)BPSR_ZDPSLib.ServiceMethods.ChitChatNtf.NotifyNewestChitChatMsgs, Managers.ChatManager.ProcessChatMessage);
 
+            netCap.RegisterNotifyHandler((ulong)EServiceId.SocialNtf, (uint)BPSR_ZDPSLib.ServiceMethods.SocialNtf.NotifySocialData, ProcessNotifySocialData);
+            
             // Uncomment to debug print unhandled events
             //netCap.RegisterUnhandledHandler(ProcessUnhandled);
 
@@ -130,6 +132,28 @@ namespace BPSR_ZDPS
             if (payloadBuffer.Length == 0)
             {
                 return;
+            }
+        }
+
+        public static void ProcessNotifySocialData(ReadOnlySpan<byte> payloadBuffer, ExtraPacketData extraData)
+        {
+            //System.Diagnostics.Debug.WriteLine("ProcessNotifySocialData");
+            if (payloadBuffer.Length == 0)
+            {
+                return;
+            }
+
+            var vData = SocialNtf.Types.NotifySocialData.Parser.ParseFrom(payloadBuffer);
+
+            // This event occurs the moment a map change request is made, before the actual change event occurs, so we have to lock it out of modifying the prior Encounter
+            if (EncounterManager.AllowSceneUpdate)
+            {
+                if (vData?.VRequest?.Data?.SceneData != null)
+                {
+                    EncounterManager.SetSceneId(vData.VRequest.Data.SceneData.LevelMapId);
+                    EncounterManager.Current.SetChannelLineNumber(vData.VRequest.Data.SceneData.LineId);
+                    EncounterManager.AllowSceneUpdate = false;
+                }
             }
         }
 
@@ -1234,10 +1258,13 @@ namespace BPSR_ZDPS
                     EncounterManager.Current.SetAbilityScore(playerUuid, vData.CharBase.FightPoint);
                 }
 
+                /*if (vData.CharBase.TeamInfo != null)
+                {
                 if (vData.CharBase.TeamInfo.TeamId != 0)
                 {
                     System.Diagnostics.Debug.WriteLine("vData.CharBase.TeamInfo.TeamId != 0");
                 }
+                }*/
             }
 
             var professionList = vData.ProfessionList;
