@@ -96,16 +96,9 @@ namespace BPSR_ZDPS
                     // We're likely entering a new phase (either raid boss phase or dungeon phase going into boss)
                     priorBossName = Current.BossName;
 
-                    if (!string.IsNullOrEmpty(Current.SceneSubName))
+                    if (Current.ExData.EncounterPhase > 0)
                     {
-                        // Break the current sub name into parts to try and figure out what our current phase number is to increment for upcoming encounter
-                        var subNameParts = Current.SceneSubName.Split(' ', StringSplitOptions.TrimEntries);
-                        if (subNameParts.Length > 1)
-                        {
-                            if (int.TryParse(subNameParts.Last(), out var phaseNumber))
-                            {
-                                // For now we trust this is a string ending with out Phase number
-                                priorEncounterPhase = phaseNumber;
+                        priorEncounterPhase = Current.ExData.EncounterPhase;
                             }
                         }
                     }
@@ -113,6 +106,7 @@ namespace BPSR_ZDPS
                     {
                         // This is our first split
                         Current.SceneSubName = "Phase 1";
+                        Current.ExData.EncounterPhase = 1;
                         priorEncounterPhase = 1;
                     }
                 }
@@ -206,6 +200,7 @@ namespace BPSR_ZDPS
                 if (priorEncounterPhase > 0)
                 {
                     Current.SceneSubName = $"Phase {priorEncounterPhase + 1}";
+                    Current.ExData.EncounterPhase = priorEncounterPhase + 1;
                 }
             }
             Current.SetWipeState(false);
@@ -215,6 +210,12 @@ namespace BPSR_ZDPS
             {
                 SetSceneId(LevelMapId, true);
                 Current.SetDungeonDifficulty(currentDifficulty);
+            }
+
+            if (AppState.IsBenchmarkMode)
+            {
+                //Current.SceneSubName = $"BENCHMARK ({AppState.BenchmarkTime}s)";
+                Current.ExData.BenchmarkTime = AppState.BenchmarkTime;
             }
 
             UpdateTruePerValuesCTS = new();
@@ -1113,6 +1114,10 @@ namespace BPSR_ZDPS
         public bool IsTimedOut { get; set; } = false;
         [ProtoMember(4)]
         public int DungeonTimeDeathChange { get; set; } = 0;
+        [ProtoMember(5)]
+        public int EncounterPhase { get; set; } = 0;
+        [ProtoMember(6)]
+        public int BenchmarkTime { get; set; } = 0;
 
         public EncounterExData() { }
     }
