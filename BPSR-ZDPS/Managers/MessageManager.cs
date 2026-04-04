@@ -38,6 +38,8 @@ namespace BPSR_ZDPS
                 ExeNames = Utils.GameCapturePreferenceToExeNames(Settings.Instance.GameCapturePreference)
             });
 
+            netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.EnterScene, ProcessEnterScene);
+
             netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.SyncContainerData, ProcessSyncContainerData);
             netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.SyncContainerDirtyData, ProcessSyncContainerDirtyData);
 
@@ -46,6 +48,8 @@ namespace BPSR_ZDPS
             netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.SyncToMeDeltaInfo, ProcessSyncToMeDeltaInfo);
 
             netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.SyncNearEntities, ProcessSyncNearEntities);
+
+            netCap.RegisterWorldNotifyHandler(BPSR_ZDPSLib.ServiceMethods.WorldNtf.SyncSceneEvents, ProcessSyncSceneEvents);
 
             netCap.RegisterNotifyHandler(936649811, (uint)BPSR_ZDPSLib.ServiceMethods.WorldActivityNtf.SyncHitInfo, ProcessSyncHitInfo);
 
@@ -80,6 +84,8 @@ namespace BPSR_ZDPS
             netCap.RegisterNotifyHandler((ulong)EServiceId.GrpcTeamNtf, (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyTeamEnterErr, ProcessNotifyTeamEnterErr);
 
             netCap.RegisterNotifyHandler((ulong)EServiceId.ChitChatNtf, (uint)BPSR_ZDPSLib.ServiceMethods.ChitChatNtf.NotifyNewestChitChatMsgs, Managers.ChatManager.ProcessChatMessage);
+
+            netCap.RegisterNotifyHandler((ulong)EServiceId.WorldActNtf, (uint)BPSR_ZDPSLib.ServiceMethods.WorldActNtf.SyncWorldActData, ProcessSyncWorldActData);
 
             netCap.RegisterNotifyHandler((ulong)EServiceId.SocialNtf, (uint)BPSR_ZDPSLib.ServiceMethods.SocialNtf.NotifySocialData, ProcessNotifySocialData);
             
@@ -132,6 +138,89 @@ namespace BPSR_ZDPS
             if (payloadBuffer.Length == 0)
             {
                 return;
+            }
+        }
+
+        public static void ProcessEnterScene(ReadOnlySpan<byte> payloadBuffer, ExtraPacketData extraData)
+        {
+            if (payloadBuffer.Length == 0)
+            {
+                return;
+            }
+
+            var vData = EnterScene.Parser.ParseFrom(payloadBuffer);
+
+            if (vData.EnterSceneInfo != null)
+            {
+                if (vData.EnterSceneInfo.PlayerEnt != null)
+                {
+                    if (vData.EnterSceneInfo.PlayerEnt.Attrs != null)
+                    {
+                        ProcessAttrs(vData.EnterSceneInfo.PlayerEnt.Uuid, vData.EnterSceneInfo.PlayerEnt.Attrs.Attrs);
+                    }
+
+                    if (vData.EnterSceneInfo.PlayerEnt.TempAttrs != null)
+                    {
+                        ProcessTempAttrs(vData.EnterSceneInfo.PlayerEnt.Uuid, vData.EnterSceneInfo.PlayerEnt.TempAttrs.Attrs);
+                    }
+                }
+
+                if (vData.EnterSceneInfo.SceneAttrs != null)
+                {
+                    Log.Debug("ProcessEnterScene");
+
+                    foreach (var attr in vData.EnterSceneInfo.SceneAttrs.Attrs)
+                    {
+                        var reader = new Google.Protobuf.CodedInputStream(attr.RawData.ToByteArray());
+
+                        EAttrType attrId = (EAttrType)attr.Id;
+                        string attrIdName = attrId.ToString();
+                        bool isNoValue = attr.RawData.Length == 0;
+                        switch (attrId)
+                        {
+                            case EAttrType.AttrSceneUuid:
+                                Log.Debug($"\t{attrIdName} = {(isNoValue ? 0 : reader.ReadInt64())}");
+                                break;
+                            case EAttrType.AttrSceneBasicId:
+                                Log.Debug($"\t{attrIdName} = {(isNoValue ? 0 : reader.ReadUInt32())}");
+                                break;
+                            case EAttrType.AttrSceneChannel:
+                                Log.Debug($"\t{attrIdName} = {(isNoValue ? 0 : reader.ReadUInt32())}");
+                                break;
+                            default:
+                                var val = isNoValue ? 0 : reader.ReadInt32();
+                                Log.Debug($"\t{attrIdName} = {val}");
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ProcessSyncWorldActData(ReadOnlySpan<byte> payloadBuffer, ExtraPacketData extraData)
+        {
+            if (payloadBuffer.Length == 0)
+            {
+                return;
+            }
+
+            var vData = WorldActActivityData.Parser.ParseFrom(payloadBuffer);
+
+            System.Diagnostics.Debug.WriteLine("ProcessSyncWorldActData");
+        }
+
+        public static void ProcessSyncSceneEvents(ReadOnlySpan<byte> payloadBuffer, ExtraPacketData extraData)
+        {
+            if (payloadBuffer.Length == 0)
+            {
+                return;
+            }
+
+            var vData = SyncSceneEvents.Parser.ParseFrom(payloadBuffer);
+
+            foreach (var evt in vData.Evt.Events)
+            {
+                EncounterManager.Current.AddSceneEvent(evt);
             }
         }
 
@@ -797,6 +886,21 @@ namespace BPSR_ZDPS
             }
         }
 
+        public static void ProcessTempAttrs(long uuid, RepeatedField<Zproto.TempAttr> tempAttrs)
+        {
+            foreach (var tempAttr in tempAttrs)
+            {
+                if (HelperMethods.DataTables.TempAttrs.Data.TryGetValue(tempAttr.Id.ToString(), out var matchedTempAttr))
+                {
+                    EncounterManager.Current.SetTempAttrKV(uuid, tempAttr.Id, new TempAttributesContainer() { Id = tempAttr.Id, Value = tempAttr.Value, TempAttr = matchedTempAttr });
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"WARN: Unmatched TempAttr: UUID={uuid} Id={tempAttr.Id} Value={tempAttr.Value}");
+                }
+            }
+        }
+
         public static void ProcessSyncNearEntities(ReadOnlySpan<byte> payloadBuffer, ExtraPacketData extraData)
         {
             //Log.Information($"ProcessSyncNearEntities: Meesage arrival time: {extraData.ArrivalTime}. Diff to DateTime now: {DateTime.Now - extraData.ArrivalTime}");
@@ -817,6 +921,11 @@ namespace BPSR_ZDPS
                 }
 
                 EncounterManager.Current.SetEntityType(entity.Uuid, entity.EntType);
+
+                if (entity.TempAttrs != null && entity.TempAttrs.Attrs.Any())
+                {
+                    ProcessTempAttrs(entity.Uuid, entity.TempAttrs.Attrs);
+                }
 
                 var attrCollection = entity.Attrs;
                 if (attrCollection?.Attrs == null)
@@ -905,7 +1014,7 @@ namespace BPSR_ZDPS
 
             if (delta.TempAttrs != null && delta.TempAttrs.Attrs.Any())
             {
-                //System.Diagnostics.Debug.WriteLine($"delta.TempAttrs.Attrs.count = {delta.TempAttrs.Attrs.Count}");
+                ProcessTempAttrs(targetUuid, delta.TempAttrs.Attrs);
             }
 
             if (AppState.IsEncounterSavingPaused && Settings.Instance.MinimalProcessingWhileEncounterSavingPaused)

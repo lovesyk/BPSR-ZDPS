@@ -523,6 +523,8 @@ namespace BPSR_ZDPS
         public event BuffUpdatedEventHandler BuffUpdated;
         public delegate void AttributeUpdatedEventHandler(object sender, AttributeUpdatedEventArgs e);
         public event AttributeUpdatedEventHandler AttributeUpdated;
+        public delegate void SceneEventEventHandler(object sender, SceneEventEventArgs e);
+        public event SceneEventEventHandler SceneEvent;
 
         public EncounterExData ExData { get; set; } = new();
         public byte[] ExDataBlob { get; set; }
@@ -758,6 +760,96 @@ namespace BPSR_ZDPS
             }
 
             OnAttributeUpdated(this, new AttributeUpdatedEventArgs() { EntityUuid = uuid, Entity = entity, AttributeName = key, AttributeValue = value });
+            }
+
+        public void SetTempAttrKV(long uuid, int key, TempAttributesContainer value)
+        {
+            var entity = GetOrCreateEntity(uuid);
+            entity.SetTempAttrKV(key, value);
+        }
+
+        public void AddSceneEvent(Zproto.EventData sceneEvent)
+        {
+            if (sceneEvent.EventType == (int)WorldEventType.BossDbm)
+            {
+                // Occurs when a boss cast preview timer appears
+
+                // { "Evt": { "Events": [ { "eventType": 29, "intParams": [ 405000601, 6, 1 ], "longParams": [ "1772338107311" ] } ] } }
+
+                // Formated: [ SkillEffectId, Time, StartTimePosition? ]
+                int skillId = 0;
+                int duration = 0;
+                int insertion = 0;
+                if (sceneEvent.IntParams != null)
+                {
+                    for (int i = 0; i < sceneEvent.IntParams.Count; i++)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                skillId = sceneEvent.IntParams[i];
+                                break;
+                            case 1:
+                                duration = sceneEvent.IntParams[i];
+                                break;
+                            case 2:
+                                insertion = sceneEvent.IntParams[i];
+                                break;
+                            default:
+                                Serilog.Log.Debug($"Unexpected item({i}) in SceneEvent[BossDbm] IntParams = {sceneEvent.IntParams[i]}");
+                                break;
+                        }
+                    }
+                }
+
+                long timestamp = 0;
+                if (sceneEvent.LongParams != null)
+                {
+                    for (int i = 0; i < sceneEvent.LongParams.Count; ++i)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                timestamp = sceneEvent.LongParams[i];
+                                break;
+                            default:
+                                Serilog.Log.Debug($"Unexpected item({i}) in SceneEvent[BossDbm] LongParams = {sceneEvent.LongParams[i]}");
+                                break;
+                        }
+                    }
+                }
+
+                OnSceneEvent(this, new SceneEventBossDbmEventArgs() { EventType = WorldEventType.BossDbm, SkillId = skillId, Duration = duration, Insertion = insertion, Timestamp = timestamp });
+            }
+            else if (sceneEvent.EventType == (int)WorldEventType.NoticeTip)
+            {
+                // Occurs when on-screen text for how to do a mechanic appears
+
+                // { "Evt": { "Events": [ { "eventType": 1, "strParams": [ "4050010", "" ] } ] } }
+
+                // Fromated: [ "StrId in MessageTable.json" ]
+                string messageId = "";
+                string extraId = "";
+                if (sceneEvent.StrParams != null)
+                {
+                    for (int i = 0; i < sceneEvent.StrParams.Count; i++)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                messageId = sceneEvent.StrParams[i];
+                                break;
+                            case 1:
+                                extraId = sceneEvent.StrParams[i];
+                                break;
+                            default:
+                                Serilog.Log.Debug($"Unexpected item({i}) in SceneEvent[NoticeTip] StrParams = {sceneEvent.StrParams[i]}");
+                                break;
+                        }
+                    }
+                }
+
+                OnSceneEvent(this, new SceneEventNoticeTipEventArgs() { EventType = WorldEventType.NoticeTip, MessageId = messageId, ExtraId = extraId });
             }
         }
 
@@ -1085,6 +1177,11 @@ namespace BPSR_ZDPS
             AttributeUpdated?.Invoke(sender, e);
         }
 
+        protected virtual void OnSceneEvent(object sender, SceneEventEventArgs e)
+        {
+            SceneEvent?.Invoke(sender, e);
+        }
+
         public void RemoveEntityHandlers()
         {
             foreach (var entity in Entities)
@@ -1100,6 +1197,7 @@ namespace BPSR_ZDPS
             EntityHpUpdated = null;
             BuffUpdated = null;
             AttributeUpdated = null;
+            SceneEvent = null;
 
             RemoveEntityHandlers();
         }
@@ -1129,6 +1227,32 @@ namespace BPSR_ZDPS
         public long Hp;
         public long MaxHp;
         public Dictionary<string, object> Attrs;
+    }
+
+    public class TempAttributesContainer
+    {
+        public int Id;
+        public int Value;
+        public DataTypes.TempAttr TempAttr;
+    }
+
+    public class SceneEventEventArgs : EventArgs
+    {
+        public Zproto.WorldEventType EventType;
+    }
+
+    public class SceneEventBossDbmEventArgs : SceneEventEventArgs
+    {
+        public int SkillId;
+        public int Duration;
+        public int Insertion;
+        public long Timestamp;
+    }
+
+    public class SceneEventNoticeTipEventArgs : SceneEventEventArgs
+    {
+        public string MessageId;
+        public string ExtraId;
     }
 
     public class Entity : System.ICloneable
@@ -1189,6 +1313,9 @@ namespace BPSR_ZDPS
         public ConcurrentQueue<List<ThreatInfo>> RecentThreatInfoListHistory { get; private set; } = new();
 
         public Dictionary<string, object> Attributes { get; set; } = new();
+
+        [JsonIgnore]
+        public Dictionary<int, TempAttributesContainer> TempAttributes { get; set; } = new();
 
         public EEntityType SummonerEntityType { get; set; } = EEntityType.EntErrType;
 
@@ -1970,6 +2097,17 @@ namespace BPSR_ZDPS
         public object? GetAttrKV(string key)
         {
             var value = Attributes.TryGetValue(key, out var val) ? val : null;
+            return value;
+        }
+
+        public void SetTempAttrKV(int key, TempAttributesContainer value)
+        {
+            TempAttributes[key] = value;
+        }
+
+        public TempAttributesContainer? GetTempAttrKV(int key)
+        {
+            var value = TempAttributes.TryGetValue(key, out var val) ? val : null;
             return value;
         }
 
