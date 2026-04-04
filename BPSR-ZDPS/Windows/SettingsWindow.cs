@@ -93,6 +93,10 @@ namespace BPSR_ZDPS.Windows
         static bool lowPerformanceMode;
         static int fixedFramerate;
 
+        static bool enableGDIBackBufferCopyCompatibility;
+
+        static bool aggressiveExceptionDebugLogging;
+
         // External Settings
         static bool externalBPTimerEnabled;
         static bool externalBPTimerIncludeCharacterId;
@@ -1033,6 +1037,20 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Unindent();
                         ImGui.EndDisabled();
 
+                        ShowRestartRequiredNotice(Settings.Instance.EnableGDIBackBufferCopyCompatibility != enableGDIBackBufferCopyCompatibility, "Enable GDI Back Buffer Copy Compatibility");
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Enable GDI Back Buffer Copy Compatibility: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##EnableGDIBackBufferCopyCompatibility", ref enableGDIBackBufferCopyCompatibility);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextUnformatted("(OBS BitBlt Capture Compatibility Mode)");
+                        ImGui.TextWrapped("When enabled, Screen Recording programs, like OBS, can perform 'Window Captures' on ZDPS using the (Default) 'BitBlt Capture Method'.");
+                        ImGui.TextWrapped("Note: This uses more GPU resources to perform. If this is disabled, 'Desktop Captures' and the 'Window Capture Method' labeled 'Windows 10/11' will still function without issue.");
+                        ImGui.TextWrapped("Note: This setting requires a ZDPS restart to fully take effect.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
                         ImGui.EndChild();
                         ImGui.EndTabItem();
                     }
@@ -1093,7 +1111,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SetNextItemWidth(-1);
                         ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                         ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                        if (ImGui.SliderFloat("##MatchmakeNotificationVolume", ref matchmakeNotificationVolume, 0.10f, 3.0f, $"{(int)(matchmakeNotificationVolume * 100)}%%"))
+                        if (ImGui.SliderFloat("##MatchmakeNotificationVolume", ref matchmakeNotificationVolume, 0.02f, 3.0f, $"{(int)(matchmakeNotificationVolume * 100)}%%"))
                         {
                             matchmakeNotificationVolume = MathF.Round(matchmakeNotificationVolume, 2);
                         }
@@ -1157,7 +1175,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SetNextItemWidth(-1);
                         ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                         ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                        if (ImGui.SliderFloat("##ReadyCheckNotificationVolume", ref readyCheckNotificationVolume, 0.10f, 3.0f, $"{(int)(readyCheckNotificationVolume * 100)}%%"))
+                        if (ImGui.SliderFloat("##ReadyCheckNotificationVolume", ref readyCheckNotificationVolume, 0.02f, 3.0f, $"{(int)(readyCheckNotificationVolume * 100)}%%"))
                         {
                             readyCheckNotificationVolume = MathF.Round(readyCheckNotificationVolume, 2);
                         }
@@ -1495,6 +1513,18 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
+                        ShowRestartRequiredNotice(Settings.Instance.AggressiveExceptionDebugLogging != aggressiveExceptionDebugLogging, "Aggressive Exception Debug Logging");
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Aggressive Exception Debug Logging: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##AggressiveExceptionDebugLogging", ref aggressiveExceptionDebugLogging);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, captures more exception data for when systems break or ZDPS crashes. Applies after restarting ZDPS.");
+                        ImGui.TextWrapped("Note: This has a chance to make ZDPS run slower.\nOnly turn this on when you encounter broken systems or crashes. Reproduce the issue to have a more useful ZDPS_log.txt and then turn off this setting.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
                         if (ImGui.Button("Open GitHub Project Page"))
                         {
                             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
@@ -1646,6 +1676,10 @@ namespace BPSR_ZDPS.Windows
             lowPerformanceMode = Settings.Instance.LowPerformanceMode;
             fixedFramerate = (int)Settings.Instance.FixedFramerateScale;
 
+            enableGDIBackBufferCopyCompatibility = Settings.Instance.EnableGDIBackBufferCopyCompatibility;
+
+            aggressiveExceptionDebugLogging = Settings.Instance.AggressiveExceptionDebugLogging;
+
             // External
             externalBPTimerEnabled = Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled;
             externalBPTimerIncludeCharacterId = Settings.Instance.External.BPTimerSettings.ExternalBPTimerIncludeCharacterId;
@@ -1748,6 +1782,11 @@ namespace BPSR_ZDPS.Windows
 
             Settings.Instance.LowPerformanceMode = lowPerformanceMode;
             Settings.Instance.FixedFramerateScale = (uint)fixedFramerate;
+
+            Settings.Instance.EnableGDIBackBufferCopyCompatibility = enableGDIBackBufferCopyCompatibility;
+            RendererImpl.EnableGDIBackBufferCopyCompatibility = enableGDIBackBufferCopyCompatibility;
+
+            Settings.Instance.AggressiveExceptionDebugLogging = aggressiveExceptionDebugLogging;
 
             // External
             Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled = externalBPTimerEnabled;

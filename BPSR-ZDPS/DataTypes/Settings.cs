@@ -89,6 +89,10 @@ public class Settings
 
     public uint FixedFramerateScale { get; set; } = 1;
 
+    public bool EnableGDIBackBufferCopyCompatibility { get; set; } = false;
+
+    public bool AggressiveExceptionDebugLogging = false;
+
     public ChatSettings Chat { get; set; } = new();
 
     public void Apply()
