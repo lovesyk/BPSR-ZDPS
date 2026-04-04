@@ -99,8 +99,6 @@ namespace BPSR_ZDPS
                     if (Current.ExData.EncounterPhase > 0)
                     {
                         priorEncounterPhase = Current.ExData.EncounterPhase;
-                            }
-                        }
                     }
                     else
                     {
@@ -116,7 +114,7 @@ namespace BPSR_ZDPS
                 if (Current.TotalDamage > 0)
                 {
                     // Perform final PerSecond calculations
-                    RecalculateEncounterPerValues();
+                    RecalculateEncounterPerValues(Current.EndTime.ToUniversalTime());
                 }
 
                 // This is safe to call to ensure we're sending a proper End Final before a new Encounter is made no matter what
@@ -395,12 +393,12 @@ namespace BPSR_ZDPS
             }
         }
 
-        public static void RecalculateEncounterPerValues()
+        public static void RecalculateEncounterPerValues(DateTime? nowTime = null)
         {
             var entities = Current.Entities.AsValueEnumerable();
             foreach (var entity in entities)
             {
-                DateTime now = DateTime.UtcNow;
+                DateTime now = nowTime ?? DateTime.UtcNow;
                 entity.Value.RecalculateInactiveTime(now, true);
                 double inactiveTime = entity.Value.GetInactiveTime();
 
@@ -765,7 +763,7 @@ namespace BPSR_ZDPS
             }
 
             OnAttributeUpdated(this, new AttributeUpdatedEventArgs() { EntityUuid = uuid, Entity = entity, AttributeName = key, AttributeValue = value });
-            }
+        }
 
         public void SetTempAttrKV(long uuid, int key, TempAttributesContainer value)
         {
