@@ -67,6 +67,7 @@ namespace BPSR_ZDPS.Windows
             RaidManagerCountdownWindow.Draw(this);
             RaidManagerThreatWindow.Draw(this);
             ChatWindow.Draw(this);
+            SkillCastTimelineWindow.Draw(this);
         }
 
         static bool p_open = true;
@@ -523,6 +524,11 @@ namespace BPSR_ZDPS.Windows
                             RaidManagerThreatWindow.Open();
                         }
 
+                        if (ImGui.MenuItem("Skill Cast Timeline"))
+                        {
+                            SkillCastTimelineWindow.Open();
+                        }
+
                         ImGui.EndMenu();
                     }
 
@@ -578,6 +584,7 @@ namespace BPSR_ZDPS.Windows
                                 AppState.BenchmarkSingleTargetUUID = 0;
                                 AppState.IsBenchmarkMode = true;
                                 CreateNewEncounter();
+                                ImGui.CloseCurrentPopup();
                             }
                             ImGui.EndDisabled();
                             if (AppState.BenchmarkTime < 5)
