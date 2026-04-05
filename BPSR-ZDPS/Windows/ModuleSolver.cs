@@ -578,7 +578,7 @@ namespace BPSR_ZDPS
             ImGui.PopFont();
 
             var availSize = ImGui.GetContentRegionAvail();
-            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 70, 5));
+            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 90, 5));
             ImGui.SetNextItemWidth(40);
 
             /*
@@ -594,6 +594,19 @@ namespace BPSR_ZDPS
                 wasChanged = true;
             }
             ImGui.SetItemTooltip("The required Link value needed for this stat to have for the combination to be considered.\nLeave 0 to use any Link.");
+
+            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 50, 5));
+            ImGui.Dummy(new Vector2(-4, 0));
+            ImGui.SameLine();
+            bool isAtleastMode = SolverConfig.StatPriorities[i].StatMode == StatMode.Atleast;
+            if (ImGui.Button($"{(isAtleastMode ? "A" : "E")}##StatMode{i}"))
+            {
+                SolverConfig.StatPriorities[i].StatMode = isAtleastMode ? StatMode.Exactly : StatMode.Atleast;
+                wasChanged = true;
+            }
+            ImGui.SetItemTooltip(isAtleastMode ?
+                "In this mode the combo must have ATLEAST this link value." :
+                "In this mode the combo must have EXACTLY this link value.");
 
             ImGui.SetCursorPos(pos + new Vector2(availSize.X - 25, 0));
             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], 13.0f);
@@ -912,6 +925,7 @@ namespace BPSR_ZDPS
         public int Id;
         public int MinLevel;
         public int ReqLevel;
+        public StatMode StatMode = StatMode.Atleast;
     }
 
     public class Preset
@@ -938,5 +952,11 @@ namespace BPSR_ZDPS
     {
         public List<ModComboResult> BestModResults = [];
         public List<long> FilteredModules = [];
+    }
+
+    public enum StatMode
+    {
+        Atleast,
+        Exactly
     }
 }

@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using ZLinq;
 using Zproto;
+using ZstdSharp.Unsafe;
 
 namespace BPSR_ZDPS.Managers
 {
@@ -339,13 +340,19 @@ namespace BPSR_ZDPS.Managers
             var statMins = new byte[vecCount];
             var statReqs = new byte[vecCount];
             var statMask = new byte[vecCount];
+            bool hasExactStatMode = false;
             foreach (var statPrio in config.StatPriorities)
             {
                 if (possableStats.TryGetValue(statPrio.Id, out var idx))
                 {
                     statMins[idx] = (byte)statPrio.MinLevel;
                     statReqs[idx] = (byte)statPrio.ReqLevel;
-                    statMask[idx] = 1;
+                    statMask[idx] = (byte)statPrio.StatMode;
+
+                    if (statPrio.StatMode == StatMode.Exactly)
+                    {
+                        hasExactStatMode = true;
+                    }
                 }
             }
             Vector<byte> statMinsVec = new Vector<byte>(statMins);
@@ -378,23 +385,23 @@ namespace BPSR_ZDPS.Managers
 
                 if (numLoops == 5)
                 {
-                    FiveModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                    FiveModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, statMaskVec, hasExactStatMode, ref topBest);
                 }
                 else if (numLoops == 4)
                 {
-                    FourModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                    FourModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, statMaskVec, hasExactStatMode, ref topBest);
                 }
                 else if (numLoops == 3)
                 {
-                    ThreeModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                    ThreeModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, statMaskVec, hasExactStatMode, ref topBest);
                 }
                 else if (numLoops == 2)
                 {
-                    TwoModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                    TwoModulesLoop(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, statMaskVec, hasExactStatMode, ref topBest);
                 }
                 else if (numLoops == 1)
                 {
-                    OneModule(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, ref topBest);
+                    OneModule(i, modStatValues, modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, numMods, statMaskVec, hasExactStatMode, ref topBest);
                 }
 
                 lock (bestMods)
@@ -493,7 +500,7 @@ namespace BPSR_ZDPS.Managers
             return result;
         }
 
-        private static void FiveModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        private static void FiveModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, in Vector<byte> statsMask, bool hasExactStatMode, ref ModComboResult[] topBest)
         {
             for (int j = i + 1; j < numMods - 3; j++)
             {
@@ -518,7 +525,7 @@ namespace BPSR_ZDPS.Managers
                                 modStatValues[l] +
                                 modStatValues[1]);
 
-                            bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+                            bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, statsMask, hasExactStatMode, sums);
                             if (!keepGoing)
                             {
                                 continue;
@@ -529,7 +536,7 @@ namespace BPSR_ZDPS.Managers
             }
         }
 
-        private static void FourModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        private static void FourModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, in Vector<byte> statsMask, bool hasExactStatMode, ref ModComboResult[] topBest)
         {
             for (int j = i + 1; j < numMods - 2; j++)
             {
@@ -550,7 +557,7 @@ namespace BPSR_ZDPS.Managers
                             modStatValues[k] +
                             modStatValues[l]);
 
-                        bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+                        bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, statsMask, hasExactStatMode, sums);
                         if (!keepGoing)
                         {
                             continue;
@@ -560,7 +567,7 @@ namespace BPSR_ZDPS.Managers
             }
         }
 
-        private static void ThreeModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        private static void ThreeModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, in Vector<byte> statsMask, bool hasExactStatMode, ref ModComboResult[] topBest)
         {
             for (int j = i + 1; j < numMods - 1; j++)
             {
@@ -578,7 +585,7 @@ namespace BPSR_ZDPS.Managers
                         modStatValues[j] +
                         modStatValues[k]);
 
-                    bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+                    bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, statsMask, hasExactStatMode, sums);
                     if (!keepGoing)
                     {
                         continue;
@@ -587,7 +594,7 @@ namespace BPSR_ZDPS.Managers
             }
         }
 
-        private static void TwoModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        private static void TwoModulesLoop(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, in Vector<byte> statsMask, bool hasExactStatMode, ref ModComboResult[] topBest)
         {
             for (int j = i + 1; j < numMods; j++)
             {
@@ -602,7 +609,7 @@ namespace BPSR_ZDPS.Managers
                 var sums = modStatValues[(int)i] +
                     modStatValues[j];
 
-                bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+                bool keepGoing = InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, statsMask, hasExactStatMode, sums);
                 if (!keepGoing)
                 {
                     continue;
@@ -610,7 +617,7 @@ namespace BPSR_ZDPS.Managers
             }
         }
 
-        private static void OneModule(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, ref ModComboResult[] topBest)
+        private static void OneModule(int i, List<Vector<byte>> modStatValues, in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, int numMods, in Vector<byte> statsMask, bool hasExactStatMode, ref ModComboResult[] topBest)
         {
             var combo = new ModuleSet()
             {
@@ -622,11 +629,26 @@ namespace BPSR_ZDPS.Managers
 
             var sums = modStatValues[i];
 
-            InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, sums);
+            InnerStatsWeightCalcs(modStatMultplier, statCap, statMinsVec, statReqsVec, breakPointBoosts, ref topBest, ref combo, statsMask, hasExactStatMode, sums);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool InnerStatsWeightCalcs(in Vector<byte> modStatMultplier, in Vector<byte> statCap, in Vector<byte> statMinsVec, in Vector<byte> statReqsVec, in byte[] breakPointBoosts, ref ModComboResult[] topBest, ref ModuleSet combo, in Vector<byte> sums)
+        private static bool InnerStatsWeightCalcs(in Vector<byte> modStatMultplier,
+            in Vector<byte> statCap, in Vector<byte> statMinsVec,
+            in Vector<byte> statReqsVec, in byte[] breakPointBoosts,
+            ref ModComboResult[] topBest, ref ModuleSet combo,
+            in Vector<byte> statsMask, bool hasExactStatMode, in Vector<byte> sums)
         {
+            if (hasExactStatMode)
+            {
+                var equalsReq = Vector.Equals(sums, statReqsVec);
+                var equalsAfterMask = Vector.Multiply(equalsReq, statsMask);
+                var equalsSum = Vector.Sum(equalsAfterMask);
+                if (equalsSum == 0)
+                {
+                    return false;
+                }
+            }
+
             var sumsMined = Vector.Min(sums, statCap);
 
             var statIsGreaterThanReq = Vector.LessThan<byte>(sumsMined, statReqsVec);
@@ -637,6 +659,7 @@ namespace BPSR_ZDPS.Managers
             }
 
             var statIsGreaterThan = Vector.GreaterThan<byte>(sumsMined, statMinsVec);
+            //var statCondition = Vector.ConditionalSelect(statsMask, equalsReq, statIsGreaterThan);
             var passedMinValues = Vector.ConditionalSelect(statIsGreaterThan, sumsMined, new Vector<byte>(0));
             //var multied = passedMinValues * modStatMultplier;
 
