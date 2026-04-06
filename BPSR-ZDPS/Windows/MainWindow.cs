@@ -697,9 +697,9 @@ namespace BPSR_ZDPS.Windows
             ImGui.SameLine();
             // Duration of current encounter
             string duration = "00:00:00";
-            if (EncounterManager.Current?.GetDuration().TotalSeconds > 0)
+            if (EncounterManager.Current?.GetDuration(true).TotalSeconds > 0)
             {
-                duration = EncounterManager.Current.GetDuration().ToString("hh\\:mm\\:ss");
+                duration = EncounterManager.Current.GetDuration(true).ToString("hh\\:mm\\:ss");
             }
 
             if (AppState.IsBenchmarkMode && !AppState.HasBenchmarkBegun)

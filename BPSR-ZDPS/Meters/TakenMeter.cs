@@ -169,7 +169,7 @@ namespace BPSR_ZDPS.Meters
                         if (SelectableWithHint($"{name} [{entity.UID.ToString()}]##TakenEntry_{i}", format.ToString()))
                         {
                             mainWindow.entityInspector = new EntityInspector();
-                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
+                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
                             mainWindow.entityInspector.Open();
                         }
 

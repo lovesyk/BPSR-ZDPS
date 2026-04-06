@@ -174,7 +174,7 @@ namespace BPSR_ZDPS.Meters
                         //if (SelectableWithHint($" {(i + 1).ToString().PadLeft((playerList.Count() < 101 ? 2 : 3), '0')}. {name}-{profession} ({entity.AbilityScore})##TpsEntry_{i}", tps_format))
                         {
                             mainWindow.entityInspector = new EntityInspector();
-                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
+                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
                             mainWindow.entityInspector.Open();
                         }
 

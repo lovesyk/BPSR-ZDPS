@@ -24,6 +24,7 @@ namespace BPSR_ZDPS.Windows
         // if pulling from current, maintain a connection to current encounter to show latest data as encounters change
         public Entity? LoadedEntity { get; set; }
         public DateTime? LoadedEncounterStartTime { get; private set; }
+        public DateTime? LoadedEncounterFirstDamageTimeStamp { get; private set; }
 
         public bool IsOpened = false;
 
@@ -105,8 +106,19 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (LoadedEncounterStartTime != EncounterManager.Current.StartTime)
                     {
-                        LoadEntity(foundEntity, EncounterManager.Current.StartTime);
+                        LoadEntity(foundEntity, EncounterManager.Current.StartTime, EncounterManager.Current.ExData.FirstDamageTimeStamp);
                         //LoadedFromEncounterIdx = EncounterManager.Encounters.Count - 1;
+                    }
+                }
+            }
+            if (LoadedEncounterFirstDamageTimeStamp == null && LoadedEncounterStartTime != null)
+            {
+                if (LoadedEncounterStartTime == EncounterManager.Current.StartTime)
+                {
+                    // The active Encounter is almost certainly the same as the Loaded one
+                    if (EncounterManager.Current.ExData.FirstDamageTimeStamp != null)
+                    {
+                        LoadedEncounterFirstDamageTimeStamp = EncounterManager.Current.ExData.FirstDamageTimeStamp;
                     }
                 }
             }
@@ -1190,10 +1202,21 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TextUnformatted($"{buffEvent.FireUuid}");
                                 }
 
-
                                 ImGui.TableNextColumn();
                                 string addTime = "";
-                                if (buffEvent.EventAddTime.TotalMilliseconds > 0)
+                                if (LoadedEncounterFirstDamageTimeStamp != null && LoadedEncounterStartTime != null)
+                                {
+                                    if (buffEvent.AddDateTime != DateTime.MinValue)
+                                    {
+                                        if (buffEvent.AddDateTime.CompareTo(LoadedEncounterFirstDamageTimeStamp) < 0)
+                                        {
+                                            // Added before the first damage event, display time as negative offset
+                                            var diff = buffEvent.AddDateTime.Subtract((DateTime)LoadedEncounterFirstDamageTimeStamp);
+                                            addTime = (diff < TimeSpan.Zero ? "-" : "") + diff.ToString("hh\\:mm\\:ss");
+                                        }
+                                    }
+                                }
+                                if (string.IsNullOrEmpty(addTime) && buffEvent.EventAddTime.TotalMilliseconds > 0)
                                 {
                                     addTime = buffEvent.EventAddTime.ToString("hh\\:mm\\:ss");
                                 }
@@ -1201,7 +1224,20 @@ namespace BPSR_ZDPS.Windows
 
                                 ImGui.TableNextColumn();
                                 string removeTime = "";
-                                if (buffEvent.EventRemoveTime.TotalMilliseconds > 0)
+                                if (LoadedEncounterFirstDamageTimeStamp != null && LoadedEncounterStartTime != null)
+                                {
+                                    if (buffEvent.RemoveDateTime != DateTime.MinValue)
+                                    {
+                                        if (buffEvent.RemoveDateTime.CompareTo(LoadedEncounterFirstDamageTimeStamp) < 0)
+                                        {
+                                            // Removed before the first damage event, display time as negative offset
+                                            var diff = buffEvent.RemoveDateTime.Subtract((DateTime)LoadedEncounterFirstDamageTimeStamp);
+                                            removeTime = (diff < TimeSpan.Zero ? "-" : "") + diff.ToString("hh\\:mm\\:ss");
+                                        }
+                                    }
+                                    var diffTime = LoadedEncounterFirstDamageTimeStamp?.Subtract((DateTime)LoadedEncounterStartTime?.ToUniversalTime());
+                                }
+                                if (string.IsNullOrEmpty(removeTime) && buffEvent.EventRemoveTime.TotalMilliseconds > 0)
                                 {
                                     removeTime = buffEvent.EventRemoveTime.ToString("hh\\:mm\\:ss");
                                 }
@@ -1530,10 +1566,11 @@ namespace BPSR_ZDPS.Windows
             }
         }
 
-        public void LoadEntity(Entity entity, DateTime encounterStartTime)
+        public void LoadEntity(Entity entity, DateTime encounterStartTime, DateTime? encounterFirstDamageTimeStamp)
         {
             LoadedEntity = entity;
             LoadedEncounterStartTime = encounterStartTime;
+            LoadedEncounterFirstDamageTimeStamp = encounterFirstDamageTimeStamp;
 
             HasLoadedGraphsData = false;
             SkillSnapshotTimestampSeconds = [];

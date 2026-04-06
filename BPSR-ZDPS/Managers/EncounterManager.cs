@@ -395,11 +395,14 @@ namespace BPSR_ZDPS
 
         public static void RecalculateEncounterPerValues(DateTime? nowTime = null)
         {
+            DateTime now = nowTime ?? DateTime.UtcNow;
             var entities = Current.Entities.AsValueEnumerable();
             foreach (var entity in entities)
             {
-                DateTime now = nowTime ?? DateTime.UtcNow;
-                entity.Value.RecalculateInactiveTime(now, true);
+                if (nowTime != null)
+                {
+                    entity.Value.RecalculateInactiveTime(now, true);
+                }
                 double inactiveTime = entity.Value.GetInactiveTime();
 
                 entity.Value.DamageStats.InactiveTime = inactiveTime;
@@ -537,7 +540,6 @@ namespace BPSR_ZDPS
         public EDungeonState DungeonState { get; set; } = EDungeonState.DungeonStateNull;
         public uint ChannelLine { get; set; } = 0;
         public Dictionary<long, EncounterBossDataCache> PreviousBossCache = new();
-        public DateTime? FirstDamageTimeStamp = null;
 
         public Encounter()
         {
@@ -570,14 +572,22 @@ namespace BPSR_ZDPS
             Duration = EndTime.Subtract(StartTime);
         }
 
-        public TimeSpan GetDuration()
+        public TimeSpan GetDuration(bool startAdjusted = false)
         {
             if (EndTime == DateTime.MinValue || Duration == null)
             {
+                if (startAdjusted && ExData.FirstDamageTimeStamp != null)
+                {
+                    return DateTime.UtcNow.Subtract((DateTime)ExData.FirstDamageTimeStamp).Duration();
+                }
                 return DateTime.Now.Subtract(StartTime).Duration();
             }
             else
             {
+                if (startAdjusted && ExData.FirstDamageTimeStamp != null)
+                {
+                    return EndTime.ToUniversalTime().Subtract((DateTime)ExData.FirstDamageTimeStamp);
+                }
                 return (TimeSpan)Duration;
             }
         }
@@ -978,7 +988,7 @@ namespace BPSR_ZDPS
         {
             LastUpdate = extraPacketData.ArrivalTime;
 
-            FirstDamageTimeStamp ??= LastUpdate;
+            ExData.FirstDamageTimeStamp ??= LastUpdate;
 
             var attackerType = (EEntityType)Utils.UuidToEntityType(attackerUuid);
             var targetType = (EEntityType)Utils.UuidToEntityType(targetUuid);
@@ -1017,7 +1027,7 @@ namespace BPSR_ZDPS
             LastUpdate = extraPacketData.ArrivalTime;
 
             // TODO: Should potentially exclude specific skills from setting this (like Symbiotic Mark)
-            FirstDamageTimeStamp ??= LastUpdate;
+            ExData.FirstDamageTimeStamp ??= LastUpdate;
 
             var attackerType = (EEntityType)Utils.UuidToEntityType(attackerUuid);
 
@@ -1118,7 +1128,7 @@ namespace BPSR_ZDPS
                 EntityCasterName = entityCasterName,
                 UpdateDateTime = extraPacketData.ArrivalTime,
             });
-            GetOrCreateEntity(entityUuid).NotifyBuffEvent(buffEventType, buffUuid, baseId, level, fireUuid, entityCasterName, layer, duration, sourceConfigId, DateTime.Now.Subtract(EncounterManager.Current.StartTime));
+            GetOrCreateEntity(entityUuid).NotifyBuffEvent(buffEventType, buffUuid, baseId, level, fireUuid, entityCasterName, layer, duration, sourceConfigId, DateTime.Now.Subtract(EncounterManager.Current.StartTime), extraPacketData);
         }
 
         protected virtual void OnSkillActivated(SkillActivatedEventArgs e)
@@ -1219,6 +1229,8 @@ namespace BPSR_ZDPS
         public int EncounterPhase { get; set; } = 0;
         [ProtoMember(6)]
         public int BenchmarkTime { get; set; } = 0;
+        [ProtoMember(7)]
+        public DateTime? FirstDamageTimeStamp { get; set; } = null;
 
         public EncounterExData() { }
     }
@@ -2029,7 +2041,7 @@ namespace BPSR_ZDPS
             RegisterSkillData(ESkillType.Taken, attackerUuid, skillId, skillLevel, damage, isCrit, isLucky, hpLessen, shieldBreak, isCauseLucky, damageElement, damageType, damageMode, isDead, damagePos, instigatorPos, victimPos, extraPacketData);
         }
 
-        public void NotifyBuffEvent(EBuffEventType buffEventType, int buffUuid, int baseId, int level, long fireUuid, string entityCasterName, int layer, int duration, int sourceConfigId, TimeSpan encounterTime)
+        public void NotifyBuffEvent(EBuffEventType buffEventType, int buffUuid, int baseId, int level, long fireUuid, string entityCasterName, int layer, int duration, int sourceConfigId, TimeSpan encounterTime, ExtraPacketData extraPacketData)
         {
             if (buffEventType == EBuffEventType.BuffEventRemove)
             {
@@ -2038,7 +2050,7 @@ namespace BPSR_ZDPS
                     // A remove event would only be coming with the uuid and type
                     buffEvent = new BuffEvent(buffUuid);
                 }
-                buffEvent.SetRemoveTime(encounterTime.Duration());
+                buffEvent.SetRemoveTime(encounterTime.Duration(), extraPacketData.ArrivalTime);
 
                 if (Settings.Instance.LimitEncounterBuffTrackingInOpenWorld && BattleStateMachine.IsInOpenWorld() && BuffEvents.Count > 99)
                 {
@@ -2058,7 +2070,7 @@ namespace BPSR_ZDPS
                 {
                     buffEvent.SetEvent(buffUuid, baseId, level, fireUuid, entityCasterName, layer, duration, sourceConfigId);
                 }
-                buffEvent.SetAddTime(encounterTime.Duration());
+                buffEvent.SetAddTime(encounterTime.Duration(), extraPacketData.ArrivalTime);
 
                 if (Settings.Instance.LimitEncounterBuffTrackingInOpenWorld && BattleStateMachine.IsInOpenWorld() && BuffEvents.Count > 99)
                 {
@@ -2548,7 +2560,7 @@ namespace BPSR_ZDPS
         {
             DateTime now = extraPacketData.ArrivalTime;
             InactiveTime = inactiveTime;
-            StartTime ??= EncounterManager.Current.FirstDamageTimeStamp;// now;
+            StartTime ??= EncounterManager.Current.ExData.FirstDamageTimeStamp;// now;
             EntityStartTime ??= startTime;
             EndTime = now;
 
@@ -2892,6 +2904,8 @@ namespace BPSR_ZDPS
         public TimeSpan EventRemoveTime { get; private set; }
         public string AttributeName { get; private set; }
         public object? Data { get; private set; }
+        public DateTime AddDateTime { get; private set; }
+        public DateTime RemoveDateTime { get; private set; }
 
         public BuffEvent(long uuid)
         {
@@ -2944,14 +2958,16 @@ namespace BPSR_ZDPS
             Data = data;
         }
 
-        public void SetAddTime(TimeSpan time)
+        public void SetAddTime(TimeSpan time, DateTime dateTime)
         {
             EventAddTime = time;
+            AddDateTime = dateTime;
         }
 
-        public void SetRemoveTime(TimeSpan time)
+        public void SetRemoveTime(TimeSpan time, DateTime dateTime)
         {
             EventRemoveTime = time;
+            RemoveDateTime = dateTime;
         }
 
         public void SetEntitySourceNameFromUuid(string name)

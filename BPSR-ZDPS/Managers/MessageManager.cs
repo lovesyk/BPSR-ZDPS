@@ -1022,6 +1022,13 @@ namespace BPSR_ZDPS
                 return;
             }
 
+            var lastDungeonState = BattleStateMachine.DungeonStateHistory.LastOrDefault();
+            if (lastDungeonState.Key == EDungeonState.DungeonStateSettlement || lastDungeonState.Key == EDungeonState.DungeonStateVote)
+            {
+                // The dungeon is over, any events coming in at this point are going to likely be invalid for what we care about
+                return;
+            }
+
             long buffBasedShieldBreakValue = 0;
             
             List<int> EventHandledBuffs = new();

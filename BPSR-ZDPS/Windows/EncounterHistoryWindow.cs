@@ -220,7 +220,7 @@ namespace BPSR_ZDPS.Windows
                 else if (SelectedEncounterIndex != -1)
                 {
                     var selectedEncounter = encounters[SelectedEncounterIndex];
-                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.SceneName, selectedEncounter.ExData, SelectedEncounterIndex);
+                    var selectedTuple = BuildDropdownStringName(selectedEncounter.StartTime, selectedEncounter.EndTime, selectedEncounter.ExData.FirstDamageTimeStamp, selectedEncounter.SceneName, selectedEncounter.BossAttrId, selectedEncounter.ExData, SelectedEncounterIndex);
                     selectedPreviewText = $"[{(SelectedViewMode == 0 ? selectedEncounter.EncounterId : SelectedEncounterIndex + 1)}] {selectedTuple.TimeRange} ({selectedTuple.Duration}) {selectedTuple.Name}{selectedTuple.Difficulty}";
                 }
                 else
@@ -246,7 +246,7 @@ namespace BPSR_ZDPS.Windows
                         bool isSelected = SelectedEncounterIndex == i;
 
                         string encounterIndexText = $"[{(SelectedViewMode == 0 ? encounters[i].EncounterId : i + 1)}]##HistoricalEncounterSelectable_{i+1}";
-                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].SceneName, encounters[i].ExData, i);
+                        var encounterTuple = BuildDropdownStringName(encounters[i].StartTime, encounters[i].EndTime, encounters[i].ExData.FirstDamageTimeStamp, encounters[i].SceneName, encounters[i].BossAttrId, encounters[i].ExData, i);
                         if (ImGui.Selectable(encounterIndexText, isSelected, ImGuiSelectableFlags.SpanAllColumns))
                         {
                             AppState.OpenedHistoricalEncounter = null;
@@ -451,7 +451,7 @@ namespace BPSR_ZDPS.Windows
                             if (ImGui.Selectable($"{entIdx + 1}##EntHistSelect_{entIdx}", true, ImGuiSelectableFlags.SpanAllColumns))
                             {
                                 mainWindow.entityInspector = new();
-                                mainWindow.entityInspector.LoadEntity(entity, encounters[SelectedEncounterIndex].StartTime);
+                                mainWindow.entityInspector.LoadEntity(entity, encounters[SelectedEncounterIndex].StartTime, encounters[SelectedEncounterIndex].ExData.FirstDamageTimeStamp);
                                 mainWindow.entityInspector.Open();
                             }
 
@@ -852,11 +852,15 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted(encounter.TotalDeaths.ToString());
         }
 
-        private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, string sceneName, EncounterExData exData, int idx)
+        private static (string TimeRange, string Duration, string Name, string Difficulty) BuildDropdownStringName(DateTime startTime, DateTime endTime, DateTime? firstDamageTime, string sceneName, long bossAttrId, EncounterExData exData, int idx)
         {
             var encounterStartTime = startTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterEndTime = endTime.ToString("HH:mm:ss"); // endTime.ToString("yyyy-MM-dd HH:mm:ss");
             var encounterDuration = (endTime - startTime).ToString("hh\\:mm\\:ss");
+            if (bossAttrId > 0 && firstDamageTime != null)
+            {
+                encounterDuration = (endTime.ToUniversalTime() - firstDamageTime.Value).ToString("hh\\:mm\\:ss");
+            }
             var encounterSceneName = !string.IsNullOrEmpty(sceneName) ? $" {sceneName}" : "";
             var encounterDifficulty = exData.DungeonDifficulty > 0 ? $" (Master {exData.DungeonDifficulty})" : "";
             string benchmarkText = "";
@@ -910,7 +914,7 @@ namespace BPSR_ZDPS.Windows
             {
                 enc.SetStartTime(firstEncounter.StartTime);
                 enc.BattleId = firstEncounter.BattleId;
-                enc.FirstDamageTimeStamp = firstEncounter.FirstDamageTimeStamp;
+                enc.ExData.FirstDamageTimeStamp = firstEncounter.ExData.FirstDamageTimeStamp;
             }
             if (lastEncounter != null)
             {

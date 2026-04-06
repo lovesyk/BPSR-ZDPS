@@ -220,7 +220,7 @@ namespace BPSR_ZDPS.Meters
                         //if (ImGui.Selectable($"{name}-{profession} ({entity.AbilityScore}) [{entity.UID.ToString()}] ({entity.TotalDamage})##DpsEntry_{i}"))
                         {
                             mainWindow.entityInspector = new EntityInspector();
-                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
+                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
                             mainWindow.entityInspector.Open();
                         }
 
