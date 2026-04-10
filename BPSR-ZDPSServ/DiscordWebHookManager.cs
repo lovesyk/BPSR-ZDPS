@@ -93,6 +93,48 @@ namespace BPSR_DeepsServ
             }
         }
 
+        public async Task ForwardNotification(NotificationRequest notification)
+        {
+            try
+            {
+                var urls = settings.Value.NotificationDiscordWebhookUrls;
+                if (urls.Length == 0)
+                    return;
+
+                var label = notification.NotificationType switch
+                {
+                    "NotifyInvitation"          => "パーティ招待",
+                    "NotifyApplyJoin"            => "パーティ申請",
+                    "NotifyRefuseInvite"         => "パーティ参加拒否",
+                    "NotifyLeaderApplyListSize"  => "人数変更申請",
+                    "NotifyApplyBeLeader"        => "リーダー申請",
+                    _                            => notification.NotificationType
+                };
+
+                var namePart = notification.Name is null
+                    ? string.Empty
+                    : notification.CharId is null
+                        ? $" **{notification.Name}**"
+                        : $" **{notification.Name}** ({notification.CharId})";
+
+                var discordPayload = new DiscordChatPayload
+                {
+                    Content = $"[{label}]{namePart}"
+                };
+                var discordJson = System.Text.Json.JsonSerializer.Serialize(discordPayload, AppJsonSerializerContext.Default.DiscordChatPayload);
+
+                foreach (var url in urls)
+                {
+                    using var content = new StringContent(discordJson, Encoding.UTF8, "application/json");
+                    await HttpClient.PostAsync(url, content);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to forward notification to Discord webhook");
+            }
+        }
+
         private async Task<HttpResponseMessage> SendWebhook(string url, string payload, IFormFileCollection files)
         {
             try

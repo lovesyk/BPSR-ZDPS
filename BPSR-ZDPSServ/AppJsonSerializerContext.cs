@@ -8,6 +8,7 @@ namespace BPSR_DeepsServ
     [JsonSerializable(typeof(Settings))]
     [JsonSerializable(typeof(DedupeResp))]
     [JsonSerializable(typeof(ChatMessageRequest))]
+    [JsonSerializable(typeof(NotificationRequest))]
     [JsonSerializable(typeof(DiscordChatPayload))]
     internal partial class AppJsonSerializerContext : JsonSerializerContext
     {

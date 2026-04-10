@@ -44,7 +44,7 @@ public class ChatHandler(MessengerConfig config)
 
     private async Task SendToApiAsync(ChitChatChannelType channel, string senderName, long senderId, DateTime timestamp, ChatMsgInfo msgInfo)
     {
-        var endpoints = config.ChannelEndpoints;
+        var endpoints = config.ChatEndpoints;
         var urls = channel switch
         {
             ChitChatChannelType.ChannelNull      => endpoints.ChannelNull,
