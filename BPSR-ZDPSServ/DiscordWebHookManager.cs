@@ -49,42 +49,43 @@ namespace BPSR_DeepsServ
         {
             try
             {
-            var webhookUrl = settings.Value.ChatDiscordWebhookUrl;
-            if (string.IsNullOrEmpty(webhookUrl))
-                return;
+                var webhookUrls = settings.Value.ChatDiscordWebhookUrls;
+                var urls = chatMessage.Channel switch
+                {
+                    "ChannelNull"       => webhookUrls.ChannelNull,
+                    "ChannelWorld"      => webhookUrls.ChannelWorld,
+                    "ChannelScene"      => webhookUrls.ChannelScene,
+                    "ChannelTeam"       => webhookUrls.ChannelTeam,
+                    "ChannelUnion"      => webhookUrls.ChannelUnion,
+                    "ChannelPrivate"    => webhookUrls.ChannelPrivate,
+                    "ChannelGroup"      => webhookUrls.ChannelGroup,
+                    "ChannelTopNotice"  => webhookUrls.ChannelTopNotice,
+                    "ChannelSystem"     => webhookUrls.ChannelSystem,
+                    _                   => []
+                };
+                if (urls.Length == 0)
+                    return;
 
-            var filter = settings.Value.ChatAllowedChannels;
-            var allowed = chatMessage.Channel switch
-            {
-                "ChannelNull"       => filter.ChannelNull,
-                "ChannelWorld"      => filter.ChannelWorld,
-                "ChannelScene"      => filter.ChannelScene,
-                "ChannelTeam"       => filter.ChannelTeam,
-                "ChannelUnion"      => filter.ChannelUnion,
-                "ChannelPrivate"    => filter.ChannelPrivate,
-                "ChannelGroup"      => filter.ChannelGroup,
-                "ChannelTopNotice"  => filter.ChannelTopNotice,
-                "ChannelSystem"     => filter.ChannelSystem,
-                _                   => false
-            };
-            if (!allowed)
-                return;
+                var (label, emoji) = chatMessage.Channel switch
+                {
+                    "ChannelWorld"   => ("ワールド",     "🟣"),
+                    "ChannelUnion"   => ("ギルド",       "🟢"),
+                    "ChannelTeam"    => ("パーティ",     "🔵"),
+                    "ChannelScene"   => ("チャンネル",   "⚫"),
+                    "ChannelPrivate" => ("プライベート", "🟡"),
+                    _                => ("その他",       "⚫")
+                };
+                var discordPayload = new DiscordChatPayload
+                {
+                    Content = $"{(string.IsNullOrEmpty(chatMessage.SenderName) ? "" : $"**{chatMessage.SenderName}** ")}{chatMessage.Timestamp:HH:mm}\n[{emoji}{label}]{chatMessage.Text}"
+                };
+                var discordJson = System.Text.Json.JsonSerializer.Serialize(discordPayload, AppJsonSerializerContext.Default.DiscordChatPayload);
 
-            var (label, emoji) = chatMessage.Channel switch
-            {
-                "ChannelWorld" => ("ワールド", "🟣"),
-                "ChannelUnion" => ("ギルド",   "🟢"),
-                "ChannelTeam"  => ("パーティ", "🔵"),
-                _              => ("その他",   "🟡")
-            };
-            var discordPayload = new DiscordChatPayload
-            {
-                Content = $"{(string.IsNullOrEmpty(chatMessage.SenderName) ? "" : $"**{chatMessage.SenderName}** ")}{chatMessage.Timestamp:HH:mm}\n[{emoji}{label}]{chatMessage.Text}"
-            };
-            var discordJson = System.Text.Json.JsonSerializer.Serialize(discordPayload, AppJsonSerializerContext.Default.DiscordChatPayload);
-
-                using var content = new StringContent(discordJson, Encoding.UTF8, "application/json");
-                await HttpClient.PostAsync(webhookUrl, content);
+                foreach (var url in urls)
+                {
+                    using var content = new StringContent(discordJson, Encoding.UTF8, "application/json");
+                    await HttpClient.PostAsync(url, content);
+                }
             }
             catch (Exception ex)
             {
