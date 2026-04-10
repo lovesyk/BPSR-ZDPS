@@ -7,7 +7,9 @@ public class MessengerConfig
     public int RemoteCaptureDeviceIndex { get; set; } = 0;
     public string RemoteCaptureFilter { get; set; } = string.Empty;
 
-    public ChannelEndpointConfig ChannelEndpoints { get; set; } = new();
+    public ChannelEndpointConfig ChatEndpoints { get; set; } = new();
+
+    public string[] NotificationEndpoints { get; set; } = [];
 }
 
 public class ChannelEndpointConfig
