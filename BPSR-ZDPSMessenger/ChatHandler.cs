@@ -44,24 +44,21 @@ public class ChatHandler(MessengerConfig config)
 
     private async Task SendToApiAsync(ChitChatChannelType channel, string senderName, long senderId, DateTime timestamp, ChatMsgInfo msgInfo)
     {
-        if (string.IsNullOrEmpty(config.ApiEndpoint))
-            return;
-
-        var filter = config.AllowedChannels;
-        var allowed = channel switch
+        var endpoints = config.ChannelEndpoints;
+        var urls = channel switch
         {
-            ChitChatChannelType.ChannelNull      => filter.ChannelNull,
-            ChitChatChannelType.ChannelWorld     => filter.ChannelWorld,
-            ChitChatChannelType.ChannelScene     => filter.ChannelScene,
-            ChitChatChannelType.ChannelTeam      => filter.ChannelTeam,
-            ChitChatChannelType.ChannelUnion     => filter.ChannelUnion,
-            ChitChatChannelType.ChannelPrivate   => filter.ChannelPrivate,
-            ChitChatChannelType.ChannelGroup     => filter.ChannelGroup,
-            ChitChatChannelType.ChannelTopNotice => filter.ChannelTopNotice,
-            ChitChatChannelType.ChannelSystem    => filter.ChannelSystem,
-            _                                    => false
+            ChitChatChannelType.ChannelNull      => endpoints.ChannelNull,
+            ChitChatChannelType.ChannelWorld     => endpoints.ChannelWorld,
+            ChitChatChannelType.ChannelScene     => endpoints.ChannelScene,
+            ChitChatChannelType.ChannelTeam      => endpoints.ChannelTeam,
+            ChitChatChannelType.ChannelUnion     => endpoints.ChannelUnion,
+            ChitChatChannelType.ChannelPrivate   => endpoints.ChannelPrivate,
+            ChitChatChannelType.ChannelGroup     => endpoints.ChannelGroup,
+            ChitChatChannelType.ChannelTopNotice => endpoints.ChannelTopNotice,
+            ChitChatChannelType.ChannelSystem    => endpoints.ChannelSystem,
+            _                                    => []
         };
-        if (!allowed)
+        if (urls.Length == 0)
             return;
 
         var text = msgInfo.MsgType switch
@@ -85,18 +82,21 @@ public class ChatHandler(MessengerConfig config)
         };
 
         var json = System.Text.Json.JsonSerializer.Serialize(payload);
-        using var request = new HttpRequestMessage(HttpMethod.Post, config.ApiEndpoint);
-        request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        foreach (var url in urls)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-        try
-        {
-            var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-                Log.Warning("Failed to send chat message to API: {StatusCode}", response.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error sending chat message to API");
+            try
+            {
+                var response = await _httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                    Log.Warning("Failed to send chat message to API: {StatusCode}", response.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error sending chat message to API");
+            }
         }
     }
 }
