@@ -32,6 +32,28 @@ netCap.RegisterNotifyHandler(
     (uint)BPSR_ZDPSLib.ServiceMethods.ChitChatNtf.NotifyNewestChitChatMsgs,
     chatHandler.OnChatMessage);
 
+var notificationHandler = new NotificationHandler(config);
+netCap.RegisterNotifyHandler(
+    (ulong)EServiceId.GrpcTeamNtf,
+    (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyInvitation,
+    notificationHandler.OnNotifyInvitation);
+netCap.RegisterNotifyHandler(
+    (ulong)EServiceId.GrpcTeamNtf,
+    (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyApplyJoin,
+    notificationHandler.OnNotifyApplyJoin);
+netCap.RegisterNotifyHandler(
+    (ulong)EServiceId.GrpcTeamNtf,
+    (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyRefuseInvite,
+    notificationHandler.OnNotifyRefuseInvite);
+netCap.RegisterNotifyHandler(
+    (ulong)EServiceId.GrpcTeamNtf,
+    (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyLeaderApplyListSize,
+    notificationHandler.OnNotifyLeaderApplyListSize);
+netCap.RegisterNotifyHandler(
+    (ulong)EServiceId.GrpcTeamNtf,
+    (uint)BPSR_ZDPSLib.ServiceMethods.GrpcTeamNtf.NotifyApplyBeLeader,
+    notificationHandler.OnNotifyApplyBeLeader);
+
 Log.Information("Starting BPSR-ZDPSMessenger...");
 netCap.Start();
 
