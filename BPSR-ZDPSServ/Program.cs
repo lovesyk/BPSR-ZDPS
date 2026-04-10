@@ -43,6 +43,11 @@ namespace BPSR_DeepsServ
                 app.MapPost("/chat", HandleChatMessage).DisableAntiforgery();
             }
 
+            if (zdpsSetings?.EnableNotificationForwarding ?? false)
+            {
+                app.MapPost("/notification", HandleNotification).DisableAntiforgery();
+            }
+
             app.Run();
         }
 
@@ -50,6 +55,19 @@ namespace BPSR_DeepsServ
         {
             var isDupe = dedupeManager.IsDupe(teamId);
             return Results.Ok(new DedupeResp() { CanSend = !isDupe });
+        }
+
+        static async Task<IResult> HandleNotification([FromBody] NotificationRequest notification, DiscordWebHookManager discordWebHooks)
+        {
+            try
+            {
+                await discordWebHooks.ForwardNotification(notification);
+                return Results.Ok();
+            }
+            catch (Exception)
+            {
+                return Results.InternalServerError();
+            }
         }
 
         static async Task<IResult> HandleChatMessage([FromBody] ChatMessageRequest chatMessage, DiscordWebHookManager discordWebHooks)

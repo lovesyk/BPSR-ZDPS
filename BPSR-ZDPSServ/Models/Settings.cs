@@ -8,8 +8,10 @@
         public int DedupeListCleanUpAfterXEntries { get; set; } = 100;
 
         public bool EnableChatForwarding { get; set; } = false;
-
         public ChatDiscordWebhookUrlConfig ChatDiscordWebhookUrls { get; set; } = new();
+
+        public bool EnableNotificationForwarding { get; set; } = false;
+        public string[] NotificationDiscordWebhookUrls { get; set; } = [];
     }
 
     public class ChatDiscordWebhookUrlConfig
