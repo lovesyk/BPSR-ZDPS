@@ -45,6 +45,7 @@ namespace BPSR_ZDPS.Windows
         static bool allowEncounterSavingPausingInOpenWorld;
         static bool persistEncounterSavingPauseStateBetweenMaps;
         static bool minimalProcessingWhileEncounterSavingPaused;
+        static bool includeHealEventsOutsideOfCombat;
 
         static bool meterSettingsTankingShowDeaths;
         static bool meterSettingsNpcTakenShowHpData;
@@ -594,6 +595,16 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("When enabled, the Damage, Healing, and Taken Per Second value shown in the Meters will have the 'Active' Per Second value, shown in square brackets, in addition to the normal 'Encounter Per Second' value. This means it is recalculated every second while taking down time and late starts into account instead of ignoring down time and calculating based on when the first damage event in the Encounter was dealt.\nNote: Both values are accurate, they are just two different metrics.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Include Heal Events Outside Of Combat: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##IncludeHealEventsOutsideOfCombat", ref includeHealEventsOutsideOfCombat);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, Healing events that occur outside of an Active Encounter Combat section will still be included in the calculations.\nThis means if a player performs healing before a boss is pulled, the Encounter will be considered started before attacks began in the fight.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1638,6 +1649,8 @@ namespace BPSR_ZDPS.Windows
             persistEncounterSavingPauseStateBetweenMaps = Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps;
             minimalProcessingWhileEncounterSavingPaused = Settings.Instance.MinimalProcessingWhileEncounterSavingPaused;
 
+            includeHealEventsOutsideOfCombat = Settings.Instance.IncludeHealEventsOutsideOfCombat;
+
             meterSettingsTankingShowDeaths = Settings.Instance.MeterSettingsTankingShowDeaths;
             meterSettingsNpcTakenShowHpData = Settings.Instance.MeterSettingsNpcTakenShowHpData;
             meterSettingsNpcTakenHideMaxHp = Settings.Instance.MeterSettingsNpcTakenHideMaxHp;
@@ -1747,6 +1760,8 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.SkipSkillSnapshotSavingInOpenWorld = skipSkillSnapshotSavingInOpenWorld;
             Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps = persistEncounterSavingPauseStateBetweenMaps;
             Settings.Instance.MinimalProcessingWhileEncounterSavingPaused = minimalProcessingWhileEncounterSavingPaused;
+
+            Settings.Instance.IncludeHealEventsOutsideOfCombat = includeHealEventsOutsideOfCombat;
 
             Settings.Instance.MeterSettingsTankingShowDeaths = meterSettingsTankingShowDeaths;
             Settings.Instance.MeterSettingsNpcTakenShowHpData = meterSettingsNpcTakenShowHpData;

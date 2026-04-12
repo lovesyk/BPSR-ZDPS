@@ -41,6 +41,7 @@ public class Settings
     public bool AllowEncounterSavingPausingInOpenWorld { get; set; } = false;
     public bool PersistEncounterSavingPauseStateBetweenMaps { get; set; } = false;
     public bool MinimalProcessingWhileEncounterSavingPaused { get; set; } = false;
+    public bool IncludeHealEventsOutsideOfCombat { get; set; } = false;
 
     public bool MeterSettingsTankingShowDeaths { get; set; } = false;
     public bool MeterSettingsNpcTakenShowHpData { get; set; } = false;

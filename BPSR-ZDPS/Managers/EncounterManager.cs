@@ -1024,6 +1024,11 @@ namespace BPSR_ZDPS
             EDamageProperty damageElement, EDamageType damageType, EDamageMode damageMode,
             bool isCrit, bool isLucky, bool isCauseLucky, bool isMiss, bool isDead, Vec3 damagePos, ExtraPacketData extraPacketData)
         {
+            if (!AppState.IsBenchmarkMode && ExData.FirstDamageTimeStamp == null && !Settings.Instance.IncludeHealEventsOutsideOfCombat)
+            {
+                return;
+            }
+
             LastUpdate = extraPacketData.ArrivalTime;
 
             // TODO: Should potentially exclude specific skills from setting this (like Symbiotic Mark)
