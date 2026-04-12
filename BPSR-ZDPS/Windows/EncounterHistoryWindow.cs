@@ -341,7 +341,15 @@ namespace BPSR_ZDPS.Windows
                         {
                             DB.DeleteEncounter(encounters[SelectedEncounterIndex].EncounterId);
                             LoadFromDB();
-                            SelectedEncounterIndex = Math.Min(encounters.Count - 2, 0);
+                            int clampMax = encounters.Count - 2;
+                            if (clampMax < 0)
+                            {
+                                SelectedEncounterIndex = -1;
+                            }
+                            else
+                            {
+                                SelectedEncounterIndex = Math.Clamp(encounters.Count - 2, 0, clampMax);
+                            }
                             HandleEncounterSelection();
                         }
                         ImGui.SetItemTooltip("Delete this encounter from the Database, hold Ctrl to enable this option.");
