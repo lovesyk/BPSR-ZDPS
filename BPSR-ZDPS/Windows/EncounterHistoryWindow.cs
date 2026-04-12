@@ -39,6 +39,13 @@ namespace BPSR_ZDPS.Windows
 
         static EncounterReportWindow encounterReportWindow = new();
 
+        static Vector2 OriginalWindowSize = new();
+        static Vector2 OriginalWindowPos = new();
+        static bool IsFullScreen = false;
+        static Vector2 FullscreenWindowSize = new();
+        static Vector2 FullscreenWindowPos = new();
+        static bool IsFullscreenToggleState = false;
+
         public enum EEntityFilterMode : int
         {
             All = 0,
@@ -130,6 +137,21 @@ namespace BPSR_ZDPS.Windows
 
             ImGui.SetNextWindowSize(new Vector2(880, 675), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250), new Vector2(ImGui.GETFLTMAX()));
+
+            if (IsFullScreen && IsFullscreenToggleState)
+            {
+                ImGui.SetNextWindowPos(FullscreenWindowPos);
+                ImGui.SetNextWindowSize(FullscreenWindowSize);
+
+                IsFullscreenToggleState = false;
+            }
+            else if (IsFullscreenToggleState)
+            {
+                IsFullscreenToggleState = false;
+
+                ImGui.SetNextWindowPos(OriginalWindowPos);
+                ImGui.SetNextWindowSize(OriginalWindowSize);
+            }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -627,11 +649,31 @@ namespace BPSR_ZDPS.Windows
                                 AppState.OpenedHistoricalEncounter = encounters[SelectedEncounterIndex];
                             }
 
+                            ImGui.Separator();
+                            if (ImGui.MenuItem("Fullscreen Window", IsFullScreen))
+                            {
+                                IsFullScreen = !IsFullScreen;
+                                if (IsFullScreen)
+                                {
+                                    var vpm = ImGuiP.GetViewportPlatformMonitor(ImGui.GetWindowViewport());
+
+                                    FullscreenWindowPos = vpm.WorkPos;
+                                    FullscreenWindowSize = vpm.WorkSize;
+                                }
+                                IsFullscreenToggleState = true;
+                            }
+
                             ImGui.EndPopup();
                         }
 
                         ImGui.EndTable();
                     }
+                }
+
+                if (!IsFullScreen && !IsFullscreenToggleState)
+                {
+                    OriginalWindowPos = ImGui.GetWindowPos();
+                    OriginalWindowSize = ImGui.GetWindowSize();
                 }
 
                 ImGui.End();

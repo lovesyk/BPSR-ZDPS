@@ -287,6 +287,12 @@ namespace BPSR_ZDPS
             return false;
         }
 
+        public static IntPtr GetMonitorForWindow(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return User32.MonitorFromWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.MONITOR_DEFAULTTONEAREST);
+        }
+
         public static void SetCurrentPlatformWindowVisible()
         {
             GLFW.SetWindowAttrib((GLFWwindowPtr)ImGui.GetWindowViewport().PlatformHandle, GLFW.GLFW_VISIBLE, 1);
