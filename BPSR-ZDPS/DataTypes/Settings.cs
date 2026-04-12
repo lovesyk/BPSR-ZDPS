@@ -24,6 +24,7 @@ public class Settings
     public bool ShowSeasonStrengthInMeters { get; set; } = false;
     public bool ShowSubProfessionNameInMeters { get; set; } = true;
     public bool ShowPlayerSummonsInMeters { get; set; } = false;
+    public bool ShowPlayerImaginesInMeters { get; set; } = false;
     public bool UseAutomaticWipeDetection { get; set; } = true;
     public bool SkipTeleportStateCheckInAutomaticWipeDetection { get; set; } = false;
     public bool DisableWipeRecalculationOverwriting { get; set; } = false;

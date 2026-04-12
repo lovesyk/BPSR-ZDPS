@@ -28,6 +28,7 @@ namespace BPSR_ZDPS.Windows
         static bool showSeasonStrengthInMeters;
         static bool showSubProfessionNameInMeters;
         static bool showPlayerSummonsInMeters;
+        static bool showPlayerImaginesInMeters;
         static bool useAutomaticWipeDetection;
         static bool skipTeleportStateCheckInAutomaticWipeDetection;
         static bool disableWipeRecalculationOverwriting;
@@ -706,6 +707,16 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("When enabled, Summons (such as Battle Imagine entities or specific skill entities) will be shown in the NPC Taken Meter.\nNote: This does not impact any data recording or Entity Inspector data.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Show Player Imagines In Meters: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowPlayerImaginesInMeters", ref showPlayerImaginesInMeters);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, shows the currently equipped imagines for players in the DPS Meter UI.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1630,6 +1641,7 @@ namespace BPSR_ZDPS.Windows
             showSeasonStrengthInMeters = Settings.Instance.ShowSeasonStrengthInMeters;
             showSubProfessionNameInMeters = Settings.Instance.ShowSubProfessionNameInMeters;
             showPlayerSummonsInMeters = Settings.Instance.ShowPlayerSummonsInMeters;
+            showPlayerImaginesInMeters = Settings.Instance.ShowPlayerImaginesInMeters;
             useAutomaticWipeDetection = Settings.Instance.UseAutomaticWipeDetection;
             skipTeleportStateCheckInAutomaticWipeDetection = Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection;
             disableWipeRecalculationOverwriting = Settings.Instance.DisableWipeRecalculationOverwriting;
@@ -1743,6 +1755,7 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.ShowSeasonStrengthInMeters = showSeasonStrengthInMeters;
             Settings.Instance.ShowSubProfessionNameInMeters = showSubProfessionNameInMeters;
             Settings.Instance.ShowPlayerSummonsInMeters = showPlayerSummonsInMeters;
+            Settings.Instance.ShowPlayerImaginesInMeters = showPlayerImaginesInMeters;
             Settings.Instance.UseAutomaticWipeDetection = useAutomaticWipeDetection;
             Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection = skipTeleportStateCheckInAutomaticWipeDetection;
             Settings.Instance.DisableWipeRecalculationOverwriting = disableWipeRecalculationOverwriting;
