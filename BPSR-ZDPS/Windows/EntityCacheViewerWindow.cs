@@ -142,7 +142,7 @@ namespace BPSR_ZDPS
                         sb.AppendLine($"Profession: {Professions.GetProfessionNameFromId(item.Value.ProfessionId)}{(item.Value.SubProfessionId > 0 ? $" - {Professions.GetSubProfessionNameFromId(item.Value.SubProfessionId)}" : "")}");
                         sb.AppendLine($"Level: {item.Value.Level} (+ {item.Value.SeasonLevel})");
 
-                        ImGui.Selectable($"{sb}");
+                        ImGui.Selectable($"{sb}##{item.Value.UUID}");
                         if (ImGui.BeginPopupContextItem())
                         {
                             if (ImGui.MenuItem("Copy Name"))
@@ -154,6 +154,12 @@ namespace BPSR_ZDPS
                             {
                                 ImGui.SetClipboardText(item.Value.UID.ToString());
                             }
+                            ImGui.SetItemTooltip($"Copy '{item.Value.UID}' to the clipboard");
+                            if (ImGui.MenuItem("Copy UUID"))
+                            {
+                                ImGui.SetClipboardText(item.Value.UUID.ToString());
+                            }
+                            ImGui.SetItemTooltip($"Copy '{item.Value.UUID}' to the clipboard");
                             ImGui.EndPopup();
                         }
                         ImGui.EndGroup();
