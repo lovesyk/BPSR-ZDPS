@@ -753,6 +753,15 @@ namespace BPSR_ZDPS.Windows
 
         public void CreateNewEncounter()
         {
+            if (AppState.IsBenchmarkMode && AppState.HasBenchmarkBegun)
+            {
+                AppState.HasBenchmarkBegun = false;
+                AppState.IsBenchmarkMode = false;
+                Log.Information($"Manual early ending of Benchmark at {DateTime.Now}");
+                EncounterManager.StartEncounter(false, EncounterStartReason.BenchmarkEnd);
+                return;
+            }
+
             if (AppState.IsEncounterSavingPaused)
             {
                 Log.Information("Tried to create a new manual Encounter but Encounter Saving is currently Paused.");
