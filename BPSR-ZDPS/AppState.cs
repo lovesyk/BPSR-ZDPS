@@ -346,6 +346,14 @@ namespace BPSR_ZDPS
                 Log.Information("Loaded TempAttrTable.json");
             }
 
+            string AttrDescriptionFile = Path.Combine(Utils.DATA_DIR_NAME, "AttrDescription.json");
+            if (File.Exists(AttrDescriptionFile))
+            {
+                var attrDescriptions = JsonConvert.DeserializeObject<Dictionary<string, AttrDescription>>(File.ReadAllText(AttrDescriptionFile));
+                HelperMethods.DataTables.AttrDescriptions.Data = attrDescriptions;
+                Log.Information("Loaded AttrDescription.json");
+            }
+
             try
             {
                 System.Reflection.FieldInfo fi = typeof(Managers.External.BPTimerManager).GetField(Encoding.UTF8.GetString([0x41, 0x50, 0x49, 0x5f, 0x4b, 0x45, 0x59]),

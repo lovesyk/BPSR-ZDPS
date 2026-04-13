@@ -507,7 +507,26 @@ namespace BPSR_ZDPS.Windows
                         {
                             int valueMin = attr.Value.AttrEffectConfig[effectIdx][0];
                             int valueMax = attr.Value.AttrEffectConfig[effectIdx][1];
-                            attrs.Add((buff.Desc, valueMin, valueMax, 0));
+
+                            bool usedTipsDescription = false;
+                            if (buff.TipsDescription > 0)
+                            {
+                                if (HelperMethods.DataTables.AttrDescriptions.Data.TryGetValue(buff.TipsDescription.ToString(), out var attrDescription))
+                                {
+                                    string desc = attrDescription.DescriptionDecisionResolve(new List<int>() { valueMin, valueMax }, out var formats);
+                                    
+                                    if (formats.Count > 0)
+                                    {
+                                        attrs.Add((desc, valueMin, valueMax, formats.FirstOrDefault()));
+                                        usedTipsDescription = true;
+                                    }
+                                }
+                            }
+
+                            if (!usedTipsDescription)
+                            {
+                                attrs.Add((buff.Desc, valueMin, valueMax, 0));
+                            }
                         }
                     }
                     effectIdx++;

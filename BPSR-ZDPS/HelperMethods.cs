@@ -42,6 +42,7 @@ namespace BPSR_ZDPS
             public static EquipBreakThroughTable EquipBreakThroughs = new EquipBreakThroughTable();
             public static DbmTable Dbms = new DbmTable();
             public static TempAttrTable TempAttrs = new TempAttrTable();
+            public static AttrDescriptionTable AttrDescriptions = new AttrDescriptionTable();
         }
     }
 }
