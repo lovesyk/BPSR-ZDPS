@@ -2077,11 +2077,11 @@
   },
   "2207430": {
     "Id": 2207430,
-    "Description": "When <linktext=1614><style=\"ItemQuality_5\">Heroic Melody</style></linktext> is active, <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext> will erupt, dealing <style=\"magic\">Magic DMG</style> equal to <style=\"accent-gn\">50%</style> ATK every <style=\"accent-gn\">3s</style> to targets it touches (DMG interval affected by Haste). <br>While in <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext>, each hit of <linktext=1605><style=\"ItemQuality_5\">Harmonic Anthem</style></linktext> also heals <style=\"accent-gn\">1</style> ally with the lowest HP for <style=\"accent-gn\">30%</style> of the DMG dealt."
+    "Description": "When <linktext=1614><style=\"ItemQuality_5\">Heroic Melody</style></linktext> is active, <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext> will erupt, dealing <style=\"magic\">Magic DMG</style> equal to <style=\"accent-gn\">350%</style> ATK every <style=\"accent-gn\">3s</style> to targets it touches (DMG interval affected by Haste). <br>While in <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext>, each hit of <linktext=1605><style=\"ItemQuality_5\">Harmonic Anthem</style></linktext> also heals <style=\"accent-gn\">1</style> ally with the lowest HP for <style=\"accent-gn\">30%</style> of the DMG dealt (this value scales proportionally when hitting multiple targets)."
   },
   "2207440": {
     "Id": 2207440,
-    "Description": "When you use an <style=\"accent-gn\">Expertise Skill</style>, <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext> will erupt with Rhythm, dealing <style=\"magic\">Magic DMG</style> equal to <style=\"accent-gn\">100%</style> of ATK and granting <linktext=1192><style=\"ItemQuality_5\">Note</style></linktext> to allies it touches."
+    "Description": "When you use an <style=\"accent-gn\">Expertise Skill</style>, <linktext=1603><style=\"ItemQuality_5\">Rhapsody of Flame</style></linktext> will erupt with Rhythm, dealing <style=\"magic\">Magic DMG</style> equal to <style=\"accent-gn\">700%</style> of ATK and granting <linktext=1192><style=\"ItemQuality_5\">Note</style></linktext> to allies it touches."
   },
   "2207450": {
     "Id": 2207450,
@@ -4153,7 +4153,7 @@
   },
   "3401192": {
     "Id": 3401192,
-    "Description": "Restores HP equal to <style=\"accent-gn\">35%</style> ATK in total within <style=\"accent-gn\">10s</style>. When a <style=\"accent-gn\">Note</style> is granted again, it immediately triggers the remaining healing of the previous <style=\"accent-gn\">Note</style>."
+    "Description": "Restores HP equal to <style=\"accent-gn\">35%</style> ATK in total within <style=\"accent-gn\">10s</style>, stacks up to <style=\"accent-gn\">10</style> times. When applied at <style=\"accent-gn\">10</style> stacks, it immediately triggers the remaining healing of the previous <style=\"accent-gn\">Note</style>."
   },
   "3401193": {
     "Id": 3401193,
@@ -4293,7 +4293,7 @@
   },
   "3210140": {
     "Id": 3210140,
-    "Description": "Every <style=\"accent-gn\">15s</style>, gains Absolute Luck: Luck <style=\"accent-gn\">+{*Decision.unmarknormal(2)*}</style>, Lucky Strike DMG and Healing <style=\"accent-gn\">+{*Decision.unmarkpercent(1)*}</style>. Removed after <style=\"accent-gn\">3</style> casts of damage-type Expertise Skills"
+    "Description": "Every <style=\"accent-gn\">15s</style>, gains Absolute Luck: Luck <style=\"accent-gn\">+{*Decision.unmarknormal(2)*}</style>, Lucky Strike DMG and Healing multiplier <style=\"accent-gn\">+{*Decision.unmarkpercent(1)*}</style>. Removed after <style=\"accent-gn\">3</style> casts of damage-type Expertise Skills"
   },
   "3210150": {
     "Id": 3210150,

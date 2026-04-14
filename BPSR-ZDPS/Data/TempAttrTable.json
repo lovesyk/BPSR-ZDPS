@@ -285,7 +285,7 @@
     "LowerLimit": 0,
     "UpperLimit": 9999999,
     "IsSyncClient": true,
-    "AttrDesc": "Trigger Lucky Block, the Resistance effect of this block +{*tempAttr.up*}.<br>Lucky Block: When attacked, both block and luck take effect.",
+    "AttrDesc": "Trigger Lucky Block, the DMG Reduction effect of this block +{*tempAttr.up*}.<br>Lucky Block: When attacked, both block and luck take effect.",
     "AttrIcon": ""
   },
   "90022": {
@@ -3624,57 +3624,6 @@
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
   },
-  "90307": {
-    "Id": 90307,
-    "Name": "【法环】特攻消耗",
-    "Desc": "【法环】特攻消耗",
-    "AttrType": 302,
-    "LogicType": 1,
-    "AttrParams": [
-      1507,
-      1518,
-      1530,
-      1541
-    ],
-    "LowerLimit": 0,
-    "UpperLimit": 10000,
-    "IsSyncClient": true,
-    "AttrDesc": "全子弹大小",
-    "AttrIcon": ""
-  },
-  "90308": {
-    "Id": 90308,
-    "Name": "【法环】禁用终极技能",
-    "Desc": "【法环】禁用终极技能",
-    "AttrType": 509,
-    "LogicType": 1,
-    "AttrParams": [
-      1509,
-      1527,
-      1528
-    ],
-    "LowerLimit": 0,
-    "UpperLimit": 10000,
-    "IsSyncClient": true,
-    "AttrDesc": "全子弹大小",
-    "AttrIcon": ""
-  },
-  "90309": {
-    "Id": 90309,
-    "Name": "【剑盾】炽热清算加速",
-    "Desc": "【剑盾】炽热清算加速",
-    "AttrType": 700,
-    "LogicType": 1,
-    "AttrParams": [
-      2413,
-      2426
-    ],
-    "LowerLimit": 0,
-    "UpperLimit": 10000,
-    "IsSyncClient": true,
-    "AttrDesc": "全子弹大小",
-    "AttrIcon": ""
-  },
   "90310": {
     "Id": 90310,
     "Name": "【剑盾】圣剑消耗",
@@ -3718,6 +3667,125 @@
       1519
     ],
     "LowerLimit": -99999,
+    "UpperLimit": 99999,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90307": {
+    "Id": 90307,
+    "Name": "【法环】特攻消耗",
+    "Desc": "【法环】特攻消耗",
+    "AttrType": 302,
+    "LogicType": 1,
+    "AttrParams": [
+      1507,
+      1518,
+      1530,
+      1541
+    ],
+    "LowerLimit": 0,
+    "UpperLimit": 10000,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90313": {
+    "Id": 90313,
+    "Name": "如川流华斩战斗资源消耗",
+    "Desc": "如川流华斩战斗资源消耗",
+    "AttrType": 302,
+    "LogicType": 1,
+    "AttrParams": [
+      1616
+    ],
+    "LowerLimit": 0,
+    "UpperLimit": 10000,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90308": {
+    "Id": 90308,
+    "Name": "【法环】禁用终极技能",
+    "Desc": "【法环】禁用终极技能",
+    "AttrType": 509,
+    "LogicType": 1,
+    "AttrParams": [
+      1509,
+      1527,
+      1528
+    ],
+    "LowerLimit": 0,
+    "UpperLimit": 10000,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90309": {
+    "Id": 90309,
+    "Name": "【剑盾】炽热清算加速",
+    "Desc": "【剑盾】炽热清算加速",
+    "AttrType": 700,
+    "LogicType": 1,
+    "AttrParams": [
+      2413,
+      2426
+    ],
+    "LowerLimit": 0,
+    "UpperLimit": 10000,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90314": {
+    "Id": 90314,
+    "Name": "血槽积攒效率",
+    "Desc": "血槽积攒效率",
+    "AttrType": 301,
+    "LogicType": 2,
+    "AttrParams": [
+      13021
+    ],
+    "LowerLimit": -99999,
+    "UpperLimit": 99999,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90315": {
+    "Id": 90315,
+    "Name": "【双斧】专精技能攻速",
+    "Desc": "【双斧】专精技能攻速",
+    "AttrType": 700,
+    "LogicType": 1,
+    "AttrParams": [
+      1615,
+      1612,
+      1608,
+      1607,
+      1617,
+      1613,
+      1614,
+      1616,
+      1621
+    ],
+    "LowerLimit": -10000,
+    "UpperLimit": 99999,
+    "IsSyncClient": true,
+    "AttrDesc": "全子弹大小",
+    "AttrIcon": ""
+  },
+  "90316": {
+    "Id": 90316,
+    "Name": "【双斧】迷狂炎舞攻速",
+    "Desc": "【双斧】迷狂炎舞攻速",
+    "AttrType": 700,
+    "LogicType": 1,
+    "AttrParams": [
+      1613
+    ],
+    "LowerLimit": -10000,
     "UpperLimit": 99999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
@@ -3915,7 +3983,7 @@
       20
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -3927,10 +3995,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      21
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -3942,10 +4010,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      22
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -3957,10 +4025,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      23
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -3972,10 +4040,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      24
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -3987,10 +4055,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      25
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4002,10 +4070,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      26
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4017,10 +4085,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      27
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4032,10 +4100,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      28
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4047,10 +4115,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      29
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4062,10 +4130,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      30
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4077,10 +4145,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      31
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4092,10 +4160,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      32
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4107,10 +4175,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      33
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4122,10 +4190,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      34
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""
@@ -4137,10 +4205,10 @@
     "AttrType": 851,
     "LogicType": 9,
     "AttrParams": [
-      20
+      35
     ],
     "LowerLimit": 0,
-    "UpperLimit": 99999,
+    "UpperLimit": 9999999,
     "IsSyncClient": true,
     "AttrDesc": "全子弹大小",
     "AttrIcon": ""

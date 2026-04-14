@@ -22,7 +22,7 @@
   "14013701": {
     "Id": 14013701,
     "CountCDTime": 15,
-    "Content": "lightning storm"
+    "Content": "Lightning Storm"
   },
   "14014201": {
     "Id": 14014201,
@@ -298,6 +298,11 @@
     "Id": 1029011401,
     "CountCDTime": 15,
     "Content": "Shatterstone Storm"
+  },
+  "1029012401": {
+    "Id": 1029012401,
+    "CountCDTime": 15,
+    "Content": "Earthshatter Fist - Chain"
   },
   "3340130": {
     "Id": 3340130,
