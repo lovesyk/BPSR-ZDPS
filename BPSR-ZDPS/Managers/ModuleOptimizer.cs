@@ -661,7 +661,7 @@ namespace BPSR_ZDPS.Managers
             var statIsGreaterThan = Vector.GreaterThan<byte>(sumsMined, statMinsVec);
             //var statCondition = Vector.ConditionalSelect(statsMask, equalsReq, statIsGreaterThan);
             var passedMinValues = Vector.ConditionalSelect(statIsGreaterThan, sumsMined, new Vector<byte>(0));
-            //var multied = passedMinValues * modStatMultplier;
+            var multied = passedMinValues * modStatMultplier;
 
             int breakPointBonus = 0;
             var breakPointValues = passedMinValues;
@@ -671,7 +671,7 @@ namespace BPSR_ZDPS.Managers
                 breakPointBonus += val;
             }
 
-            int score = Vector.Sum(sums) + breakPointBonus;
+            int score = Vector.Sum(multied) + breakPointBonus;
 
             for (int bestIdx = 0; bestIdx < topBest.Length; bestIdx++)
             {
@@ -711,7 +711,8 @@ namespace BPSR_ZDPS.Managers
             {
                 if (config.StatPriorities[i].Id == statId)
                 {
-                    return (ushort)((config.StatPriorities.Count - i) + 1);
+                    var idx = config.StatPriorities.Count - i;
+                    return (ushort)(idx + 1);
                 }
             }
 
