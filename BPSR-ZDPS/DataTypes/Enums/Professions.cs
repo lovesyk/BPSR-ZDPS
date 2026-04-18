@@ -41,6 +41,8 @@ namespace BPSR_ZDPS.DataTypes.Enums
             SubProfession_Moonstrike = 01_00_02,
             SubProfession_Icicle = 02_00_01,
             SubProfession_Frostbeam = 02_00_02,
+            SubProfession_FormlessExpertise = 03_00_01,
+            SubProfession_CrimsonExpertise = 03_00_02,
             SubProfession_Vanguard = 04_00_01,
             SubProfession_Skyward = 04_00_02,
             SubProfession_Smite = 05_00_01,
@@ -66,6 +68,10 @@ namespace BPSR_ZDPS.DataTypes.Enums
             Profession_FrostMage = 103,
             SubProfession_Icicle = 104,
             SubProfession_Frostbeam = 105,
+
+            //Profession_TwinStriker = 000,
+            SubProfession_FormlessExpertise = 124,
+            SubProfession_CrimsonExpertise = 125,
 
             Profession_WindKnight = 106,
             SubProfession_Vanguard = 107,
