@@ -50,7 +50,11 @@ namespace BPSR_ZDPS.Windows
                 HasInitBindings = true;
 
                 NotifyMsgClass.ClassId = ImGuiP.ImHashStr("RaidWarningNotificationsClass");
-                NotifyMsgClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.NoTaskBarIcon | ImGuiViewportFlags.NoInputs;// | ImGuiViewportFlags.NoRendererClear;
+                NotifyMsgClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.NoInputs;// | ImGuiViewportFlags.NoRendererClear;
+                if (!Settings.Instance.WindowSettings.RaidManagerRaidWarning.ShowInTaskBar)
+                {
+                    NotifyMsgClass.ViewportFlagsOverrideSet |= ImGuiViewportFlags.NoTaskBarIcon;
+                }
 
                 EditModeClass.ClassId = ImGuiP.ImHashStr("RaidWarningEditorClass");
                 EditModeClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost;
@@ -189,7 +193,7 @@ namespace BPSR_ZDPS.Windows
                 
                 ImGui.SetNextWindowSizeConstraints(new Vector2(0, 20), new Vector2(maxWindowWidth, ImGui.GETFLTMAX()));
 
-                ImGui.SetNextWindowSize(new Vector2(maxWindowWidth, RaidWarningMessages.Count * LineHeight));
+                ImGui.SetNextWindowSize(new Vector2(maxWindowWidth, (RaidWarningMessages.Count * LineHeight) + ImGui.GetStyle().FramePadding.Y + ImGui.GetStyle().ItemSpacing.Y));
 
                 //ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(17 / 255.0f, 17 / 255.0f, 17 / 255.0f, 0.0f));
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(5 / 255.0f, 5 / 255.0f, 5 / 255.0f, 0.0f));
@@ -214,7 +218,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginChild("##WarningsListChild", ImGuiChildFlags.AutoResizeY, ImGuiWindowFlags.NoInputs))
                     {
                         ImGui.PushFont(null, 34.0f * (windowSettings.MessageTextScale * 0.01f));
-                        LineHeight = ImGui.CalcTextSize("0WM0").Y + ImGui.GetStyle().ItemSpacing.Y + ImGui.GetStyle().FramePadding.Y;
+                        LineHeight = ImGui.CalcTextSize("0WM0").Y + ImGui.GetStyle().ItemSpacing.Y;
                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed);
 
                         float width = ImGui.GetContentRegionAvail().X;
@@ -312,6 +316,26 @@ namespace BPSR_ZDPS.Windows
                 ImGui.Indent();
                 ImGui.BeginDisabled(true);
                 ImGui.TextWrapped("When enabled, a sound alert will be played each time a new Raid Warning appears.");
+                ImGui.EndDisabled();
+                ImGui.Unindent();
+
+                ImGui.AlignTextToFramePadding();
+                ImGui.TextUnformatted("Show In Task Bar: ");
+                ImGui.SameLine();
+                if (ImGui.Checkbox("##ShowInTaskBar", ref windowSettings.ShowInTaskBar))
+                {
+                    if (windowSettings.ShowInTaskBar)
+                    {
+                        NotifyMsgClass.ViewportFlagsOverrideSet &= ~ImGuiViewportFlags.NoTaskBarIcon;
+                    }
+                    else
+                    {
+                        NotifyMsgClass.ViewportFlagsOverrideSet |= ImGuiViewportFlags.NoTaskBarIcon;
+                    }
+                }
+                ImGui.Indent();
+                ImGui.BeginDisabled(true);
+                ImGui.TextWrapped("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Raid Warning Messages window to capture.");
                 ImGui.EndDisabled();
                 ImGui.Unindent();
 
@@ -634,6 +658,7 @@ namespace BPSR_ZDPS.Windows
     public class RaidManagerRaidWarningWindowSettings : WindowSettingsBase
     {
         public bool AllowRaidWarnings = true;
+        public bool ShowInTaskBar = false;
         public Vector2 RaidWarningMessagePosition = new();
         public Vector2 RaidWarningMessageSize = new();
         public int MessageTextScale = 100;

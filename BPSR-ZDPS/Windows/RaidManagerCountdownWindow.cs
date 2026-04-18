@@ -52,7 +52,11 @@ namespace BPSR_ZDPS.Windows
                 HasInitBindings = true;
 
                 CountdownDisplayClass.ClassId = ImGuiP.ImHashStr("CountdownClass");
-                CountdownDisplayClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.NoTaskBarIcon | ImGuiViewportFlags.NoInputs;// | ImGuiViewportFlags.NoRendererClear;
+                CountdownDisplayClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.NoInputs;// | ImGuiViewportFlags.NoRendererClear;
+                if (!Settings.Instance.WindowSettings.RaidManagerRaidWarning.ShowInTaskBar)
+                {
+                    CountdownDisplayClass.ViewportFlagsOverrideSet |= ImGuiViewportFlags.NoTaskBarIcon;
+                }
 
                 CountdownEditorClass.ClassId = ImGuiP.ImHashStr("CountdownEditorClass");
                 CountdownEditorClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost;
@@ -253,6 +257,26 @@ namespace BPSR_ZDPS.Windows
                 ImGui.Indent();
                 ImGui.BeginDisabled(true);
                 ImGui.TextWrapped("When enabled, allows Countdowns to be processed and displayed.");
+                ImGui.EndDisabled();
+                ImGui.Unindent();
+
+                ImGui.AlignTextToFramePadding();
+                ImGui.TextUnformatted("Show In Task Bar: ");
+                ImGui.SameLine();
+                if (ImGui.Checkbox("##ShowInTaskBar", ref windowSettings.ShowInTaskBar))
+                {
+                    if (windowSettings.ShowInTaskBar)
+                    {
+                        CountdownDisplayClass.ViewportFlagsOverrideSet &= ~ImGuiViewportFlags.NoTaskBarIcon;
+                    }
+                    else
+                    {
+                        CountdownDisplayClass.ViewportFlagsOverrideSet |= ImGuiViewportFlags.NoTaskBarIcon;
+                    }
+                }
+                ImGui.Indent();
+                ImGui.BeginDisabled(true);
+                ImGui.TextWrapped("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Countdown window to capture.");
                 ImGui.EndDisabled();
                 ImGui.Unindent();
 
@@ -493,6 +517,7 @@ namespace BPSR_ZDPS.Windows
     public class RaidManagerCountdownWindowSettings : WindowSettingsBase
     {
         public bool AllowCountdowns = true;
+        public bool ShowInTaskBar = false;
         public Vector2 CountdownPosition = new();
         public bool UseStylizedNumbers = true;
         public HashSet<Zproto.ChitChatChannelType> ChatChannels = new() { Zproto.ChitChatChannelType.ChannelTeam };
