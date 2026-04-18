@@ -49,7 +49,7 @@ namespace BPSR_ZDPS.Meters
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
-                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId)
+                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         if (EncounterManager.Current.HasStatsBeenRecorded())
                         {
@@ -59,7 +59,7 @@ namespace BPSR_ZDPS.Meters
                 }
                 else
                 {
-                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId)
+                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
