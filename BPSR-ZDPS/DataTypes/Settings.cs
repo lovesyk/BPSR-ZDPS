@@ -194,6 +194,7 @@ public class WindowSettings : ICloneable
     public RaidManagerCountdownWindowSettings RaidManagerCountdown { get; set; } = new();
     public RaidManagerThreatWindowSettings RaidManagerThreat { get; set; } = new();
     public ChatWindowSettings ChatWindow { get; set; } = new();
+    public EventTrackerWindowSettings EventTracker { get; set; } = new();
     public SkillCastTimelineWindowSettings SkillCastTimeline { get; set; } = new();
 
     public object Clone()
@@ -205,6 +206,7 @@ public class WindowSettings : ICloneable
         cloned.EntityCacheViewer = (EntityCacheViewerWindowSettings)this.EntityCacheViewer.Clone();
         cloned.SpawnTracker = (SpawnTrackerWindowSettings)this.SpawnTracker.Clone();
         cloned.ChatWindow = (ChatWindowSettings)this.ChatWindow.Clone();
+        cloned.EventTracker = (EventTrackerWindowSettings)this.EventTracker.Clone();
         cloned.SkillCastTimeline = (SkillCastTimelineWindowSettings)this.SkillCastTimeline.Clone();
         return cloned;
     }

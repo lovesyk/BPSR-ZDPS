@@ -67,6 +67,7 @@ namespace BPSR_ZDPS.Windows
             RaidManagerCountdownWindow.Draw(this);
             RaidManagerThreatWindow.Draw(this);
             ChatWindow.Draw(this);
+            EventTrackerWindow.Draw(this);
             SkillCastTimelineWindow.Draw(this);
         }
 
@@ -393,7 +394,36 @@ namespace BPSR_ZDPS.Windows
                     ImGui.TextDisabled($"v{Utils.AppVersion}");
                 }
 
-                if (Settings.Instance.AllowEncounterSavingPausingInOpenWorld && BattleStateMachine.DungeonStateHistory.Count > 0 && BattleStateMachine.DungeonStateHistory.LastOrDefault().Key == EDungeonState.DungeonStateNull)
+                bool showForcehideContainersBtn = Settings.Instance.WindowSettings.EventTracker.ShowForceHideContainersBtnOnMainWindow;
+                bool showPauseEncounterSavingBtn = Settings.Instance.AllowEncounterSavingPausingInOpenWorld && BattleStateMachine.DungeonStateHistory.Count > 0 && BattleStateMachine.DungeonStateHistory.LastOrDefault().Key == EDungeonState.DungeonStateNull;
+                if (showForcehideContainersBtn)
+                {
+                    int btnIdx = 5;
+                    if (showPauseEncounterSavingBtn)
+                    {
+                        btnIdx = 6;
+                    }
+
+                    ImGui.SetCursorPosX(MainMenuBarSize.X - (settingsWidth * btnIdx));
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    ImGui.PushStyleColor(ImGuiCol.Text, EventTrackerWindow.ForceHideAllContainers ? Colors.Red * new Vector4(1, 1, 1, 0.75f) : Colors.White);
+                    if (ImGui.MenuItem($"{(EventTrackerWindow.ForceHideAllContainers ? FASIcons.EyeSlash : FASIcons.Eye)}##ForceToggleVisibilityBtn"))
+                    {
+                        EventTrackerWindow.ToggleForceHideAllContainers(!EventTrackerWindow.ForceHideAllContainers);
+                    }
+                    ImGui.PopStyleColor();
+                    ImGui.PopFont();
+                    if (EventTrackerWindow.ForceHideAllContainers)
+                    {
+                        ImGui.SetItemTooltip("Disables forcefully hiding Containers.");
+                    }
+                    else
+                    {
+                        ImGui.SetItemTooltip("Forcefully hide all Containers.");
+                    }
+                }
+
+                if (showPauseEncounterSavingBtn)
                 {
                     ImGui.BeginDisabled(AppState.IsBenchmarkMode);
 
@@ -522,6 +552,11 @@ namespace BPSR_ZDPS.Windows
                         if (ImGui.MenuItem("Threat Meter"))
                         {
                             RaidManagerThreatWindow.Open();
+                        }
+
+                        if (ImGui.MenuItem("Event Tracker"))
+                        {
+                            EventTrackerWindow.Open();
                         }
 
                         if (ImGui.MenuItem("Skill Cast Timeline"))
