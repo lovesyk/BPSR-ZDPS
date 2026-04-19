@@ -9,8 +9,8 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Resources\BPSR_Benchmark_Icon.ico</ApplicationIcon>
-    <AssemblyVersion>0.1.6.2</AssemblyVersion>
-    <FileVersion>0.1.6.2</FileVersion>
+    <AssemblyVersion>0.1.7.0</AssemblyVersion>
+    <FileVersion>0.1.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -2419,7 +2419,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\Images\Skills_Imagines\skill_aoyi_skill_icon_056.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\Images\Skills_Imagines\skill_aoyi_skill_icon_057.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
