@@ -2216,6 +2216,24 @@ namespace BPSR_ZDPS.Windows
                     {
                         ImGui.TextUnformatted($"Trackers: {container.EventTrackers.Count}");
 
+                        if (container.EventTrackers.Count > 0)
+                        {
+                            bool ctrlHeld = ImGui.IsKeyDown(ImGuiKey.ModCtrl);
+                            if (!ctrlHeld)
+                            {
+                                ImGui.TextUnformatted("Hold CTRL to see list of all Trackers.");
+                            }
+                            else
+                            {
+                                ImGui.Indent();
+                                foreach (var tracker in container.EventTrackers)
+                                {
+                                    ImGui.TextUnformatted($"{tracker.Value.Name}");
+                                }
+                                ImGui.Unindent();
+                            }
+                        }
+
                         ImGui.EndTooltip();
                     }
 
@@ -2822,7 +2840,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ImGui.Indent();
 
-                ImGui.AlignTextToFramePadding();
+                /*ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted("Layout Style:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(-1);
@@ -2847,7 +2865,7 @@ namespace BPSR_ZDPS.Windows
                 if (ActiveTrackerContainer.EventTrackers.Count > 1)
                 {
                     ImGui.SetItemTooltip("You have more than 1 Tracker created on this Container.\nYou cannot switch back to Single mode until you delete your extra Trackers in this Container.");
-                }
+                }*/
 
                 if (ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.List)
                 {
@@ -2949,12 +2967,14 @@ namespace BPSR_ZDPS.Windows
                         ActiveTrackedEventEntry.TrackerName = $"All Buffs Tracker";
                         ActiveTrackerContainer.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
                         ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
+                        ActiveTrackedEventEntry.IsEnabled = true;
+                        ActiveTrackerContainer.RecheckTrackerStates();
                     }
                 }
                 ImGui.EndDisabled();
                 ImGui.BeginDisabled();
                 ImGui.Indent();
-                ImGui.TextWrapped("If this in Enabled, the First Tracker in this Container will be used for the settings of all Buffs that get automatically tracked.");
+                ImGui.TextWrapped("If this is Enabled, the First Tracker in this Container will be used for the settings of all Buffs that get automatically tracked.");
                 ImGui.TextWrapped("Any Buff selected within the Tracker will be ignored. Additionally, the Tracker Type MUST be set to Buff.");
                 ImGui.Unindent();
                 ImGui.Unindent();
@@ -3060,6 +3080,8 @@ namespace BPSR_ZDPS.Windows
                 ActiveTrackedEventEntry.TrackerName = $"Tracker {ActiveTrackedEventEntry.IdTracker}";
                 ActiveTrackerContainer.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
                 ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
+                ActiveTrackedEventEntry.IsEnabled = true;
+                ActiveTrackerContainer.RecheckTrackerStates();
             }
             ImGui.PopStyleColor();
             ImGui.EndDisabled();
@@ -3285,7 +3307,45 @@ namespace BPSR_ZDPS.Windows
                         }
                         if (ImGui.BeginItemTooltip())
                         {
-                            ImGui.TextUnformatted(JsonConvert.SerializeObject(buff.Value, Formatting.Indented));
+                            //ImGui.TextUnformatted(JsonConvert.SerializeObject(buff.Value, Formatting.Indented));
+                            ImGui.TextUnformatted($"Id: {buff.Value.Id}");
+                            ImGui.TextUnformatted($"Level: {buff.Value.Level}");
+                            ImGui.TextUnformatted($"NameDesign: {buff.Value.NameDesign}");
+                            if (!string.IsNullOrEmpty(buff.Value.Note))
+                            {
+                                ImGui.TextUnformatted($"Note: {buff.Value.Note}");
+                            }
+                            ImGui.TextUnformatted($"Name: {buff.Value.Name}");
+                            if (!string.IsNullOrEmpty(buff.Value.Desc))
+                            {
+                                ImGui.TextUnformatted($"Desc: {buff.Value.Desc}");
+                            }
+                            ImGui.TextUnformatted($"Icon: {buff.Value.Icon}");
+                            ImGui.TextUnformatted($"BuffType: {buff.Value.BuffType}");
+                            if (buff.Value.RepeatAddRule.Count > 0)
+                            {
+                                ImGui.TextUnformatted($"RepeatAddRule:");
+                                foreach (var param in buff.Value.RepeatAddRule)
+                                {
+                                    ImGui.SameLine();
+                                    ImGui.TextUnformatted($" {param},");
+                                }
+                            }
+                            if (buff.Value.DestroyParam.Count > 0)
+                            {
+                                ImGui.TextUnformatted($"DestroyParam:");
+                                foreach (var paramList in buff.Value.DestroyParam)
+                                {
+                                    string fmt = "";
+                                    foreach (var param in paramList)
+                                    {
+                                        fmt += $" {param},";
+                                    }
+                                    ImGui.SameLine();
+                                    ImGui.TextUnformatted($"[{fmt} ]");
+                                }
+                            }
+
                             ImGui.EndTooltip();
                         }
 
@@ -4841,6 +4901,8 @@ namespace BPSR_ZDPS.Windows
     {
         [JsonProperty]
         public uint IdTracker { get; private set; } = 0;
+
+        public int Version = EventTrackerWindow.EventTrackerSaveVersion;
 
         public TrackedEventEntry(uint counter)
         {
