@@ -627,18 +627,22 @@ namespace BPSR_ZDPS
             entity.SetEntityType(etype);
 
             var attr_id = entity.GetAttrKV("AttrId");
-            if (attr_id != null && etype == EEntityType.EntMonster)
+            if (attr_id != null && etype != EEntityType.EntChar)
             {
                 // Only players tend to come with a valid UID that's already unique to them
                 // The field that claims to normally be the UID for non-players is actually their non-unique ID
                 // Only the Attribute named Id (AttrId) is their real type UID which can be resolved into a name
                 // Also can be used to get all of their setup information from the Monsters table
                 entity.UpdateUID((int)attr_id);
-                if (HelperMethods.DataTables.Monsters.Data.TryGetValue(attr_id.ToString(), out var monsterEntry))
+
+                if (etype == EEntityType.EntMonster)
                 {
-                    entity.SetName(monsterEntry.Name);
-                    entity.SetMonsterType(monsterEntry.MonsterType);
-                    UpdateEncounterBossData(entity, (int)attr_id);
+                    if (HelperMethods.DataTables.Monsters.Data.TryGetValue(attr_id.ToString(), out var monsterEntry))
+                    {
+                        entity.SetName(monsterEntry.Name);
+                        entity.SetMonsterType(monsterEntry.MonsterType);
+                        UpdateEncounterBossData(entity, (int)attr_id);
+                    }
                 }
             }
         }
@@ -649,14 +653,18 @@ namespace BPSR_ZDPS
             entity.SetAttrKV(key, value);
 
             // We used to care if the entity already had a name, but there were strange incorrect name issues, so now we don't
-            if (key == "AttrId" && entity.EntityType == EEntityType.EntMonster)
+            if (key == "AttrId" && entity.EntityType != EEntityType.EntChar)
             {
                 entity.UpdateUID((int)value);
-                if (HelperMethods.DataTables.Monsters.Data.TryGetValue(value.ToString(), out var monsterEntry))
+
+                if (entity.EntityType == EEntityType.EntMonster)
                 {
-                    entity.SetName(monsterEntry.Name);
-                    entity.SetMonsterType(monsterEntry.MonsterType);
-                    UpdateEncounterBossData(entity, (int)value);
+                    if (HelperMethods.DataTables.Monsters.Data.TryGetValue(value.ToString(), out var monsterEntry))
+                    {
+                        entity.SetName(monsterEntry.Name);
+                        entity.SetMonsterType(monsterEntry.MonsterType);
+                        UpdateEncounterBossData(entity, (int)value);
+                    }
                 }
             }
             else if (key == "AttrName")
