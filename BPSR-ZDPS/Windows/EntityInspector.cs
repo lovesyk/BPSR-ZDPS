@@ -265,8 +265,15 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextUnformatted($"HP: {hp:N0} ({hpPct}%)");
                         
                         ImGui.TextUnformatted($"Max HP: {maxHp:N0}");
-                        ImGui.TextUnformatted($"ATK: {LoadedEntity.GetAttrKV("AttrAttack") ?? "0"}");
                         string MainStat = Professions.GetBaseProfessionMainStatName(LoadedEntity.ProfessionId);
+                        if (MainStat == "Intellect")
+                        {
+                            ImGui.TextUnformatted($"MATK: {LoadedEntity.GetAttrKV("AttrMattack") ?? "0"}");
+                        }
+                        else
+                        {
+                            ImGui.TextUnformatted($"ATK: {LoadedEntity.GetAttrKV("AttrAttack") ?? "0"}");
+                        }
                         if (MainStat == "Strength" || MainStat == "")
                         {
                             ImGui.TextUnformatted($"Strength: {LoadedEntity.GetAttrKV("AttrStrength") ?? "0"}");
