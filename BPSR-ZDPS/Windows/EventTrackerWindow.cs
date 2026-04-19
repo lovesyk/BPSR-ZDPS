@@ -66,6 +66,7 @@ namespace BPSR_ZDPS.Windows
         static ConcurrentQueue<string> DebugEventTrackerLog = new();
 
         static bool IsPresetManagerOpened = false;
+        static bool ShouldPresetManagerFocusNext = false;
         static bool IsPresetManagerInContainerMode = false;
         static int SelectedPresetManagerTrackerIdx = -1;
         static List<TrackedEventEntry> PresetTrackersList = new();
@@ -2176,6 +2177,14 @@ namespace BPSR_ZDPS.Windows
             ImGui.SetNextWindowSize(new Vector2(400, 450), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Preset Manager###EventTrackerPresetManagerWindow", ref IsPresetManagerOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
             {
+                if (ShouldPresetManagerFocusNext)
+                {
+                    if (Utils.CheckIfViewportValid())
+                    {
+                        ShouldPresetManagerFocusNext = false;
+                        Utils.BringWindowToFront();
+                    }
+                }
 
                 if (IsPresetManagerInContainerMode)
                 {
@@ -2468,6 +2477,7 @@ namespace BPSR_ZDPS.Windows
             IsPresetManagerOpened = true;
             ImGui.OpenPopup("###EventTrackerPresetManagerWindow");
             ImGui.PopID();
+            ShouldPresetManagerFocusNext = true;
         }
 
         public static void Draw(MainWindow mainWindow)
