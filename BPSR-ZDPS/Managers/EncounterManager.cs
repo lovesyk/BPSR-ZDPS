@@ -141,7 +141,7 @@ namespace BPSR_ZDPS
             Current = new Encounter(CurrentBattleId);
             Current.EncounterId = DB.GetNextEncounterId() + nextEncounterIdModifier;
             System.Diagnostics.Debug.WriteLine($"Created new encounter for EncounterId {Current.EncounterId} + ({nextEncounterIdModifier})");
-            if (priorEncounter != null && (reason == EncounterStartReason.NewObjective || reason == EncounterStartReason.Wipe || reason == EncounterStartReason.Restart))
+            if (priorEncounter != null && (reason != EncounterStartReason.None && reason != EncounterStartReason.Force))
             {
                 // Bring over basic data and attributes for the characters of the previous phase into the new one
                 var priorCharacters = priorEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == EEntityType.EntChar);
@@ -151,7 +151,7 @@ namespace BPSR_ZDPS
                     newChar.SetHpValuesNoUpdate(priorChar.Value.Hp, priorChar.Value.MaxHp);
                     newChar.Attributes = priorChar.Value.Attributes.ToDictionary();
                 }
-                
+
                 if (reason == EncounterStartReason.NewObjective)
                 {
                     // Only pull through Bosses if it's a New Objective as that's where data for them can actually get lost when creating a new Encounter

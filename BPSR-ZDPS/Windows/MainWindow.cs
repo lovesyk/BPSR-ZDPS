@@ -810,8 +810,16 @@ namespace BPSR_ZDPS.Windows
                 //Log.Information($"Requesting new manual encounter at {DateTime.Now}");
                 //BattleStateMachine.SetDeferredEncounterEndFinalData(DateTime.Now, new EncounterEndFinalData() { BattleId = EncounterManager.CurrentBattleId, Encounter = EncounterManager.Current, EncounterId = EncounterManager.Current.EncounterId, Reason = EncounterStartReason.Force });
                 //EncounterManager.StopEncounter();
-                Log.Information($"Starting new manual encounter at {DateTime.Now}");
-                EncounterManager.StartEncounter(true, EncounterStartReason.Force);
+                if (AppState.IsBenchmarkMode)
+                {
+                    Log.Information($"Starting new Benchmark encounter at {DateTime.Now}");
+                    EncounterManager.StartEncounter(true, EncounterStartReason.BenchmarkStart);
+                }
+                else
+                {
+                    Log.Information($"Starting new manual encounter at {DateTime.Now}");
+                    EncounterManager.StartEncounter(true, EncounterStartReason.Force);
+                } 
             });
         }
 

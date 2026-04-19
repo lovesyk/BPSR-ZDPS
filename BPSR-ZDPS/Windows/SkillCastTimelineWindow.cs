@@ -181,7 +181,7 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(500, 720));
+            ImGui.SetNextWindowSize(new Vector2(500, 720), ImGuiCond.Appearing);
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -372,15 +372,6 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (Utils.CheckIfViewportValid(ImGui.GetWindowViewport()))
                     {
-                        unsafe
-                        {
-                            // This is how we support transparency effects of just the background and not the text content.
-                            // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
-                            // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
-                            //Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
-                            //Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
-                            //User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00010101, 200, User32.LWA_COLORKEY | User32.LWA_ALPHA);
-                        }
                         HadTransparentBackground = true;
                     }
                 }
@@ -388,16 +379,6 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (Utils.CheckIfViewportValid(ImGui.GetWindowViewport()))
                     {
-                        unsafe
-                        {
-                            // This is how we support transparency effects of just the background and not the text content.
-                            // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
-                            // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
-                            //Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
-                            //Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
-                            //User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00010101, 255, User32.LWA_COLORKEY | User32.LWA_ALPHA);
-                        }
-
                         HadTransparentBackground = false;
                     }
                 }

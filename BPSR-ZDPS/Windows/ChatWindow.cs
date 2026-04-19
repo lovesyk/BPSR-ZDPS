@@ -692,7 +692,7 @@ namespace BPSR_ZDPS.Windows
                 {
                     ChatManager.BlockUser(sender);
                 }
-                ImGui.SetItemTooltip($"Blocks this users ({sender.Info.Name}) messages from showing in your ZDPS chat.");
+                ImGui.SetItemTooltip($"Blocks this user's ({sender.Info.Name}) messages from showing in your ZDPS chat.");
 
                 ImGui.EndPopup();
             }

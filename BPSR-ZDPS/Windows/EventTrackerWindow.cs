@@ -3152,7 +3152,7 @@ namespace BPSR_ZDPS.Windows
             ImGui.InputText("##TrackerNameInputText", ref ActiveTrackedEventEntry.TrackerName, 256);
 
             ImGui.AlignTextToFramePadding();
-            ImGui.TextUnformatted("Tracker Type [Attributes Not Supported]:");
+            ImGui.TextUnformatted("Tracker Type:");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(-1);
             if (ImGui.BeginCombo("##TrackerType", ActiveTrackedEventEntry.TrackerType.ToString(), ImGuiComboFlags.None))
