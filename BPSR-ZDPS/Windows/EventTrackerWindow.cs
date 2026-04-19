@@ -2262,6 +2262,11 @@ namespace BPSR_ZDPS.Windows
                 ActiveTrackedEventEntry = null;
                 ActiveTrackedEventEntryIdx = -1;
 
+                foreach (var newTracker in ActiveTrackerContainer.EventTrackers)
+                {
+                    newTracker.Value.UpdateIconData(newTracker.Value.OriginalIconPath, false);
+                }
+
                 ActiveTrackerContainer.RecheckTrackerStates();
             }
             ImGui.PopStyleColor();
@@ -2390,7 +2395,7 @@ namespace BPSR_ZDPS.Windows
 
                 ActiveTrackedEventEntry = ActiveTrackerContainer.EventTrackers[newTracker.IdTracker];
                 ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
-
+                ActiveTrackedEventEntry.UpdateIconData(ActiveTrackedEventEntry.OriginalIconPath, false);
                 ActiveTrackerContainer.RecheckTrackerStates();
             }
             ImGui.PopStyleColor();
