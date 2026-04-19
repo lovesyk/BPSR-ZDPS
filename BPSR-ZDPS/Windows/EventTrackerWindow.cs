@@ -480,7 +480,8 @@ namespace BPSR_ZDPS.Windows
                             //eventTracker.EventData.Add(e.EntityUuid, eventData);
                         }
 
-                        if (eventTracker.TrackedBuffId == e.BaseId || (eventData != null && e.BuffUuid != 0 && eventData.Uuid == e.BuffUuid))
+                        if ((eventTracker.TrackedBuffId == e.BaseId && (eventTracker.EventSourceMustBeSelf ? AppState.PlayerUUID == e.FireUuid : true))
+                            || (eventData != null && e.BuffUuid != 0 && eventData.Uuid == e.BuffUuid))
                         {
                             if (eventTracker.BuffEvents.Contains(e.BuffEventType))
                             {
@@ -3377,6 +3378,11 @@ namespace BPSR_ZDPS.Windows
 
             DrawWhoToTrack();
 
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted("Buff Source Must Be 'Self':");
+            ImGui.SameLine();
+            ImGui.Checkbox("##BuffSourceMustBeSelf", ref ActiveTrackedEventEntry.EventSourceMustBeSelf);
+
             ImGui.NewLine();
 
             ImGui.AlignTextToFramePadding();
@@ -4937,6 +4943,7 @@ namespace BPSR_ZDPS.Windows
         public long DefinedEntityTargetUuid = 0;
         [JsonIgnore]
         public long LastUserTargetEntityUuid = 0;
+        public bool EventSourceMustBeSelf = false;
 
         public int TrackedBuffId = 0;
         public List<Zproto.EBuffEventType> BuffEvents = new();
