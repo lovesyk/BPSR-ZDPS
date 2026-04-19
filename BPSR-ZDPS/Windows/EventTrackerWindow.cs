@@ -410,6 +410,27 @@ namespace BPSR_ZDPS.Windows
                     shouldHandle = true;
                 }
             }
+            else if (eventTracker.TrackedEntityType == ETrackedEntityType.Summons)
+            {
+                if (AppState.PlayerUUID != 0 && EncounterManager.Current != null)
+                {
+                    if (EncounterManager.Current.Entities.TryGetValue(entityUuid, out var otherEntity))
+                    {
+                        if (otherEntity.SummonerEntityType != EEntityType.EntErrType)
+                        {
+                            if (eventTracker.OnlyTrackSummonsFromSelf)
+                            {
+                                var topSummonerId = otherEntity.GetAttrKV("AttrTopSummonerId") as long?;
+                                shouldHandle = (topSummonerId != null && topSummonerId == AppState.PlayerUUID);
+                            }
+                            else
+                            {
+                                shouldHandle = true;
+                            }
+                        }
+                    }
+                }
+            }
 
             return shouldHandle;
         }
@@ -4121,6 +4142,13 @@ namespace BPSR_ZDPS.Windows
                 ImGui.SameLine();
                 ImGui.Checkbox("##ExcludeSelfFromEveryoneType", ref ActiveTrackedEventEntry.ExcludeSelfFromEveryoneType);
             }
+            if (ActiveTrackedEventEntry.TrackedEntityType == ETrackedEntityType.Summons)
+            {
+                ImGui.AlignTextToFramePadding();
+                ImGui.TextUnformatted("Only Track Summons From 'Self':");
+                ImGui.SameLine();
+                ImGui.Checkbox("##OnlyTrackSummonsFromSelf", ref ActiveTrackedEventEntry.OnlyTrackSummonsFromSelf);
+            }
         }
 
         private static void DrawLoadTimeOptions()
@@ -4900,7 +4928,8 @@ namespace BPSR_ZDPS.Windows
         DefinedTarget = 2,
         Party = 3,
         //Raid = 4,
-        Everyone = 5
+        Everyone = 5,
+        Summons = 6
     }
 
     public enum EHideTrackerCondition
@@ -4944,6 +4973,7 @@ namespace BPSR_ZDPS.Windows
         [JsonIgnore]
         public long LastUserTargetEntityUuid = 0;
         public bool EventSourceMustBeSelf = false;
+        public bool OnlyTrackSummonsFromSelf = false;
 
         public int TrackedBuffId = 0;
         public List<Zproto.EBuffEventType> BuffEvents = new();
