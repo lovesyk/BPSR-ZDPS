@@ -112,10 +112,10 @@ namespace BPSR_ZDPS
             }
 
             // TODO: Every language can have its own 'Overrides' file
-            string skillOverrivesFile = Path.Combine(Utils.DATA_DIR_NAME, "SkillOverrides.en.json");
-            if (File.Exists(skillOverrivesFile))
+            string skillOverridesFile = Path.Combine(Utils.DATA_DIR_NAME, "SkillOverrides.en.json");
+            if (File.Exists(skillOverridesFile))
             {
-                var overrides = JsonConvert.DeserializeObject<Dictionary<string, Skill>>(File.ReadAllText(skillOverrivesFile));
+                var overrides = JsonConvert.DeserializeObject<Dictionary<string, Skill>>(File.ReadAllText(skillOverridesFile));
                 foreach (var item in overrides)
                 {
                     if (HelperMethods.DataTables.Skills.Data.TryGetValue(item.Key, out var skill))
@@ -219,10 +219,10 @@ namespace BPSR_ZDPS
             }
 
             // TODO: Every language can have its own 'Overrides' file
-            string buffOverrivesFile = Path.Combine(Utils.DATA_DIR_NAME, "BuffOverrides.en.json");
-            if (File.Exists(buffOverrivesFile))
+            string buffOverridesFile = Path.Combine(Utils.DATA_DIR_NAME, "BuffOverrides.en.json");
+            if (File.Exists(buffOverridesFile))
             {
-                var overrides = JsonConvert.DeserializeObject<Dictionary<string, Buff>>(File.ReadAllText(buffOverrivesFile));
+                var overrides = JsonConvert.DeserializeObject<Dictionary<string, Buff>>(File.ReadAllText(buffOverridesFile));
                 foreach (var item in overrides)
                 {
                     if (HelperMethods.DataTables.Buffs.Data.TryGetValue(item.Key, out var buff))
@@ -352,6 +352,28 @@ namespace BPSR_ZDPS
                 var attrDescriptions = JsonConvert.DeserializeObject<Dictionary<string, AttrDescription>>(File.ReadAllText(AttrDescriptionFile));
                 HelperMethods.DataTables.AttrDescriptions.Data = attrDescriptions;
                 Log.Information("Loaded AttrDescription.json");
+            }
+
+            string DummyTableFile = Path.Combine(Utils.DATA_DIR_NAME, "DummyTable.json");
+            if (File.Exists(DummyTableFile))
+            {
+                var dummys = JsonConvert.DeserializeObject<Dictionary<string, Dummy>>(File.ReadAllText(DummyTableFile));
+                HelperMethods.DataTables.Dummys.Data = dummys;
+                Log.Information("Loaded DummyTable.json");
+            }
+
+            string dummyOverridesFile = Path.Combine(Utils.DATA_DIR_NAME, "DummyOverrides.en.json");
+            if (File.Exists(dummyOverridesFile))
+            {
+                var overrides = JsonConvert.DeserializeObject<Dictionary<string, Dummy>>(File.ReadAllText(dummyOverridesFile));
+                foreach (var item in overrides)
+                {
+                    if (HelperMethods.DataTables.Dummys.Data.TryGetValue(item.Key, out var dummy))
+                    {
+                        dummy.Name = string.IsNullOrEmpty(item.Value.Name) ? dummy.Name : item.Value.Name;
+                    }
+                }
+                Log.Information("Loaded DummyOverrides.en.json");
             }
 
             try

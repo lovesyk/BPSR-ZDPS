@@ -43,6 +43,7 @@ namespace BPSR_ZDPS
             public static DbmTable Dbms = new DbmTable();
             public static TempAttrTable TempAttrs = new TempAttrTable();
             public static AttrDescriptionTable AttrDescriptions = new AttrDescriptionTable();
+            public static DummyTable Dummys = new DummyTable();
         }
     }
 }
