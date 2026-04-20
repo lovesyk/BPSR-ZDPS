@@ -420,7 +420,8 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (EncounterManager.Current.Entities.TryGetValue(entityUuid, out var otherEntity))
                     {
-                        if (otherEntity.SummonerEntityType != EEntityType.EntErrType)
+                        var summonFlag = otherEntity.GetAttrKV("AttrSummonFlag") as int?;
+                        if (summonFlag != null && summonFlag > 0)
                         {
                             if (eventTracker.OnlyTrackSummonsFromSelf)
                             {
@@ -510,6 +511,26 @@ namespace BPSR_ZDPS.Windows
                         {
                             if (eventTracker.BuffEvents.Contains(e.BuffEventType))
                             {
+                                if (eventTracker.LimitToOneTrackerInstance)
+                                {
+                                    if (eventTracker.EventData.Count > 0)
+                                    {
+                                        bool shouldSkip = false;
+                                        foreach (var item in eventTracker.EventData)
+                                        {
+                                            if (item.Value.Cooldown != null)
+                                            {
+                                                shouldSkip = true;
+                                                break;
+                                            }
+                                        }
+                                        if (shouldSkip)
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                }
+
                                 if (eventData == null)
                                 {
                                     eventData = new();
@@ -1595,6 +1616,8 @@ namespace BPSR_ZDPS.Windows
                                 eventTracker.EventData[0].Cooldown.StartOrUpdate(DateTime.UtcNow);
                             }
 
+                            //List<long> expiredEventData = [];
+
                             foreach (var eventDataKVP in eventTracker.EventData.AsValueEnumerable())
                             {
                                 var eventData = eventDataKVP.Value;
@@ -2102,6 +2125,7 @@ namespace BPSR_ZDPS.Windows
                                         ImGui.TextUnformatted("Duration Ended");
                                         ImGui.PopFont();
                                     }
+                                    //expiredEventData.Add(eventDataKVP.Key);
                                 }
 
                                 ImGui.EndGroup();
@@ -2137,6 +2161,11 @@ namespace BPSR_ZDPS.Windows
                             {
                                 eventTracker.EventData.Remove(0, out _);
                             }
+
+                            /*foreach (var expired in expiredEventData)
+                            {
+                                eventTracker.EventData.Remove(expired, out _);
+                            }*/
                         }
 
                         Settings.Instance.WindowSettings.EventTracker.ContainerPositions[eventContainer.IdTracker] = ImGui.GetWindowPos();
@@ -3431,6 +3460,18 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted("Buff Source Must Be 'Self':");
             ImGui.SameLine();
             ImGui.Checkbox("##BuffSourceMustBeSelf", ref ActiveTrackedEventEntry.EventSourceMustBeSelf);
+
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted("Limit To One Tracker Instance:");
+            ImGui.SameLine();
+            if (ImGui.Checkbox("##LimitToOneTrackerInstance", ref ActiveTrackedEventEntry.LimitToOneTrackerInstance))
+            {
+                if (ActiveTrackedEventEntry.LimitToOneTrackerInstance)
+                {
+                    ActiveTrackedEventEntry.EventData.Clear();
+                }
+            }
+            ImGui.SetItemTooltip($"This will clear the current Internal Trackers when Enabled.\nCurrent Internal Trackers Count = {ActiveTrackedEventEntry.EventData.Count}");
 
             ImGui.NewLine();
 
@@ -5018,6 +5059,8 @@ namespace BPSR_ZDPS.Windows
         public int OverrideTrackedIdValue = 0;
 
         public string TrackedAttributeName = "";
+
+        public bool LimitToOneTrackerInstance = false;
 
         public bool ShowIcon = false;
         public string OriginalIconPath = "";
