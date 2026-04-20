@@ -1388,6 +1388,14 @@ namespace BPSR_ZDPS.Windows
 
                 if (windowSettings.HideContainersWhenGameNotFocused)
                 {
+                    bool keepContainers = false;
+                    if (windowSettings.KeepContainersWhenZDPSFocused && Utils.IsApplicationFocused())
+                    {
+                        keepContainers = true;
+                    }
+
+                    if (!keepContainers)
+                    {
                     if (LastGameFocusCheckTime == null || DateTime.Now.Subtract(LastGameFocusCheckTime.Value).TotalSeconds > 3.0)
                     {
                         LastGameFocusCheckTime = DateTime.Now;
@@ -1428,6 +1436,7 @@ namespace BPSR_ZDPS.Windows
                             return;
                         }
                     }
+                }
                 }
 
                 ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
@@ -2864,6 +2873,12 @@ namespace BPSR_ZDPS.Windows
 
                     ImGui.Checkbox("Hide Containers When Game Not Focused", ref windowSettings.HideContainersWhenGameNotFocused);
                     ImGui.SetItemTooltip("Automatically hides all Containers when the game isn't in focus regardless of Container and Tracker settings.");
+                    ImGui.Indent();
+                    ImGui.BeginDisabled(!windowSettings.HideContainersWhenGameNotFocused);
+                    ImGui.Checkbox("Keep Containers When ZDPS Focused", ref windowSettings.KeepContainersWhenZDPSFocused);
+                    ImGui.SetItemTooltip("Having a ZDPS window in focus will prevent the Containers from being automatically hidden due to the game no longer being in focus.");
+                    ImGui.EndDisabled();
+                    ImGui.Unindent();
 
                     ImGui.Checkbox("Containers Always Ignore Input (Excluding Edit Mode)", ref windowSettings.AlwaysIgnoreInputs);
                     ImGui.SetItemTooltip("All input/mouse events will be ignored for Containers unless in Edit Mode.\nOtherwise, 'Pinned Window Clickthrough' (Mouse Passthrough) must be toggled on via Hotkey Keybind in Settings.");
@@ -5578,6 +5593,7 @@ namespace BPSR_ZDPS.Windows
         public bool EditModeShowPlaceholders = false;
 
         public bool HideContainersWhenGameNotFocused = false;
+        public bool KeepContainersWhenZDPSFocused = false;
 
         public bool AlwaysIgnoreInputs = false;
         public bool ShowForceHideContainersBtnOnMainWindow = false;

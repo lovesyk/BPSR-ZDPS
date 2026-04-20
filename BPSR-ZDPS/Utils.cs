@@ -412,6 +412,19 @@ namespace BPSR_ZDPS
             User32.SetWindowLong((IntPtr)viewport.Value.PlatformHandleRaw, nIndex, dwNewLong);
         }
 
+        public static bool IsApplicationFocused()
+        {
+            IntPtr foregroundWindow = User32.GetForegroundWindow();
+
+            if (foregroundWindow == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            User32.GetWindowThreadProcessId(foregroundWindow, out int activeProcessId);
+            return activeProcessId == System.Diagnostics.Process.GetCurrentProcess().Id;
+        }
+
         public static void SetWindowClearColor(Vector4 clearColor, ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();
