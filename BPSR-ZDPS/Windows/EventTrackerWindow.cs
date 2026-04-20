@@ -53,6 +53,7 @@ namespace BPSR_ZDPS.Windows
         static bool ShowAllBuffEventsToTrack = false;
 
         static ImGuiWindowClassPtr EventTrackerDisplayClass = ImGui.ImGuiWindowClass();
+        static ImGuiWindowClassPtr EventTrackerDisplayInTaskBarClass = ImGui.ImGuiWindowClass();
 
         static string BuffFilterText = "";
         static KeyValuePair<string, Buff>[]? BuffFilterMatches;
@@ -95,6 +96,9 @@ namespace BPSR_ZDPS.Windows
 
                 EventTrackerDisplayClass.ClassId = ImGuiP.ImHashStr("EventTrackerDisplayClass");
                 EventTrackerDisplayClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.NoTaskBarIcon | ImGuiViewportFlags.OwnedByApp;// | ImGuiViewportFlags.NoInputs;
+
+                EventTrackerDisplayInTaskBarClass.ClassId = ImGuiP.ImHashStr("EventTrackerDisplayInTaskBarClass");
+                EventTrackerDisplayInTaskBarClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost | ImGuiViewportFlags.OwnedByApp;// | ImGuiViewportFlags.NoInputs;
 
                 LoadContainersFromFile();
                 LoadContainerPresetsFromFile();
@@ -1440,7 +1444,14 @@ namespace BPSR_ZDPS.Windows
                         }
                     }
 
+                    if (eventContainer.ShowInTaskBar)
+                    {
+                        ImGui.SetNextWindowClass(EventTrackerDisplayInTaskBarClass);
+                    }
+                    else
+                    {
                     ImGui.SetNextWindowClass(EventTrackerDisplayClass);
+                    }
 
                     ImGuiWindowFlags extraFlags = ImGuiWindowFlags.None;
                     if (!windowSettings.IsContainerEditMode)
@@ -1493,6 +1504,12 @@ namespace BPSR_ZDPS.Windows
                     // Set the Window Name to be the stable IdTracker value as Windows will manage the window's by their title
                     if (ImGui.Begin($"{eventContainer.IdTracker}", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoFocusOnAppearing | extraFlags))
                     {
+                        if (eventContainer.IsWindowTitleDirty && Utils.CheckIfViewportValid(ImGui.GetWindowViewport()))
+                        {
+                            Utils.SetWindowTitle(eventContainer.ContainerName, ImGui.GetWindowViewport());
+                            eventContainer.IsWindowTitleDirty = false;
+                        }
+
                         var windowBaseSize = ImGui.GetWindowSize();
 
                         if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize)
@@ -2862,7 +2879,10 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted("Container Name:");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(-1);
-            ImGui.InputText("##ContainerNameInput", ref ActiveTrackerContainer.ContainerName, 128);
+            if (ImGui.InputText("##ContainerNameInput", ref ActiveTrackerContainer.ContainerName, 128))
+            {
+                ActiveTrackerContainer.IsWindowTitleDirty = true;
+            }
 
             ImGui.Checkbox("Show Container Name", ref ActiveTrackerContainer.ShowContainerName);
             ImGui.SetItemTooltip("Controls if the Container Name should be displayed at the top of the Tracker Container window.");
@@ -2871,8 +2891,16 @@ namespace BPSR_ZDPS.Windows
             {
                 ActiveTrackerContainer.HadTransparentBackground = false;
                 ActiveTrackerContainer.LastSetOpacity = 100;
+                ActiveTrackerContainer.IsWindowTitleDirty = true;
             }
             ImGui.SetItemTooltip("Controls if the entire Container is Enabled and should be shown.");
+
+            if (ImGui.Checkbox("Show In Task Bar", ref ActiveTrackerContainer.ShowInTaskBar))
+            {
+                ActiveTrackerContainer.IsWindowTitleDirty = true;
+            }
+            ImGui.SetItemTooltip("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Container window to capture.");
+
             if (ImGui.CollapsingHeader("Container Settings", ImGuiTreeNodeFlags.DefaultOpen))
             {
                 ImGui.Indent();
@@ -4863,6 +4891,10 @@ namespace BPSR_ZDPS.Windows
         public string ContainerName = "";
         public bool ShowContainerName = true;
         public bool IsContainerEnabled = true;
+        public bool ShowInTaskBar = false;
+
+        [JsonIgnore]
+        public bool IsWindowTitleDirty = true;
 
         public EContainerLayoutStyle ContainerLayoutStyle = EContainerLayoutStyle.List;
         public EContainerListDirection ContainerListDirection = EContainerListDirection.Down;

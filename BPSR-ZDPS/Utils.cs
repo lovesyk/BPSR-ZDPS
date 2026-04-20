@@ -311,6 +311,12 @@ namespace BPSR_ZDPS
             return false;
         }
 
+        public static void SetWindowTitle(string title, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            GLFW.SetWindowTitle((GLFWwindowPtr)viewport.Value.PlatformHandle, title);
+        }
+
         /// <summary>
         /// This likely will not actually do anything. Instead consider using ImGuiWindowFlags.NoInputs or ImGuiViewportFlags.NoInputs.
         /// </summary>
