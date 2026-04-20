@@ -1154,6 +1154,21 @@ namespace BPSR_ZDPS.Windows
                                         }
                                     }
                                     ImGui.TextUnformatted($"Buff Id: {buffEvent.BaseId}\n{buffEvent.Description}{extraTooltip}");
+
+                                    bool ctrlHeld = ImGui.IsKeyDown(ImGuiKey.ModCtrl);
+                                    if (ctrlHeld)
+                                    {
+                                        if (!string.IsNullOrEmpty(buffEvent.EntityCasterName))
+                                        {
+                                            ImGui.TextUnformatted($"Caster: {buffEvent.EntityCasterName}");
+                                        }
+                                        else
+                                        {
+                                            ImGui.TextUnformatted($"Caster: {buffEvent.FireUuid}");
+                                        }
+                                        ImGui.TextUnformatted($"Caster Type: {(Zproto.EEntityType)Utils.UuidToEntityType(buffEvent.FireUuid)}");
+                                    }
+
                                     ImGui.EndTooltip();
                                 }
 

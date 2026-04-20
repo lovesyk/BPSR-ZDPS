@@ -644,6 +644,13 @@ namespace BPSR_ZDPS
                         UpdateEncounterBossData(entity, (int)attr_id);
                     }
                 }
+                else if (entity.EntityType == EEntityType.EntDummy)
+                {
+                    if (HelperMethods.DataTables.Dummys.Data.TryGetValue(attr_id.ToString(), out var dummyEntry))
+                    {
+                        entity.SetName(dummyEntry.Name);
+                    }
+                }
             }
         }
 
@@ -664,6 +671,13 @@ namespace BPSR_ZDPS
                         entity.SetName(monsterEntry.Name);
                         entity.SetMonsterType(monsterEntry.MonsterType);
                         UpdateEncounterBossData(entity, (int)value);
+                    }
+                }
+                else if (entity.EntityType == EEntityType.EntDummy)
+                {
+                    if (HelperMethods.DataTables.Dummys.Data.TryGetValue(value.ToString(), out var dummyEntry))
+                    {
+                        entity.SetName(dummyEntry.Name);
                     }
                 }
             }
@@ -773,7 +787,7 @@ namespace BPSR_ZDPS
             }
             else if (key == "AttrTopSummonerId")
             {
-                if (entity.EntityType == EEntityType.EntMonster)
+                if (entity.EntityType != EEntityType.EntChar)
                 {
                     var summoner = GetOrCreateEntity((long)value);
                     entity.SummonerEntityType = summoner.EntityType;
@@ -1526,6 +1540,18 @@ namespace BPSR_ZDPS
                     {
                         SetName(monsterEntry.Name);
                         SetMonsterType(monsterEntry.MonsterType);
+                    }
+                }
+            }
+            else if (type == EEntityType.EntDummy)
+            {
+                var attr_id = GetAttrKV("AttrId");
+                if (attr_id != null)
+                {
+                    UID = (int)attr_id;
+                    if (HelperMethods.DataTables.Dummys.Data.TryGetValue(attr_id.ToString(), out var dummyEntry))
+                    {
+                        SetName(dummyEntry.Name);
                     }
                 }
             }
