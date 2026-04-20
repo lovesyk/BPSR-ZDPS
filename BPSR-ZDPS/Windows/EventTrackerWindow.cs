@@ -1666,7 +1666,7 @@ namespace BPSR_ZDPS.Windows
                                     maxWindowSize = ImGui.GetContentRegionAvail().X;
                                 }*/
 
-                                bool hasAnyShown = (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar) || (eventTracker.ShowIcon && eventTracker.IsIconValid) || (eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar) || eventTracker.ShowEntityName;
+                                bool hasAnyShown = (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar) || (eventTracker.ShowIcon && eventTracker.IsIconValid) || (eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar) || eventTracker.ShowEntityName || (eventTracker.ShowDurationProgessBar && eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize);
                                 if (!hasAnyShown)
                                 {
                                     continue;
@@ -2928,7 +2928,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ActiveTrackerContainer.IsWindowTitleDirty = true;
             }
-            ImGui.SetItemTooltip("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Container window to capture.");
+            ImGui.SetItemTooltip("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Container window to capture.\nNote: You may need to toggle the Enabled state of this Container after changing this setting for it to take effect.");
 
             if (ImGui.CollapsingHeader("Container Settings", ImGuiTreeNodeFlags.DefaultOpen))
             {
