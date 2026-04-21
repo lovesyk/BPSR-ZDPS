@@ -2741,7 +2741,7 @@ namespace BPSR_ZDPS.Windows
 
                     TrackerContainer? duplicateContainer = null;
 
-                    ImGui.TextUnformatted("Tracker Containers:");
+                    ImGui.SeparatorText("Tracker Containers");
 
                     if (IsPresetManagerInContainerMode)
                     {
