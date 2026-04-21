@@ -75,6 +75,8 @@ namespace BPSR_ZDPS.Windows
         static int SelectedPresetManagerContainerIdx = -1;
         static List<TrackerContainer> PresetContainersList = new();
 
+        static string DragDropTargetName = "";
+
         // TODO: This really should be split up into an Event Tracker Manager and not all in the Window class
 
         public static void Open()
@@ -2738,6 +2740,9 @@ namespace BPSR_ZDPS.Windows
                 exWindowFlags |= ImGuiWindowFlags.NoInputs;
             }
 
+            // Reset Drag and Drop target data each frame so we can safely update it on demand
+            DragDropTargetName = "";
+
             if (ImGui.Begin($"{TITLE}{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar | exWindowFlags))
             {
                 ShouldTrackOpenState = true;
@@ -2812,6 +2817,77 @@ namespace BPSR_ZDPS.Windows
                                     ActiveTrackedEventEntryIdx = -1;
                                 }
                             }
+                            ImGui.PushStyleColor(ImGuiCol.DragDropTarget, Colors.LightBlue_Transparent);
+                            if (ImGui.BeginDragDropTarget())
+                            {
+                                var payload = ImGui.AcceptDragDropPayload("TrackedEvent", ImGuiDragDropFlags.AcceptBeforeDelivery);
+                                
+                                if (!payload.IsNull)
+                                {
+                                    DragDropTargetName = container.Value.ContainerName;
+
+                                    if (payload.IsDelivery())
+                                    {
+                                        // If Control is held when the drop occurs, we Copy instead of Move the data
+                                        if (!ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+                                        {
+                                            if (container.Value.EventTrackers.ContainsKey(ActiveTrackedEventEntry.IdTracker))
+                                            {
+                                                // User is trying to drag and drop the Tracker onto it's owning Container while in Move mode
+                                            }
+                                            else
+                                            {
+                                                // Since we're only moving the Tracker, we don't need to change any Id data
+
+                                                // Add the tracker to the container we dropped onto, without changing the active container
+                                                container.Value.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
+
+                                                // Remove all version of the Tracker from it's prior Container
+                                                ActiveTrackerContainer.EventTrackers.Remove(ActiveTrackedEventEntry.IdTracker);
+                                                if (ActiveTrackedEventEntryIdx > 0)
+                                                {
+                                                    ActiveTrackedEventEntryIdx = ActiveTrackedEventEntryIdx - 1;
+                                                    ActiveTrackedEventEntry = ActiveTrackerContainer.EventTrackers.ElementAt(ActiveTrackedEventEntryIdx).Value;
+                                                }
+                                                else if (ActiveTrackedEventEntryIdx == 0)
+                                                {
+                                                    if (ActiveTrackerContainer.EventTrackers.Count > 0)
+                                                    {
+                                                        ActiveTrackedEventEntryIdx = 0;
+                                                        ActiveTrackedEventEntry = ActiveTrackerContainer.EventTrackers.ElementAt(ActiveTrackedEventEntryIdx).Value;
+                                                    }
+                                                    else
+                                                    {
+                                                        ActiveTrackedEventEntryIdx = -1;
+                                                        ActiveTrackedEventEntry = null;
+                                                    }
+                                                }
+
+                                                // Revalidate the source Container as it may no longer have any valid active Trackers
+                                                ActiveTrackerContainer.RecheckTrackerStates();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // Performing a Copy operation
+
+                                            // Convert down into a valid tracker for this session
+                                            var newTracker = (TrackedEventEntry)ActiveTrackedEventEntry.Clone(++PersistentTrackerCount);
+
+                                            // Add the tracker to the container we dropped onto, without changing the active container
+                                            container.Value.EventTrackers.Add(newTracker.IdTracker, newTracker);
+
+                                            // Validate the new tracker data
+                                            newTracker.UpdateIconData(newTracker.OriginalIconPath, false);
+                                        }
+
+                                        container.Value.RecheckTrackerStates();
+                                    }
+                                }
+                                
+                                ImGui.EndDragDropTarget();
+                            }
+                            ImGui.PopStyleColor();
                             ImGui.SetItemTooltip($"Trackers: {container.Value.EventTrackers.Count}");
                             if (ImGui.BeginPopupContextItem())
                             {
@@ -3288,6 +3364,26 @@ namespace BPSR_ZDPS.Windows
                     {
                         ActiveTrackedEventEntryIdx = idx;
                         ActiveTrackedEventEntry = eventTracker.Value;
+                    }
+                    if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.None))
+                    {
+                        unsafe
+                        {
+                            ImGui.SetDragDropPayload("TrackedEvent", (void*)IntPtr.Zero, 0);
+                        }
+                        // Forcefully set the Tracker we're dragging as the Active Selected one so we can query it on the drop event
+                        ActiveTrackedEventEntryIdx = idx;
+                        ActiveTrackedEventEntry = eventTracker.Value;
+
+                        // Preview element
+                        string dropAction = "Moving";
+                        if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+                        {
+                            dropAction = "Copying";
+                        }
+                        ImGui.TextUnformatted($"{dropAction} Tracker '{eventTracker.Value.Name}'{(!string.IsNullOrEmpty(DragDropTargetName) ? $" to '{DragDropTargetName}'" : "")}");
+
+                        ImGui.EndDragDropSource();
                     }
                     if (ImGui.BeginItemTooltip())
                     {
