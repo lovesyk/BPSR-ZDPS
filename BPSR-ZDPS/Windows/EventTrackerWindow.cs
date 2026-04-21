@@ -541,8 +541,11 @@ namespace BPSR_ZDPS.Windows
                                 eventTracker.IsHidden = false;
 
                                 eventData.Uuid = e.BuffUuid;
-                                eventData.SourceEntityUuid = e.FireUuid;
-                                eventData.SourceEntityName = e.EntityCasterName;
+                                if (e.BaseId != 0)
+                                {
+                                    eventData.SourceEntityUuid = e.FireUuid;
+                                    eventData.SourceEntityName = e.EntityCasterName;
+                                }
                                 eventData.OwnerEntityUuid = e.EntityUuid;
 
                                 bool didRaidWarning = false;
@@ -601,7 +604,7 @@ namespace BPSR_ZDPS.Windows
 
                                 if (eventTracker.DebugLogTracker)
                                 {
-                                    AddDebugLog($"{DateTime.Now} Buff Event [{e.BuffUuid}]({e.BaseId}) {e.BuffEventType} FromUUID={e.EntityUuid} Name={eventTracker.Name} Layers={e.Layer} Duration={e.Duration} AppliedDur={eventData.Cooldown.BaseDuration}");
+                                    AddDebugLog($"{DateTime.Now} Buff Event [{e.BuffUuid}]({e.BaseId}) {e.BuffEventType} FromUUID={e.EntityUuid} Name={eventTracker.Name} Layers={e.Layer} Duration={e.Duration} AppliedDur={eventData.Cooldown?.BaseDuration}");
                                 }
 
                                 eventData.Cooldown.StartOrUpdate(e.UpdateDateTime);
@@ -1896,12 +1899,14 @@ namespace BPSR_ZDPS.Windows
 
                                 if (eventData.Cooldown != null)
                                 {
-                                    if (!eventData.Cooldown.IsFinished())
+                                    bool usingLayersForDuration = eventTracker.IgnoreCooldownDuration && eventTracker.UseLayersForDuration;
+
+                                    if (!eventData.Cooldown.IsFinished() || usingLayersForDuration)
                                     {
                                         // Overall progress metrics
                                         float remainingSeconds = eventData.Cooldown.GetRemainingSeconds();
                                         float remainingPct = 1.0f - eventData.Cooldown.GetProgressPercent();
-
+                                        
                                         if (skillEventData != null && skillEventData.ChargeTimes.Count > 0)
                                         {
                                             DateTime? lastFinish = null;
@@ -1953,6 +1958,23 @@ namespace BPSR_ZDPS.Windows
                                         else
                                         {
                                             // This is not a skill, or is skill with no charge setup, the overall cooldown will be used
+                                            if (usingLayersForDuration)
+                                            {
+                                                if (eventData.Layers > eventTracker.LayersForDurationMaxValue && eventTracker.LayersForDurationMaxValue > 0)
+                                                {
+                                                    remainingPct = ((float)eventTracker.LayersForDurationMaxValue / (float)eventData.Layers);
+                                                    remainingSeconds = eventData.Layers;
+                                                }
+                                                else if (eventData.Layers < eventTracker.LayersForDurationMaxValue && eventData.Layers > 0)
+                                                {
+                                                    remainingPct = ((float)eventData.Layers / (float)eventTracker.LayersForDurationMaxValue);
+                                                    remainingSeconds = eventTracker.LayersForDurationMaxValue;
+                                                }
+                                                if (remainingPct < 0)
+                                                {
+                                                    remainingPct = 0;
+                                                }
+                                            }
                                         }
 
                                         if (eventTracker.ShowDurationText && !eventTracker.ShowDurationTextInProgressBar)
@@ -1963,7 +1985,14 @@ namespace BPSR_ZDPS.Windows
                                             }
 
                                             ImGui.PushFont(null, eventTracker.DurationTextSize);
-                                            ImGui.TextUnformatted($"{remainingSeconds:F2}s");
+                                            if(usingLayersForDuration)
+                                            {
+                                                ImGui.TextUnformatted($"{remainingSeconds}");
+                                            }
+                                            else
+                                            {
+                                                ImGui.TextUnformatted($"{remainingSeconds:F2}s");
+                                            }
                                             ImGui.PopFont();
                                         }
                                         if (eventTracker.ShowDurationProgessBar)
@@ -2009,7 +2038,14 @@ namespace BPSR_ZDPS.Windows
                                                     {
                                                         displayText += " ";
                                                     }
-                                                    displayText += $"{remainingSeconds:F2}s";
+                                                    if (usingLayersForDuration)
+                                                    {
+                                                        displayText += $"{remainingSeconds}";
+                                                    }
+                                                    else
+                                                    {
+                                                        displayText += $"{remainingSeconds:F2}s";
+                                                    }
                                                 }
 
                                                 Vector4? barColor = null;
@@ -2121,21 +2157,24 @@ namespace BPSR_ZDPS.Windows
                                     }
                                     else
                                     {
-                                        // Cooldown duration is complete, reset/clean up here
-                                        eventData.Layers = 0;
-                                        if (eventData is SkillEventData)
+                                        if (!eventTracker.IgnoreCooldownDuration)
                                         {
-                                            ((SkillEventData)eventData).ChargeTimes.Clear();
+                                            // Cooldown duration is complete, reset/clean up here
+                                            eventData.Layers = 0;
+                                            if (eventData is SkillEventData)
+                                            {
+                                                ((SkillEventData)eventData).ChargeTimes.Clear();
+                                            }
+
+                                            var rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
+
+                                            if (rw != null)
+                                            {
+                                                HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, null);
+                                            }
+
+                                            eventData.Cooldown = null;
                                         }
-
-                                        var rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
-
-                                        if (rw != null)
-                                        {
-                                            HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, null);
-                                        }
-
-                                        eventData.Cooldown = null;
                                     }
                                 }
                                 else
@@ -3641,6 +3680,21 @@ namespace BPSR_ZDPS.Windows
                 ImGui.SameLine();
                 ImGui.InputInt("##OverrideValueInput", ref ActiveTrackedEventEntry.DurationOverrideValue, ImGuiInputTextFlags.CharsDecimal);
                 ImGui.SetItemTooltip("New Duration value to force. Value is in Seconds.");
+                ImGui.Unindent();
+            }
+
+            ImGui.Checkbox("Ignore Duration", ref ActiveTrackedEventEntry.IgnoreCooldownDuration);
+            ImGui.SetItemTooltip("The duration of the Tracker will be ignored. This may prevent some Events from triggering.\nThis can be useful for Buffs that do not make use of a duration to end and instead rely on Layer Count or some other metric.");
+            ImGui.Checkbox("Use Layers For Duration", ref ActiveTrackedEventEntry.UseLayersForDuration);
+            ImGui.SetItemTooltip("The Buff's Layers count will be used to indicate progress via the Duration Progress Bar.");
+            if (ActiveTrackedEventEntry.UseLayersForDuration)
+            {
+                ImGui.Indent();
+                ImGui.AlignTextToFramePadding();
+                ImGui.TextUnformatted("Layers Duration Max Value:");
+                ImGui.SameLine();
+                ImGui.InputInt("##LayersForDurationMaxValue", ref ActiveTrackedEventEntry.LayersForDurationMaxValue, ImGuiInputTextFlags.CharsDecimal);
+                ImGui.SetItemTooltip("This value will be used as the max target for the Buff's Layer count to reach.");
                 ImGui.Unindent();
             }
         }
@@ -5269,6 +5323,10 @@ namespace BPSR_ZDPS.Windows
 
         public bool OverrideDuration = false;
         public int DurationOverrideValue = 0;
+
+        public bool IgnoreCooldownDuration = false;
+        public bool UseLayersForDuration = false;
+        public int LayersForDurationMaxValue = 0;
 
         public List<RaidWarningTrackerData> RaidWarningTrackerDatas = new();
 
