@@ -2891,6 +2891,16 @@ namespace BPSR_ZDPS.Windows
                             ImGui.SetItemTooltip($"Trackers: {container.Value.EventTrackers.Count}");
                             if (ImGui.BeginPopupContextItem())
                             {
+                                if (ImGui.MenuItem("Copy Container To Clipboard"))
+                                {
+                                    uint tempTrackerId = 0;
+                                    var newContainer = ((TrackerContainer)container.Value.Clone(0, ref tempTrackerId));
+                                    ImGui.SetClipboardText(JsonConvert.SerializeObject(newContainer));
+                                }
+                                ImGui.SetItemTooltip($"Copies Container '{container.Value.ContainerName}' like a Preset to the clipboard.");
+
+                                ImGui.Separator();
+
                                 if (ImGui.MenuItem("Duplicate Container"))
                                 {
                                     duplicateContainer = container.Value;
@@ -3408,6 +3418,18 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextUnformatted($"Who To Track: {eventTracker.Value.TrackedEntityType}");
 
                         ImGui.EndTooltip();
+                    }
+                    if (ImGui.BeginPopupContextItem())
+                    {
+                        if (ImGui.MenuItem("Copy Tracker To Clipboard"))
+                        {
+                            // Create a cleaned version of the Tracker that is dependency-free before it is copied
+                            var newTracker = (TrackedEventEntry)eventTracker.Value.Clone(0);
+                            ImGui.SetClipboardText(JsonConvert.SerializeObject(newTracker));
+                        }
+                        ImGui.SetItemTooltip($"Copies Tracker '{eventTracker.Value.Name}' like a Preset to the clipboard.");
+
+                        ImGui.EndPopup();
                     }
 
                     idx++;
