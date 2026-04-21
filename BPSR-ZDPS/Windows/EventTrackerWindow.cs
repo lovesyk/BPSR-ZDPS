@@ -2666,7 +2666,7 @@ namespace BPSR_ZDPS.Windows
 
                     TrackerContainer? duplicateContainer = null;
 
-                    ImGui.TextUnformatted("Tracker Containers:");
+                    ImGui.SeparatorText("Tracker Containers");
 
                     if (IsPresetManagerInContainerMode)
                     {
@@ -2919,6 +2919,7 @@ namespace BPSR_ZDPS.Windows
 
         private static void DrawContainerOptions()
         {
+            ImGui.SeparatorText("Container Settings");
             ImGui.AlignTextToFramePadding();
             ImGui.TextUnformatted("Container Name:");
             ImGui.SameLine();
@@ -2931,6 +2932,8 @@ namespace BPSR_ZDPS.Windows
             ImGui.Checkbox("Show Container Name", ref ActiveTrackerContainer.ShowContainerName);
             ImGui.SetItemTooltip("Controls if the Container Name should be displayed at the top of the Tracker Container window.");
 
+            ImGui.SameLine();
+
             if (ImGui.Checkbox("Is Container Enabled", ref ActiveTrackerContainer.IsContainerEnabled))
             {
                 ActiveTrackerContainer.HadTransparentBackground = false;
@@ -2939,11 +2942,15 @@ namespace BPSR_ZDPS.Windows
             }
             ImGui.SetItemTooltip("Controls if the entire Container is Enabled and should be shown.");
 
+            ImGui.SameLine();
+
             if (ImGui.Checkbox("Show In Task Bar", ref ActiveTrackerContainer.ShowInTaskBar))
             {
                 ActiveTrackerContainer.IsWindowTitleDirty = true;
             }
             ImGui.SetItemTooltip("Hiding from the Task Bar may prevent screen recording software like OBS from seeing the Container window to capture.\nNote: You may need to toggle the Enabled state of this Container after changing this setting for it to take effect.");
+
+            ImGui.Dummy(new Vector2(0, 0));
 
             if (ImGui.CollapsingHeader("Container Settings", ImGuiTreeNodeFlags.DefaultOpen))
             {
@@ -2981,7 +2988,7 @@ namespace BPSR_ZDPS.Windows
                     ImGui.AlignTextToFramePadding();
                     ImGui.TextUnformatted("Layout List Direction:");
                     ImGui.SameLine();
-                    ImGui.SetNextItemWidth(-1);
+                    ImGui.SetNextItemWidth(100);
                     if (ImGui.BeginCombo("##LayoutDirectionCombo", ActiveTrackerContainer.ContainerListDirection.ToString(), ImGuiComboFlags.None))
                     {
                         int idx = 0;
@@ -3005,10 +3012,12 @@ namespace BPSR_ZDPS.Windows
                     }
                 }
 
+                ImGui.SameLine();
+
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted("Layout Size Constraints:");
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(-1);
+                ImGui.SetNextItemWidth(100);
                 if (ImGui.BeginCombo("##LayoutSizeConstraintCombo", ActiveTrackerContainer.ContainerSizeConstraint.ToString(), ImGuiComboFlags.None))
                 {
                     if (ImGui.Selectable($"{EContainerSizeConstraint.AutoSize.ToString()}"))
@@ -3028,11 +3037,13 @@ namespace BPSR_ZDPS.Windows
                     ImGui.EndCombo();
                 }
 
-                ImGui.TextUnformatted("Layout Visuals:");
-                ImGui.Indent();
+                ImGui.SeparatorText("Layout Visuals");
+                //ImGui.Indent();
                 ImGui.BeginDisabled(ActiveTrackerContainer.ModifiedWindowOpacity);
-                ImGui.Checkbox("Transparent Background", ref ActiveTrackerContainer.TransparentBackground);
+                ImGui.Checkbox("Transparent Background ", ref ActiveTrackerContainer.TransparentBackground);
                 ImGui.EndDisabled();
+
+                ImGui.SameLine();
 
                 ImGui.BeginDisabled(ActiveTrackerContainer.TransparentBackground);
                 ImGui.Checkbox("Window Opacity", ref ActiveTrackerContainer.ModifiedWindowOpacity);
@@ -3042,6 +3053,7 @@ namespace BPSR_ZDPS.Windows
                     ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                     ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                     ImGui.SetNextItemWidth(-1);
+                    ImGui.SameLine();
                     ImGui.SliderInt("##Opacity", ref ActiveTrackerContainer.WindowOpacityValue, 20, 100, ImGuiSliderFlags.AlwaysClamp);
                     ImGui.PopStyleColor(2);
                     ImGui.Unindent();
@@ -3050,24 +3062,32 @@ namespace BPSR_ZDPS.Windows
 
                 ImGui.Checkbox("Hide Tracker Background", ref ActiveTrackerContainer.HideTrackerBackground);
                 ImGui.SetItemTooltip("Removes the background coloring for Trackers.\nWorks well when combined with Transparent Background.");
+
+                ImGui.SameLine();
+
                 ImGui.Checkbox("Hide Tracker Borders", ref ActiveTrackerContainer.HideTrackerBorders);
                 ImGui.SetItemTooltip("Removes the borders around Trackers.\nWorks well when combined with Transparent Background.");
 
-                ImGui.Unindent();
+                //ImGui.Unindent();
 
-                ImGui.TextUnformatted("Tooltips:");
-                ImGui.Indent();
-                ImGui.Checkbox("Show Caster In Tooltip", ref ActiveTrackerContainer.ShowCasterInTooltip);
-                ImGui.Checkbox("Show Duration In Tooltip", ref ActiveTrackerContainer.ShowDurationInTooltip);
-                ImGui.Checkbox("Show Name Tooltip", ref ActiveTrackerContainer.ShowNameInTooltip);
-                ImGui.Checkbox("Show Description In Tooltip", ref ActiveTrackerContainer.ShowDescriptionInTooltip);
-                ImGui.Checkbox("Trim Long Descriptions In Tooltip", ref ActiveTrackerContainer.TrimLongDescriptionTooltips);
+                ImGui.SeparatorText("Tooltips");
+                //ImGui.Indent();
+                ImGui.Checkbox("Show Caster", ref ActiveTrackerContainer.ShowCasterInTooltip);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 32);
+                ImGui.Checkbox("Show Duration               ", ref ActiveTrackerContainer.ShowDurationInTooltip);
+                ImGui.SameLine();
+                ImGui.Checkbox("Show Name     ", ref ActiveTrackerContainer.ShowNameInTooltip);
+                ImGui.Checkbox("Show Description", ref ActiveTrackerContainer.ShowDescriptionInTooltip);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 2);
+                ImGui.Checkbox("Trim Long Descriptions", ref ActiveTrackerContainer.TrimLongDescriptionTooltips);
                 ImGui.SetItemTooltip("Descriptions are limited to 120 characters with this is Enabled.");
-                ImGui.Unindent();
+                //ImGui.Unindent(); 
 
-                ImGui.TextUnformatted("Special:");
+                ImGui.SeparatorText("Special");
                 ImGui.BeginDisabled(ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.SingleItem);
-                ImGui.Indent();
+                //ImGui.Indent();
                 if (ImGui.Checkbox("Track All Buffs##ContainerTrackAllBuffs", ref ActiveTrackerContainer.TrackAllBuffs))
                 {
                     if (ActiveTrackerContainer.TrackAllBuffs && ActiveTrackerContainer.EventTrackers.Count == 0)
@@ -3097,9 +3117,13 @@ namespace BPSR_ZDPS.Windows
                     if (windowSettings.ContainerPositions.TryGetValue(ActiveTrackerContainer.IdTracker, out var pos))
                     {
                         int[] posArray = { (int)pos.X, (int)pos.Y };
+                        ImGui.AlignTextToFramePadding();
                         ImGui.TextUnformatted("Container Position:");
                         ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                         ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(300);
                         if (ImGui.SliderInt2("##ContainerPos", ref posArray[0], 0, 9999))
                         {
                             pos[0] = posArray[0];
@@ -3110,7 +3134,8 @@ namespace BPSR_ZDPS.Windows
                         }
                         ImGui.PopStyleColor(2);
 
-                        if (ImGui.Button("Reset Container Position"))
+                        ImGui.SameLine();
+                        if (ImGui.Button("Reset"))
                         {
                             var glfwMonitor = Hexa.NET.GLFW.GLFW.GetPrimaryMonitor();
                             var glfwVidMode = Hexa.NET.GLFW.GLFW.GetVideoMode(glfwMonitor);
@@ -3131,11 +3156,11 @@ namespace BPSR_ZDPS.Windows
                     ImGui.Unindent();
                 }
 
-                ImGui.Unindent();
+                //ImGui.Unindent();
             }
             
 
-            ImGui.TextUnformatted("Event Trackers:");
+            ImGui.SeparatorText("Event Trackers"u8);
 
             if (ImGui.BeginListBox("##TrackersListbox", new Vector2(ImGui.GetContentRegionAvail().X, 140)))
             {
