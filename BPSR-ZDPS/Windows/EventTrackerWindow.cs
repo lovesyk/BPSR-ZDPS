@@ -579,6 +579,10 @@ namespace BPSR_ZDPS.Windows
                                     if (eventData.Cooldown != null && eventData.Cooldown.IsCooldownStarted && newDuration != eventData.Cooldown.BaseDuration)
                                     {
                                         eventData.Cooldown.IncreaseBaseDuration(newDuration, true);
+                                        if (e.BuffEventType == EBuffEventType.BuffEventRemoveLayer)
+                                        {
+                                            eventData.Cooldown.StartOrUpdate(e.UpdateDateTime, null, true);
+                                    }
                                     }
                                     else
                                     {
@@ -586,6 +590,7 @@ namespace BPSR_ZDPS.Windows
                                     }
                                 }
 
+                                int previousLayers = eventData.Layers;
                                 eventData.Layers = e.Layer;
 
                                 if (e.BuffEventType == EBuffEventType.BuffEventAddTo)
