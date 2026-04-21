@@ -149,7 +149,7 @@ namespace BPSR_ZDPS.Windows
 
                     ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(1 / 255.0f, 1 / 255.0f, 1 / 255.0f, 0.0f));
                     ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
-                    if (ImGui.Begin("Countdown", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoBackground))
+                    if (ImGui.Begin("Countdown", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoFocusOnAppearing))
                     {
                         if (CountdownRunOnceDelayed == 0)
                         {
