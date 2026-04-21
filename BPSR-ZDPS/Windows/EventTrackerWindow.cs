@@ -70,7 +70,7 @@ namespace BPSR_ZDPS.Windows
         static bool IsPresetManagerOpened = false;
         static bool ShouldPresetManagerFocusNext = false;
         static bool IsPresetManagerInContainerMode = false;
-        static int SelectedPresetManagerTrackerIdx = -1;
+        static TrackedEventEntry? SelectedPresetManagerTracker = null;
         static List<TrackedEventEntry> PresetTrackersList = new();
         static int SelectedPresetManagerContainerIdx = -1;
         static List<TrackerContainer> PresetContainersList = new();
@@ -2392,6 +2392,8 @@ namespace BPSR_ZDPS.Windows
                     {
                         ImGui.TextUnformatted($"Trackers: {container.EventTrackers.Count}");
 
+                        ImGui.TextUnformatted($"Source Type: {container.SourceLocationType}");
+
                         if (container.EventTrackers.Count > 0)
                         {
                             bool ctrlHeld = ImGui.IsKeyDown(ImGuiKey.ModCtrl);
@@ -2424,6 +2426,7 @@ namespace BPSR_ZDPS.Windows
             if (ImGui.Button("Create Container From Preset", new Vector2(-1, 0)))
             {
                 ActiveTrackerContainer = (TrackerContainer)PresetContainersList.ElementAt(SelectedPresetManagerContainerIdx).Clone(++PersistentContainerCount, ref PersistentTrackerCount);
+                ActiveTrackerContainer.SourceLocationType = ESourceLocationType.Manual;
                 EventTrackerContainers.Add(ActiveTrackerContainer.IdTracker, ActiveTrackerContainer);
 
                 ActiveTrackedEventEntry = null;
@@ -2470,6 +2473,7 @@ namespace BPSR_ZDPS.Windows
                             throw new FormatException("Imported Container was missing required data (ContainerName is null).");
                         }
 
+                        newContainer.SourceLocationType = ESourceLocationType.Manual;
                         PresetContainersList.Add((TrackerContainer)newContainer.Clone(0, ref tempTrackerId));
                     }
                 }
@@ -2490,6 +2494,7 @@ namespace BPSR_ZDPS.Windows
                                     throw new FormatException("Imported Container was missing expected required data.");
                                 }
 
+                                newContainer.Value.SourceLocationType = ESourceLocationType.Manual;
                                 PresetContainersList.Add((TrackerContainer)newContainer.Value.Clone(0, ref tempTrackerId));
                             }
                         }
@@ -2524,14 +2529,21 @@ namespace BPSR_ZDPS.Windows
                 int idx = 0;
                 foreach (var tracker in PresetTrackersList)
                 {
-                    bool isSelected = SelectedPresetManagerTrackerIdx == idx;
+                    bool isSelected = SelectedPresetManagerTracker == tracker;
                     var highlight = isSelected ? ImGuiSelectableFlags.Highlight : ImGuiSelectableFlags.None;
                     if (ImGui.Selectable($"{tracker.TrackerName}##Preset_{idx}", isSelected, ImGuiSelectableFlags.SpanAllColumns | highlight))
                     {
-                        SelectedPresetManagerTrackerIdx = idx;
+                        SelectedPresetManagerTracker = tracker;
                     }
                     if (ImGui.BeginItemTooltip())
                     {
+                        ImGui.TextUnformatted($"Source Type: {tracker.SourceLocationType}");
+                        bool ctrlHeld = ImGui.IsKeyDown(ImGuiKey.ModCtrl);
+                        if (ctrlHeld)
+                        {
+                            ImGui.TextUnformatted($"Source Id: {tracker.SourceLocationId}");
+                        }
+
                         if (tracker.TrackerType == ETrackerType.Buffs)
                         {
                             ImGui.TextUnformatted($"BuffId: {tracker.TrackedBuffId}");
@@ -2553,11 +2565,12 @@ namespace BPSR_ZDPS.Windows
             }
 
             bool hasSingleItem = ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.SingleItem && ActiveTrackerContainer.EventTrackers.Count > 0;
-            ImGui.BeginDisabled(hasSingleItem || ActiveTrackerContainer == null || SelectedPresetManagerTrackerIdx == -1);
+            ImGui.BeginDisabled(hasSingleItem || ActiveTrackerContainer == null || SelectedPresetManagerTracker == null);
             ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen_Transparent);
             if (ImGui.Button("Create Tracker From Preset", new Vector2(-1, 0)))
             {
-                var newTracker = (TrackedEventEntry)PresetTrackersList.ElementAt(SelectedPresetManagerTrackerIdx).Clone(++PersistentTrackerCount);
+                var newTracker = (TrackedEventEntry)SelectedPresetManagerTracker.Clone(++PersistentTrackerCount);
+                newTracker.SourceLocationType = ESourceLocationType.Manual;
                 ActiveTrackerContainer.EventTrackers.Add(newTracker.IdTracker, newTracker);
 
                 ActiveTrackedEventEntry = ActiveTrackerContainer.EventTrackers[newTracker.IdTracker];
@@ -2572,15 +2585,19 @@ namespace BPSR_ZDPS.Windows
             ImGui.BeginDisabled(ActiveTrackedEventEntry == null);
             if (ImGui.Button("Create Preset From Selected Tracker", new Vector2(-1, 0)))
             {
-                PresetTrackersList.Add((TrackedEventEntry)ActiveTrackedEventEntry.Clone(0));
+                var newTracker = (TrackedEventEntry)ActiveTrackedEventEntry.Clone(0);
+                newTracker.SourceLocationType = ESourceLocationType.Manual;
+                PresetTrackersList.Add(newTracker);
             }
             ImGui.EndDisabled();
             ImGui.SetItemTooltip("Creates a new Preset from the currently selected Tracker in the Event Tracker window.");
 
-            ImGui.BeginDisabled(SelectedPresetManagerTrackerIdx == -1);
+            ImGui.BeginDisabled(SelectedPresetManagerTracker == null);
             if (ImGui.Button("Copy Preset To Clipboard", new Vector2(-1, 0)))
             {
-                ImGui.SetClipboardText(JsonConvert.SerializeObject(PresetTrackersList.ElementAt(SelectedPresetManagerTrackerIdx)));
+                var newTracker = (TrackedEventEntry)SelectedPresetManagerTracker.Clone(0);
+                newTracker.SourceLocationType = ESourceLocationType.Manual;
+                ImGui.SetClipboardText(JsonConvert.SerializeObject(newTracker));
             }
             ImGui.EndDisabled();
             ImGui.SetItemTooltip("Copies the selected Preset data to your clipboard.");
@@ -2596,7 +2613,7 @@ namespace BPSR_ZDPS.Windows
                         {
                             throw new FormatException("Imported Tracker was missing required data (TrackerName is null).");
                         }
-
+                        newTracker.SourceLocationType = ESourceLocationType.Manual;
                         PresetTrackersList.Add((TrackedEventEntry)newTracker.Clone(0));
                     }
                 }
@@ -2609,19 +2626,19 @@ namespace BPSR_ZDPS.Windows
 
             ImGui.NewLine();
 
-            ImGui.BeginDisabled(SelectedPresetManagerTrackerIdx == -1);
+            ImGui.BeginDisabled(SelectedPresetManagerTracker == null);
             ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkRed_Transparent);
             if (ImGui.Button("Delete Selected Preset", new Vector2(-1, 0)))
             {
                 if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
                 {
                     PresetTrackersList.Clear();
-                    SelectedPresetManagerTrackerIdx = -1;
+                    SelectedPresetManagerTracker = null;
                 }
                 else
                 {
-                    PresetTrackersList.RemoveAt(SelectedPresetManagerTrackerIdx);
-                    SelectedPresetManagerTrackerIdx = -1;
+                    PresetTrackersList.Remove(SelectedPresetManagerTracker);
+                    SelectedPresetManagerTracker = null;
                 }
             }
             ImGui.PopStyleColor();
@@ -4386,7 +4403,7 @@ namespace BPSR_ZDPS.Windows
 
                 ImGui.BeginDisabled(!raidWarningData.UseConditionValueCheck);
                 ImGui.SameLine();
-                if (ImGui.BeginCombo($"##ConditonCombo_{raidWarningIdx}", raidWarningData.CheckConditionType.ToString(), ImGuiComboFlags.WidthFitPreview))
+                if (ImGui.BeginCombo($"##ConditionCombo_{raidWarningIdx}", raidWarningData.CheckConditionType.ToString(), ImGuiComboFlags.WidthFitPreview))
                 {
                     foreach (var checkType in System.Enum.GetValues<EConditionCheckType>())
                     {
@@ -5070,6 +5087,8 @@ namespace BPSR_ZDPS.Windows
                 TrackerContainer groupDebuffsContainer = new TrackerContainer(0)
                 {
                     ContainerName = "Group Debuffs",
+                    SourceLocationType = ESourceLocationType.Internal,
+                    SourceLocationId = "Group Debuffs",
                     ShowContainerName = true,
                     IsContainerEnabled = true,
                     ContainerLayoutStyle = EContainerLayoutStyle.List,
@@ -5103,14 +5122,65 @@ namespace BPSR_ZDPS.Windows
 
             if (forceAdd)
             {
-                PresetTrackersList.AddRange(backupPresetTrackersList);
-                PresetContainersList.AddRange(backupPresetContainersList);
+                // Iterate through each newly added Preset then scan the old list for a match
+                // If a match is found, replace it with our new Preset version
+                int insertIdx = 0;
+                foreach (var tracker in PresetTrackersList)
+                {
+                    bool updated = false;
+                    for (int i = 0; i < backupPresetTrackersList.Count; i++)
+                    {
+                        var newTracker = backupPresetTrackersList[i];
+                        if (newTracker.SourceLocationType == tracker.SourceLocationType && !string.IsNullOrEmpty(newTracker.SourceLocationId) && newTracker.SourceLocationId == tracker.SourceLocationId)
+                        {
+                            newTracker = tracker;
+                            updated = true;
+                            break;
+                        }
+                    }
+                    if (!updated)
+                    {
+                        backupPresetTrackersList.Insert(insertIdx, tracker);
+                        insertIdx++;
+                    }
+                }
+
+                PresetTrackersList = backupPresetTrackersList;
+
+                insertIdx = 0;
+                foreach (var container in PresetContainersList)
+                {
+                    bool updated = false;
+                    for (int i = 0; i < backupPresetContainersList.Count; i++)
+                    {
+                        var newTracker = backupPresetContainersList[i];
+                        if (newTracker.SourceLocationType == container.SourceLocationType && !string.IsNullOrEmpty(newTracker.SourceLocationId) && newTracker.SourceLocationId == container.SourceLocationId)
+                        {
+                            newTracker = container;
+                            updated = true;
+                            break;
+                        }
+                    }
+                    if (!updated)
+                    {
+                        backupPresetContainersList.Insert(insertIdx, container);
+                        insertIdx++;
+                    }
+                }
+
+                PresetTrackersList = backupPresetTrackersList;
+                PresetContainersList = backupPresetContainersList;
+
+                //PresetTrackersList.AddRange(backupPresetTrackersList);
+                //PresetContainersList.AddRange(backupPresetContainersList);
             }
         }
 
         private static TrackedEventEntry CreateNewBasicBuffEventEntry(string trackerName, int buffId)
         {
             var newEntry = new TrackedEventEntry(0);
+            newEntry.SourceLocationType = ESourceLocationType.Internal;
+            newEntry.SourceLocationId = trackerName;
             newEntry.TrackerName = trackerName;
             newEntry.TrackerType = ETrackerType.Buffs;
 
@@ -5165,6 +5235,8 @@ namespace BPSR_ZDPS.Windows
         private static TrackedEventEntry CreateNewBasicSkillEventEntry(string trackerName, int skillId)
         {
             var newEntry = new TrackedEventEntry(0);
+            newEntry.SourceLocationType = ESourceLocationType.Internal;
+            newEntry.SourceLocationId = trackerName;
             newEntry.TrackerName = trackerName;
             newEntry.TrackerType = ETrackerType.Skills;
 
@@ -5265,6 +5337,9 @@ namespace BPSR_ZDPS.Windows
         public bool IsContainerEnabled = true;
         public bool ShowInTaskBar = false;
 
+        public ESourceLocationType SourceLocationType = ESourceLocationType.Manual;
+        public string SourceLocationId = "";
+
         [JsonIgnore]
         public bool IsWindowTitleDirty = true;
 
@@ -5315,6 +5390,9 @@ namespace BPSR_ZDPS.Windows
             cloned.EventWindowSizes = new();
             cloned.LastSetOpacity = 100;
             cloned.HadTransparentBackground = false;
+            // If we ever need to perform a clone we are breaking the original source type
+            // This can be manually restored in the rare case we didn't want to break it
+            cloned.SourceLocationType = ESourceLocationType.Manual;
             foreach (var item in EventTrackers)
             {
                 var newTracker = (TrackedEventEntry)item.Value.Clone(++trackerCounter);
@@ -5357,6 +5435,13 @@ namespace BPSR_ZDPS.Windows
         Circle = 1
     }
 
+    public enum ESourceLocationType
+    {
+        Manual = 0,
+        Internal = 1,
+        Custom = 2,
+    }
+
     public class TrackedEventEntry
     {
         [JsonProperty]
@@ -5372,6 +5457,10 @@ namespace BPSR_ZDPS.Windows
         public string TrackerName = "";
         public bool IsEnabled = false;
         public bool IsHidden = false;
+
+        public ESourceLocationType SourceLocationType = ESourceLocationType.Manual;
+        //public string SourceLocationPath = ""; // Where the Source is located
+        public string SourceLocationId = ""; // Unique Id (Key) per SourceLocationType and SourceLocationPath
 
         public LoadEvent LoadEvents = new();
 
@@ -5547,6 +5636,9 @@ namespace BPSR_ZDPS.Windows
             cloned.IdTracker = counter;
             cloned.EventData = new();
             cloned.LastUserTargetEntityUuid = 0;
+            // If we ever need to perform a clone we are breaking the original source type
+            // This can be manually restored in the rare case we didn't want to break it
+            cloned.SourceLocationType = ESourceLocationType.Manual;
             return cloned;
         }
     }
