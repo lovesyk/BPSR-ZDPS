@@ -64,6 +64,7 @@ namespace BPSR_ZDPS.Windows
         static bool SkillFilterIncludeDescriptions = false;
 
         static bool ShowDebugLogWindow = false;
+        static bool DebugLogAutoScroll = true;
         static ConcurrentQueue<string> DebugEventTrackerLog = new();
 
         static bool IsPresetManagerOpened = false;
@@ -2579,10 +2580,36 @@ namespace BPSR_ZDPS.Windows
                     foreach (var logItem in DebugEventTrackerLog)
                     {
                         ImGui.TextUnformatted(logItem);
+                        if (DebugLogAutoScroll)
+                        {
                         ImGui.SetScrollHereY(1.0f);
+                    }
                     }
 
                     ImGui.EndChild();
+                    if (ImGui.BeginPopupContextItem())
+                    {
+                        if (ImGui.MenuItem("Auto Scroll", DebugLogAutoScroll))
+                        {
+                            DebugLogAutoScroll = !DebugLogAutoScroll;
+                        }
+
+                        ImGui.Separator();
+
+                        if (ImGui.MenuItem("Copy Log To Clipboard"))
+                        {
+                            ImGui.SetClipboardText(string.Join("\n", DebugEventTrackerLog));
+                        }
+
+                        ImGui.Separator();
+
+                        if (ImGui.MenuItem("Clear Log"))
+                        {
+                            DebugEventTrackerLog.Clear();
+                        }
+
+                        ImGui.EndPopup();
+                    }
 
                     ImGui.End();
                 }
