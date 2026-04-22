@@ -307,7 +307,22 @@ namespace BPSR_ZDPS.Windows
                     eventContainer.Value.EventWindowSizes.Clear();
                     foreach (var eventTrackers in eventContainer.Value.EventTrackers)
                     {
-                        eventTrackers.Value.EventData.Clear();
+                        if (eventTrackers.Value.LoadEvents.KeepOnSceneChange && (e.Reason == EncounterStartReason.Force || e.Reason == EncounterStartReason.None))
+                        {
+                            // Tracker should persist through what is likely a scene change
+                        }
+                        else if (eventTrackers.Value.LoadEvents.KeepOnWipe && (e.Reason == EncounterStartReason.Wipe))
+                        {
+                            // Tracker should persist through a wipe
+                        }
+                        else if (eventTrackers.Value.LoadEvents.KeepOnRestart && (e.Reason == EncounterStartReason.Restart))
+                        {
+                            // Tracker should persist through a restart (generally is a Raid Boss kill)
+                        }
+                        else
+                        {
+                            eventTrackers.Value.EventData.Clear();
+                        }
                     }
                 }
             }
@@ -666,6 +681,16 @@ namespace BPSR_ZDPS.Windows
                                     eventTracker.IsHidden = true;
                                 }
 
+                                if (eventTracker.IgnoreCooldownDuration && e.BuffEventType == EBuffEventType.BuffEventRemove)
+                                {
+                                    // There won't be a Remove event coming from regular Cooldown Finished events so we'll simulate one here
+                                    var rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
+
+                                    if (rw != null)
+                                    {
+                                        didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, null);
+                                    }
+                                }
                                 //System.Diagnostics.Debug.WriteLine($"{e.BuffEventType} ({eventData.Uuid}) {eventTracker.Name} - Dur={e.Duration}, Upd={e.UpdateDateTime}, Add={eventData.Added}, Rmv={eventData.Removed}");
                             }
                         }
@@ -1993,7 +2018,14 @@ namespace BPSR_ZDPS.Windows
                                             }
                                             else
                                             {
-                                                ImGui.TextUnformatted($"{remainingSeconds:F2}s");
+                                                if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                {
+                                                    ImGui.TextUnformatted($"{(int)remainingSeconds / 60}m");
+                                                }
+                                                else
+                                                {
+                                                    ImGui.TextUnformatted($"{remainingSeconds:F2}s");
+                                                }
                                             }
                                             ImGui.PopFont();
                                         }
@@ -2046,7 +2078,14 @@ namespace BPSR_ZDPS.Windows
                                                     }
                                                     else
                                                     {
-                                                        displayText += $"{remainingSeconds:F2}s";
+                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                        {
+                                                            displayText += $"{(int)remainingSeconds / 60}m";
+                                                        }
+                                                        else
+                                                        {
+                                                            displayText += $"{remainingSeconds:F2}s";
+                                                        }
                                                     }
                                                 }
 
@@ -2065,7 +2104,53 @@ namespace BPSR_ZDPS.Windows
                                                     }
 
                                                     ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-                                                    ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetItemRectSize().X, eventTracker.DurationProgressBarSize);
+                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                                    {
+                                                        var startPos = ImGui.GetCursorPos();
+
+                                                        ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, eventTracker.DurationProgressBarCircleBackgroundColor);
+                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
+                                                        {
+                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
+                                                            // If the texture is null it will be skipped during the render process automatically
+                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
+                                                        }
+                                                        else
+                                                        {
+                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, null, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                        }
+                                                        ImGui.PopStyleColor();
+
+                                                        var endPos = ImGui.GetCursorPos();
+                                                        var tSize = new Vector2();
+                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                        {
+                                                            tSize = ImGui.CalcTextSize($"{(int)remainingSeconds / 60}m");
+                                                        }
+                                                        else
+                                                        {
+                                                            tSize = ImGui.CalcTextSize($"{remainingSeconds:F2}s");
+                                                        }
+                                                        
+                                                        ImGui.SetCursorPosX(startPos.X + (eventTracker.DurationProgressBarSize * 0.5f) - (tSize.X * 0.5f));
+                                                        ImGui.SetCursorPosY((startPos.Y * 0.5f) + (endPos.Y * 0.5f) - (tSize.Y * 0.5f));
+                                                        //ImGui.SetCursorPos((startPos + endPos) * 0.5f);
+                                                        bool customTextColor = eventTracker.UseCustomDurationTextColor;
+                                                        if (customTextColor)
+                                                        {
+                                                            ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
+                                                        }
+                                                        ImGui.TextUnformatted(displayText);
+                                                        if (customTextColor)
+                                                        {
+                                                            ImGui.PopFont();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetItemRectSize().X, eventTracker.DurationProgressBarSize);
+                                                    }
                                                     ImGui.PopFont();
 
                                                     if (barColor != null)
@@ -2081,7 +2166,55 @@ namespace BPSR_ZDPS.Windows
                                                     }
 
                                                     ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-                                                    ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetContentRegionAvail().X, eventTracker.DurationProgressBarSize);
+
+                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                                    {
+                                                        var startPos = ImGui.GetCursorPos();
+
+                                                        ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, eventTracker.DurationProgressBarCircleBackgroundColor);
+                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
+                                                        {
+                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
+                                                            // If the texture is null it will be skipped during the render process automatically
+                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
+                                                        }
+                                                        else
+                                                        {
+                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, null, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                        }
+                                                        ImGui.PopStyleColor();
+
+                                                        var endPos = ImGui.GetCursorPos();
+                                                        var tSize = new Vector2();
+                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                        {
+                                                            tSize = ImGui.CalcTextSize($"{(int)remainingSeconds / 60}m");
+                                                        }
+                                                        else
+                                                        {
+                                                            tSize = ImGui.CalcTextSize($"{remainingSeconds:F2}s");
+                                                        }
+
+                                                        ImGui.SetCursorPosX(startPos.X + (eventTracker.DurationProgressBarSize * 0.5f) - (tSize.X * 0.5f));
+                                                        ImGui.SetCursorPosY((startPos.Y * 0.5f) + (endPos.Y * 0.5f) - (tSize.Y * 0.5f));
+                                                        //ImGui.SetCursorPos((startPos + endPos) * 0.5f);
+                                                        bool customTextColor = eventTracker.UseCustomDurationTextColor;
+                                                        if (customTextColor)
+                                                        {
+                                                            ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
+                                                        }
+                                                        ImGui.TextUnformatted(displayText);
+                                                        if (customTextColor)
+                                                        {
+                                                            ImGui.PopStyleColor();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetContentRegionAvail().X, eventTracker.DurationProgressBarSize);
+                                                    }
+                                                    
                                                     ImGui.PopFont();
 
                                                     if (barColor != null)
@@ -3044,6 +3177,23 @@ namespace BPSR_ZDPS.Windows
 
                 ImGui.TextUnformatted(TITLE);
 
+                if (windowSettings.IsContainerEditMode)
+                {
+                    if (AppState.PlayerUUID != 0 && EncounterManager.Current != null)
+                    {
+                        if (EncounterManager.Current.Entities.TryGetValue(AppState.PlayerUUID, out var playerEnt))
+                        {
+                            var attrCombatState = playerEnt.GetAttrKV("AttrCombatState") as int?;
+                            if (attrCombatState != null && attrCombatState > 0)
+                            {
+                                ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                                ImGui.TextUnformatted("[WARNING: Edit Mode Is Enabled. Trackers May Not Behave Correctly!]");
+                                ImGui.PopStyleColor();
+                            }
+                        }
+                    }
+                }
+
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 4) - (ImGui.GetStyle().ItemSpacing.X * 3));
                 ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
                 ImGui.PushStyleColor(ImGuiCol.Text, windowSettings.IsContainerEditMode ? Colors.Red * new Vector4(1, 1, 1, 0.75f) : Colors.White);
@@ -3820,6 +3970,9 @@ namespace BPSR_ZDPS.Windows
 
             ImGui.Checkbox("Ignore Duration", ref ActiveTrackedEventEntry.IgnoreCooldownDuration);
             ImGui.SetItemTooltip("The duration of the Tracker will be ignored. This may prevent some Events from triggering.\nThis can be useful for Buffs that do not make use of a duration to end and instead rely on Layer Count or some other metric.");
+
+            ImGui.BeginDisabled(!ActiveTrackedEventEntry.IgnoreCooldownDuration);
+            ImGui.Indent();
             ImGui.Checkbox("Use Layers For Duration", ref ActiveTrackedEventEntry.UseLayersForDuration);
             ImGui.SetItemTooltip("The Buff's Layers count will be used to indicate progress via the Duration Progress Bar.");
             if (ActiveTrackedEventEntry.UseLayersForDuration)
@@ -3832,6 +3985,8 @@ namespace BPSR_ZDPS.Windows
                 ImGui.SetItemTooltip("This value will be used as the max target for the Buff's Layer count to reach.");
                 ImGui.Unindent();
             }
+            ImGui.Unindent();
+            ImGui.EndDisabled();
         }
 
         private static void DrawSkillTrackerOptions()
@@ -4073,11 +4228,19 @@ namespace BPSR_ZDPS.Windows
                         tracker.Value.ShowDurationText = ActiveTrackedEventEntry.ShowDurationText;
                         tracker.Value.DurationTextSize = ActiveTrackedEventEntry.DurationTextSize;
                         tracker.Value.DurationTextSameLine = ActiveTrackedEventEntry.DurationTextSameLine;
+                        tracker.Value.UseMinutesForLongDuration = ActiveTrackedEventEntry.UseMinutesForLongDuration;
+                        tracker.Value.UseCustomDurationTextColor = ActiveTrackedEventEntry.UseCustomDurationTextColor;
+                        tracker.Value.DurationTextColor = ActiveTrackedEventEntry.DurationTextColor;
                         tracker.Value.ShowDurationProgessBar = ActiveTrackedEventEntry.ShowDurationProgessBar;
+                        tracker.Value.DurationProgressBarStyle = ActiveTrackedEventEntry.DurationProgressBarStyle;
+                        tracker.Value.DurationProgressBarCircleThickness = ActiveTrackedEventEntry.DurationProgressBarCircleThickness;
+                        tracker.Value.UseDurationProgressBarCircleBackgroundFill = ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill;
+                        tracker.Value.DurationProgressBarCircleBackgroundColor = ActiveTrackedEventEntry.DurationProgressBarCircleBackgroundColor;
                         tracker.Value.DurationProgressBarSize = ActiveTrackedEventEntry.DurationProgressBarSize;
                         tracker.Value.DurationProgressBarTextSize = ActiveTrackedEventEntry.DurationProgressBarTextSize;
                         tracker.Value.DurationProgressBarSameLine = ActiveTrackedEventEntry.DurationProgressBarSameLine;
                         tracker.Value.DurationProgressBarVerticalOffset = ActiveTrackedEventEntry.DurationProgressBarVerticalOffset;
+                        tracker.Value.ShowIconInsideProgressBar = ActiveTrackedEventEntry.ShowIconInsideProgressBar;
                         tracker.Value.ShowNameInsideProgressBar = ActiveTrackedEventEntry.ShowNameInsideProgressBar;
                         tracker.Value.ShowLayersInsideProgressBar = ActiveTrackedEventEntry.ShowLayersInsideProgressBar;
                         tracker.Value.ShowDurationTextInProgressBar = ActiveTrackedEventEntry.ShowDurationTextInProgressBar;
@@ -4203,6 +4366,21 @@ namespace BPSR_ZDPS.Windows
                 ImGui.Checkbox("Same Line##DurationTextSameLine", ref ActiveTrackedEventEntry.DurationTextSameLine);
                 ImGui.SetItemTooltip("Displays Duration Text on the same line as the previous displayed option for this Tracker.");
 
+                ImGui.Checkbox("Use Minutes Format For Long Durations##UseMinutesForLongDuration", ref ActiveTrackedEventEntry.UseMinutesForLongDuration);
+                ImGui.SetItemTooltip("Displays the Duration as minutes instead of seconds when more than 60 seconds remain.");
+
+                ImGui.Checkbox("Use Custom Duration Text Color##UseCustomDurationTextColor", ref ActiveTrackedEventEntry.UseCustomDurationTextColor);
+                ImGui.SetItemTooltip("Changes the color of Duration Text when NOT combined with other elements.");
+
+                if (ActiveTrackedEventEntry.UseCustomDurationTextColor)
+                {
+                    ImGui.Indent();
+
+                    ImGui.ColorEdit4("##DurationTextColorPicker", ref ActiveTrackedEventEntry.DurationTextColor);
+
+                    ImGui.Unindent();
+                }
+
                 ImGui.Unindent();
             }
 
@@ -4241,6 +4419,7 @@ namespace BPSR_ZDPS.Windows
                 if (ActiveTrackedEventEntry.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
                 {
                     ImGui.Indent();
+
                     ImGui.AlignTextToFramePadding();
                     ImGui.TextUnformatted("Circle Progress Bar Thickness:");
                     ImGui.SameLine();
@@ -4249,6 +4428,19 @@ namespace BPSR_ZDPS.Windows
                     ImGui.SetNextItemWidth(-1);
                     ImGui.SliderInt("##DurationProgressBarCircleThickness", ref ActiveTrackedEventEntry.DurationProgressBarCircleThickness, 1, 24);
                     ImGui.PopStyleColor(2);
+
+                    ImGui.Checkbox("Apply Overlay To Circle Fill##UseDurationProgressBarCircleBackgroundFill", ref ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill);
+                    ImGui.SetItemTooltip("Adds a dimmed overlay to the center of the circle, potentially making it easier to read text in it.");
+
+                    if (ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill)
+                    {
+                        ImGui.Indent();
+
+                        ImGui.ColorEdit4("##DurationProgressBarCircleBackgroundColorPicker", ref ActiveTrackedEventEntry.DurationProgressBarCircleBackgroundColor);
+
+                        ImGui.Unindent();
+                    }
+
                     ImGui.Unindent();
                 }
 
@@ -4796,6 +4988,19 @@ namespace BPSR_ZDPS.Windows
 
             ImGui.Checkbox("Is Owner Dead", ref ActiveTrackedEventEntry.LoadEvents.IsOwnerDead);
             ImGui.SetItemTooltip("Tracker is only Enabled while the Owner is dead.");
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+
+            ImGui.SeparatorText("Extra Options");
+            ImGui.Checkbox("Keep On Scene Change", ref ActiveTrackedEventEntry.LoadEvents.KeepOnSceneChange);
+            ImGui.SetItemTooltip("The Tracker will persist through Scene (Map) changes.\nNote: Encounter events like wipes will still remove it.");
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+
+            ImGui.Checkbox("Keep On Wipe", ref ActiveTrackedEventEntry.LoadEvents.KeepOnWipe);
+            ImGui.SetItemTooltip("The Tracker will persist through wipes.");
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+
+            ImGui.Checkbox("Keep On Restart", ref ActiveTrackedEventEntry.LoadEvents.KeepOnRestart);
+            ImGui.SetItemTooltip("The Tracker will persist through Restart events. These are typically when a Raid Boss is killed.");
             HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
         }
 
@@ -5503,6 +5708,9 @@ namespace BPSR_ZDPS.Windows
         public bool LayersNewLineBeforeIcon = false;
         public bool ShowDurationText = false;
         public bool DurationTextSameLine = false;
+        public bool UseMinutesForLongDuration = false;
+        public bool UseCustomDurationTextColor = false;
+        public Vector4 DurationTextColor = new Vector4(1, 1, 1, 1);
         public bool ShowDurationProgessBar = false;
         public bool ShowIconInsideProgressBar = false;
         public bool ShowNameInsideProgressBar = false;
@@ -5514,6 +5722,8 @@ namespace BPSR_ZDPS.Windows
         public bool ColorDurationProgressBarByType = false;
 
         public EDurationProgressBarStyle DurationProgressBarStyle = EDurationProgressBarStyle.Line;
+        public bool UseDurationProgressBarCircleBackgroundFill = false;
+        public Vector4 DurationProgressBarCircleBackgroundColor = new Vector4(0, 0, 0, 0.25f);
 
         public int NameSize = 18;
         public int IconSize = 18;
@@ -5691,6 +5901,10 @@ namespace BPSR_ZDPS.Windows
         // These are checked outside of the CheckShouldLoad function
         public bool IsOwnerAlive = false;
         public bool IsOwnerDead = false;
+
+        public bool KeepOnSceneChange = false;
+        public bool KeepOnWipe = false;
+        public bool KeepOnRestart = false;
 
         [JsonProperty]
         public List<int> SceneIdValues { get; private set; } = new();
