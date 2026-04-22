@@ -177,10 +177,10 @@ namespace BPSR_ZDPS.Windows
             // Will need to use GLFW to figure out monitors/sizes/positions/etc
 
             //ImGui.SetNextWindowPos(new Vector2(main_viewport.WorkPos.X + 200, main_viewport.WorkPos.Y + 120), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 350), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 350) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
             //ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X, io.DisplaySize.Y), ImGuiCond.Appearing);
 
-            ImGui.SetNextWindowSize(new Vector2(700, 700), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(700, 700) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
             if (ImGui.BeginPopupModal($"Settings{TITLE_ID}"))
@@ -210,14 +210,14 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("General"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##GeneralTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##GeneralTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Network Device");
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.TextUnformatted("Network Device Type: ");
                         ImGui.SameLine();
-                        ImGui.SetNextItemWidth(150);
+                        ImGui.SetNextItemWidth(150 * HelperMethods.DpiScale);
                         if (ImGui.BeginCombo("##NetworkDeviceType", useRemoteCapture ? "Remote" : "Local", ImGuiComboFlags.None))
                         {
                             if (ImGui.Selectable("Local", !useRemoteCapture))
@@ -277,7 +277,7 @@ namespace BPSR_ZDPS.Windows
                             ImGui.AlignTextToFramePadding();
                             ImGui.TextUnformatted("Remote Host: ");
                             ImGui.SameLine();
-                            ImGui.SetNextItemWidth(200);
+                            ImGui.SetNextItemWidth(200 * HelperMethods.DpiScale);
                             ImGui.InputText("##RemoteCaptureHost", ref remoteCaptureHostAndPort, 256);
                             ImGui.SameLine();
                             if (ImGui.Button("Refresh Devices"))
@@ -342,7 +342,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SameLine();
 
                         var gamePrefName = Utils.GameCapturePreferenceToName(GameCapturePreference);
-                        ImGui.SetNextItemWidth(150);
+                        ImGui.SetNextItemWidth(150 * HelperMethods.DpiScale);
                         if (ImGui.BeginCombo("##EGameCapturePreference", gamePrefName, ImGuiComboFlags.HeightLarge))
                         {
                             if (ImGui.Selectable("Auto"))
@@ -589,7 +589,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("Combat"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##CombatTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##CombatTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Combat");
 
@@ -704,7 +704,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("User Interface"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##UserInterfaceTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##UserInterfaceTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("User Interface");
 
@@ -1168,7 +1168,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("Matchmaking"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##MatchmakingTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##MatchmakingTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Matchmaking");
                         ImGui.AlignTextToFramePadding();
@@ -1186,10 +1186,10 @@ namespace BPSR_ZDPS.Windows
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Matchmake Notification Sound Path: ");
-                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 - ImGui.GetStyle().ItemSpacing.X);
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 * HelperMethods.DpiScale - ImGui.GetStyle().ItemSpacing.X);
                         ImGui.InputText("##MatchmakeNotificationSoundPath", ref matchmakeNotificationSoundPath, 1024);
                         ImGui.SameLine();
-                        if (ImGui.Button("Browse...##MatchmakeSoundPathBrowseBtn", new Vector2(140, 0)))
+                        if (ImGui.Button("Browse...##MatchmakeSoundPathBrowseBtn", new Vector2(140 * HelperMethods.DpiScale, 0)))
                         {
                             string defaultDir = File.Exists(matchmakeNotificationSoundPath) ? Path.GetDirectoryName(matchmakeNotificationSoundPath) : "";
 
@@ -1250,10 +1250,10 @@ namespace BPSR_ZDPS.Windows
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Ready Check Notification Sound Path: ");
-                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 - ImGui.GetStyle().ItemSpacing.X);
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 * HelperMethods.DpiScale - ImGui.GetStyle().ItemSpacing.X);
                         ImGui.InputText("##ReadyCheckNotificationSoundPath", ref readyCheckNotificationSoundPath, 1024);
                         ImGui.SameLine();
-                        if (ImGui.Button("Browse...##ReadyCheckSoundPathBrowseBtn", new Vector2(140, 0)))
+                        if (ImGui.Button("Browse...##ReadyCheckSoundPathBrowseBtn", new Vector2(140 * HelperMethods.DpiScale, 0)))
                         {
                             string defaultDir = File.Exists(readyCheckNotificationSoundPath) ? Path.GetDirectoryName(readyCheckNotificationSoundPath) : "";
 
@@ -1306,7 +1306,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("Integrations"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##IntegrationsTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##IntegrationsTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Integrations");
 
@@ -1578,7 +1578,7 @@ namespace BPSR_ZDPS.Windows
                     if (ImGui.BeginTabItem("Development"))
                     {
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
-                        ImGui.BeginChild("##DevelopmentTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
+                        ImGui.BeginChild("##DevelopmentTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
 
                         ImGui.SeparatorText("Development");
                         if (ImGui.Button("Reload DataTables"))
@@ -2082,7 +2082,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonHovered]);
             }
-            if (ImGui.Button($"{bindDisplay}##BindBtn_{bindingName}", new Vector2(120, 0)))
+            if (ImGui.Button($"{bindDisplay}##BindBtn_{bindingName}", new Vector2(120 * HelperMethods.DpiScale, 0)))
             {
                 bindingState = true;
             }

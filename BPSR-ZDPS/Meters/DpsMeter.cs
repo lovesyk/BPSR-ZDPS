@@ -174,7 +174,7 @@ namespace BPSR_ZDPS.Meters
                         var startPoint = ImGui.GetCursorPos();
                         // ImGui.GetTextLineHeightWithSpacing();
 
-                        ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale);
+                        ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale * HelperMethods.DpiScale);
 
                         // Begin the rendering split to overlay elements, we have to do it this way since Hexa.NET.ImGui blocks the normal functions
                         //var drawList = ImGui.GetWindowDrawList();

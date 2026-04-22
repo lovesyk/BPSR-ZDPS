@@ -134,7 +134,7 @@ namespace BPSR_ZDPS.Windows
                 {
                     ImGui.SetNextWindowClass(CountdownDisplayClass);
 
-                    ImGui.SetNextWindowSize(new Vector2(300, 300), ImGuiCond.Always);
+                    ImGui.SetNextWindowSize(new Vector2(300, 300) * HelperMethods.DpiScale, ImGuiCond.Always);
 
                     if (windowSettings.CountdownPosition != new Vector2())
                     {
@@ -183,7 +183,7 @@ namespace BPSR_ZDPS.Windows
                                         {
                                             ImGui.SameLine();
                                         }
-                                        ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
+                                        ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f) * HelperMethods.DpiScale, new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
                                     }
                                 }
                                 ImGui.EndGroup();
@@ -191,7 +191,7 @@ namespace BPSR_ZDPS.Windows
                             }
                             else
                             {
-                                ImGui.PushFont(null, 250);
+                                ImGui.PushFont(null, 250 * HelperMethods.DpiScale);
                                 ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed);
                                 ImGui.TextAligned(0.5f, -1, $"{(int)Math.Ceiling(countdownRemaining.TotalSeconds)}");
                                 ImGui.PopStyleColor();
@@ -226,8 +226,8 @@ namespace BPSR_ZDPS.Windows
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
-            ImGui.SetNextWindowSize(new Vector2(650, 550), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 450), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSize(new Vector2(650, 550) * HelperMethods.DpiScale, ImGuiCond.Appearing);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 450) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (ImGui.Begin($"Raid Manager - Countdowns{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
             {
@@ -344,7 +344,7 @@ namespace BPSR_ZDPS.Windows
                         }
                     }
 
-                    if (ImGui.BeginListBox("##PlayerListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120)))
+                    if (ImGui.BeginListBox("##PlayerListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120 * HelperMethods.DpiScale)))
                     {
                         if (EntityFilterMatches != null && (EntityFilterMatches.Length < 100 || EntityNameFilter.Length > 2))
                         {
@@ -359,7 +359,7 @@ namespace BPSR_ZDPS.Windows
                                     {
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red_Transparent);
                                         ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                        if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30)))
+                                        if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                         {
                                             windowSettings.PlayerUIDBlacklist.Remove(match.Value.UID);
                                         }
@@ -370,7 +370,7 @@ namespace BPSR_ZDPS.Windows
                                     {
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.Green_Transparent);
                                         ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                        if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30)))
+                                        if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                         {
                                             windowSettings.PlayerUIDBlacklist.Add(match.Value.UID);
                                         }
@@ -396,7 +396,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ImGui.SetNextWindowClass(CountdownEditorClass);
 
-                ImGui.SetNextWindowSize(new Vector2(300, 300), ImGuiCond.Always);
+                ImGui.SetNextWindowSize(new Vector2(300, 300) * HelperMethods.DpiScale, ImGuiCond.Always);
 
                 if (windowSettings.CountdownPosition != new Vector2())
                 {
@@ -438,7 +438,7 @@ namespace BPSR_ZDPS.Windows
                                 {
                                     ImGui.SameLine();
                                 }
-                                ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
+                                ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f) * HelperMethods.DpiScale, new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
                             }
                         }
                         ImGui.EndGroup();
@@ -446,7 +446,7 @@ namespace BPSR_ZDPS.Windows
                     }
                     else
                     {
-                        ImGui.PushFont(null, 250);
+                        ImGui.PushFont(null, 250 * HelperMethods.DpiScale);
                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed_Transparent);
                         ImGui.TextAligned(0.5f, -1, $"{remaining}");
                         ImGui.PopStyleColor();

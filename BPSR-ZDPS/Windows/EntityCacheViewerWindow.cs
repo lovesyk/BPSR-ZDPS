@@ -19,7 +19,7 @@ namespace BPSR_ZDPS
         public static string TITLE = "Entity Cache Viewer";
         public static bool IsOpened = false;
         public static bool CollapseToContentOnly = false;
-        public static Vector2 DefaultWindowSize = new Vector2(700, 600);
+        public static Vector2 DefaultWindowSize => new Vector2(700, 600) * HelperMethods.DpiScale;
         public static bool ResetWindowSize = false;
 
         static int RunOnceDelayed = 0;
@@ -60,7 +60,7 @@ namespace BPSR_ZDPS
             var windowSettings = Settings.Instance.WindowSettings.EntityCacheViewer;
 
             ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 300), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 300) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowSize != new Vector2())
             {

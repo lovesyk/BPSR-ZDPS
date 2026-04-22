@@ -124,7 +124,7 @@ namespace BPSR_ZDPS.Meters
                         var startPoint = ImGui.GetCursorPos();
                         // ImGui.GetTextLineHeightWithSpacing();
 
-                        ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale);
+                        ImGui.PushFont(HelperMethods.Fonts["Cascadia-Mono"], 14.0f * Settings.Instance.WindowSettings.MainWindow.MeterBarScale * HelperMethods.DpiScale);
 
                         bool hasHpData = entity.Hp >= 0 && entity.MaxHp > 0;
                         if (hasHpData && (Settings.Instance.MeterSettingsNpcTakenShowHpData || Settings.Instance.MeterSettingsNpcTakenUseHpMeter))

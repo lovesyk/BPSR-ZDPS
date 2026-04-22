@@ -25,7 +25,7 @@ public static class NetDebug
         if (!IsOpened)
             return;
         
-        ImGui.SetNextWindowSize(new Vector2(1000, 600), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(1000, 600) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
 
         ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 

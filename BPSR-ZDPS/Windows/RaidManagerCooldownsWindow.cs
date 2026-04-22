@@ -17,7 +17,7 @@ namespace BPSR_ZDPS.Windows
         public static string TITLE = "Cooldown Priority Tracker";
         public static bool IsOpened = false;
         public static bool CollapseToContentOnly = false;
-        public static Vector2 DefaultWindowSize = new Vector2(700, 600);
+        public static Vector2 DefaultWindowSize => new Vector2(700, 600) * HelperMethods.DpiScale;
         public static bool ResetWindowSize = false;
 
         static int RunOnceDelayed = 0;
@@ -95,7 +95,7 @@ namespace BPSR_ZDPS.Windows
             var windowSettings = Settings.Instance.WindowSettings.RaidManagerCooldowns;
 
             ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 240), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 240) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowPosition != new Vector2())
             {
@@ -178,7 +178,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Text($"{EntityCache.Instance.Cache.Lines[trackedEntity.Key]?.Name}");
                         ImGui.SameLine();
 
-                        ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ((20 * 4) + ImGui.GetStyle().ItemSpacing.X));
+                        ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ((20 * 4 * HelperMethods.DpiScale) + ImGui.GetStyle().ItemSpacing.X));
 
                         ImGui.BeginDisabled(trackedEntityIdx == 0);
                         ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
@@ -364,7 +364,7 @@ namespace BPSR_ZDPS.Windows
                             }
                         }
                         // Require at least 3 characters to perform our search to maintain performance against large lists
-                        if (ImGui.BeginListBox("##FilteredEntitiesListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120)))
+                        if (ImGui.BeginListBox("##FilteredEntitiesListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120 * HelperMethods.DpiScale)))
                         {
                             if (EntityFilterMatches != null && (EntityFilterMatches.Length < 100 || EntityNameFilter.Length > 2))
                             {
@@ -379,7 +379,7 @@ namespace BPSR_ZDPS.Windows
                                         {
                                             ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red_Transparent);
                                             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                            if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30)))
+                                            if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                             {
                                                 TrackedEntities.Remove(match.Value.UUID);
                                                 BindCurrentEncounterEvents();
@@ -391,7 +391,7 @@ namespace BPSR_ZDPS.Windows
                                         {
                                             ImGui.PushStyleColor(ImGuiCol.Text, Colors.Green_Transparent);
                                             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                            if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30)))
+                                            if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                             {
                                                 TrackedEntities.Add(match.Value.UUID, new List<TrackedSkill>());
                                                 BindCurrentEncounterEvents();
@@ -438,7 +438,7 @@ namespace BPSR_ZDPS.Windows
                             }
                         }
 
-                        if (ImGui.BeginListBox("##SkillFilterList", new Vector2(-1, 120)))
+                        if (ImGui.BeginListBox("##SkillFilterList", new Vector2(-1, 120 * HelperMethods.DpiScale)))
                         {
                             if (SkillCastConditionValue.Length > 0)
                             {
@@ -458,7 +458,7 @@ namespace BPSR_ZDPS.Windows
                                             ImGui.AlignTextToFramePadding();
                                             ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red_Transparent);
                                             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                            if (ImGui.Button($"{FASIcons.Minus}##SkillBtn_{skillMatchIdx}", new Vector2(30, ImGui.GetFontSize() * 2.5f)))
+                                            if (ImGui.Button($"{FASIcons.Minus}##SkillBtn_{skillMatchIdx}", new Vector2(30 * HelperMethods.DpiScale, ImGui.GetFontSize() * 2.5f)))
                                             {
                                                 TrackedSkills.Remove(skillId);
                                                 foreach (var trackedEntity in TrackedEntities)

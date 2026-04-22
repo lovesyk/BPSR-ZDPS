@@ -39,7 +39,7 @@ namespace BPSR_ZDPS.Windows
         static int LastPinnedOpacity = 100;
         public Vector2 WindowPosition;
         public Vector2 NextWindowPosition = new();
-        public Vector2 DefaultWindowSize = new Vector2(550, 600);
+        public Vector2 DefaultWindowSize => new Vector2(550, 600) * HelperMethods.DpiScale;
         public Vector2 WindowSize;
         public Vector2 NextWindowSize = new();
 
@@ -82,11 +82,11 @@ namespace BPSR_ZDPS.Windows
 
             if (!Settings.Instance.AllowEncounterSavingPausingInOpenWorld)
             {
-                ImGui.SetNextWindowSizeConstraints(new Vector2(375, 150), new Vector2(ImGui.GETFLTMAX()));
+                ImGui.SetNextWindowSizeConstraints(new Vector2(375, 150) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
             }
             else
             {
-                ImGui.SetNextWindowSizeConstraints(new Vector2(400, 220), new Vector2(ImGui.GETFLTMAX()));
+                ImGui.SetNextWindowSizeConstraints(new Vector2(400, 220) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
             }
 
             var windowSettings = Settings.Instance.WindowSettings.MainWindow;
@@ -316,9 +316,9 @@ namespace BPSR_ZDPS.Windows
                     ImGui.PushStyleColor(ImGuiCol.ChildBg, Colors.Goldenrod_Transparent);
                     ImGui.BeginChild("##EncounterNotCurrentChild", ImGuiChildFlags.AutoResizeY);
                     ImGui.TextAligned(0.5f, -1, "Viewing Historical Encounter Data");
-                    ImGui.SetCursorPosX((ImGui.GetContentRegionAvail().X - 200) * 0.5f);
+                    ImGui.SetCursorPosX((ImGui.GetContentRegionAvail().X - 200 * HelperMethods.DpiScale) * 0.5f);
                     ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen);
-                    if (ImGui.Button("Go To Current Encounter##GoToCurrentEncounterBtn", new Vector2(200, 0)))
+                    if (ImGui.Button("Go To Current Encounter##GoToCurrentEncounterBtn", new Vector2(200 * HelperMethods.DpiScale, 0)))
                     {
                         AppState.OpenedHistoricalEncounter = null;
                         AppState.ActiveEncounter = EncounterManager.Current;
@@ -340,9 +340,9 @@ namespace BPSR_ZDPS.Windows
                 {
                     ImGui.TextAligned(0.5f, -1, "Automatically resumes if you change maps.");
                 }
-                ImGui.SetCursorPosX((ImGui.GetContentRegionAvail().X - 200) * 0.5f);
+                ImGui.SetCursorPosX((ImGui.GetContentRegionAvail().X - 200 * HelperMethods.DpiScale) * 0.5f);
                 ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen);
-                if (ImGui.Button("RESUME SAVING NOW##ResumeEncounterSavingBtn", new Vector2(200, 0)))
+                if (ImGui.Button("RESUME SAVING NOW##ResumeEncounterSavingBtn", new Vector2(200 * HelperMethods.DpiScale, 0)))
                 {
                     AppState.IsEncounterSavingPaused = false;
                 }

@@ -18,7 +18,7 @@ namespace BPSR_ZDPS.Windows
         public static string TITLE = "Spawn Tracker";
         public static bool IsOpened = false;
         public static bool CollapseToContentOnly = false;
-        public static Vector2 DefaultWindowSize = new Vector2(700, 600);
+        public static Vector2 DefaultWindowSize => new Vector2(700, 600) * HelperMethods.DpiScale;
         public static bool ResetWindowSize = false;
 
         static int RunOnceDelayed = 0;
@@ -101,7 +101,7 @@ namespace BPSR_ZDPS.Windows
             var windowSettings = Settings.Instance.WindowSettings.SpawnTracker;
 
             ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(240, 140), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(240, 140) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowPosition != new Vector2())
             {
@@ -209,7 +209,7 @@ namespace BPSR_ZDPS.Windows
                         RegionName = regions[selectedRegionIndex];
                     }
 
-                    ImGui.BeginChild("##FilterDataListBoxChild", new Vector2(0, 150), ImGuiChildFlags.Borders | ImGuiChildFlags.ResizeY);
+                    ImGui.BeginChild("##FilterDataListBoxChild", new Vector2(0, 150 * HelperMethods.DpiScale), ImGuiChildFlags.Borders | ImGuiChildFlags.ResizeY);
                     var mobs = BPTimerManager.MobsDescriptors.AsValueEnumerable();
                     foreach (var mob in mobs)
                     {

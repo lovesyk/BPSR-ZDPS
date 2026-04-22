@@ -82,8 +82,8 @@ namespace BPSR_ZDPS.Windows
 
             var windowSettings = Settings.Instance.WindowSettings.RaidManagerThreat;
 
-            ImGui.SetNextWindowSize(new Vector2(700, 600), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 240), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSize(new Vector2(700, 600) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 240) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowPosition != new Vector2())
             {

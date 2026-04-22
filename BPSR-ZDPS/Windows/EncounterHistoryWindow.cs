@@ -135,8 +135,8 @@ namespace BPSR_ZDPS.Windows
 
             encounterReportWindow.Draw();
 
-            ImGui.SetNextWindowSize(new Vector2(880, 675), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSize(new Vector2(880, 675) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (IsFullScreen && IsFullscreenToggleState)
             {

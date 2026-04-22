@@ -107,10 +107,10 @@ namespace BPSR_ZDPS
 
             if (!IsOpen) return;
 
-            var windowSize = new Vector2(800, 500);
-            float leftWidth = 320;
+            var windowSize = new Vector2(800, 500) * HelperMethods.DpiScale;
+            float leftWidth = 320 * HelperMethods.DpiScale;
             ImGui.SetNextWindowSize(windowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(1270, 700), new Vector2(float.PositiveInfinity, float.PositiveInfinity));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(1270, 700) * HelperMethods.DpiScale, new Vector2(float.PositiveInfinity, float.PositiveInfinity));
 
             if (Settings.Instance.WindowSettings.ModuleWindow.WindowPosition != new Vector2())
             {
@@ -158,11 +158,11 @@ namespace BPSR_ZDPS
                     {
                         if (ImGui.BeginTable("settings_table", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.PadOuterX | ImGuiTableFlags.BordersInnerH))
                         {
-                            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 200f);
+                            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 200f * HelperMethods.DpiScale);
                             ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
 
                             AddSettingRow("Preset Share Code: ", () => {
-                                ImGui.SetNextItemWidth(400);
+                                ImGui.SetNextItemWidth(400 * HelperMethods.DpiScale);
                                 if (ImGui.InputText("##PresetCode", ref CurrentPresetString, 1024, ImGuiInputTextFlags.AutoSelectAll))
                                 {
 
@@ -190,7 +190,7 @@ namespace BPSR_ZDPS
                                 {
                                     string[] solverNames = ["Legacy", "Fallback", "Normal"];
                                     int selectedSolver = (int)Settings.Instance.WindowSettings.ModuleWindow.SolverMode;
-                                    ImGui.SetNextItemWidth(300);
+                                    ImGui.SetNextItemWidth(300 * HelperMethods.DpiScale);
                                     ImGui.Combo("##SolverMode", ref selectedSolver, solverNames, 3);
                                     Settings.Instance.WindowSettings.ModuleWindow.SolverMode = (SolverModes)selectedSolver;
                                 });
@@ -218,13 +218,13 @@ namespace BPSR_ZDPS
                             //ImGui.PushClipRect(ImGui.GetCursorScreenPos(), ImGui.GetCursorScreenPos() + new Vector2(linkLevelSettingsWidth, 100000), false);
                             if (ImGui.BeginTable("LinkLevelBoosts", 2))
                             {
-                                ImGui.TableSetupColumn("1", ImGuiTableColumnFlags.WidthFixed, 300f);
+                                ImGui.TableSetupColumn("1", ImGuiTableColumnFlags.WidthFixed, 300f * HelperMethods.DpiScale);
                                 ImGui.TableSetupColumn("2", ImGuiTableColumnFlags.WidthStretch);
 
                                 ImGui.TableNextColumn();
                                 if (ImGui.BeginTable("LinkLevelBoostsValues", 2, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.PadOuterX | ImGuiTableFlags.BordersInnerH))
                                 {
-                                    ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 80f);
+                                    ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 80f * HelperMethods.DpiScale);
                                     ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
 
 
@@ -262,19 +262,19 @@ namespace BPSR_ZDPS
                             //ImGui.PopClipRect();
                         }
 
-                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 62));
+                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 62) * HelperMethods.DpiScale);
                         //ImGui.SeparatorText("Debug Info");
                         ImGui.TextUnformatted($"HW Accel: {Vector.IsHardwareAccelerated}");
-                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 42));
+                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 42) * HelperMethods.DpiScale);
                         ImGui.TextUnformatted($"AVX2: {Avx2.IsSupported}");
-                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 22));
+                        ImGui.SetCursorPos(ImGui.GetWindowSize() - new Vector2(300, 22) * HelperMethods.DpiScale);
                         ImGui.TextUnformatted($"Size: {Vector<byte>.Count}");
 
                         var tina = ImageHelper.LoadTexture(Path.Combine(ModuleImgBasePath, "Missing.png"));
                         if (tina.HasValue)
                         {
-                            var size = new Vector2(200, 200);
-                            var start = ImGui.GetWindowPos() + ImGui.GetWindowSize() - size - new Vector2(0, -5);
+                            var size = new Vector2(200, 200) * HelperMethods.DpiScale;
+                            var start = ImGui.GetWindowPos() + ImGui.GetWindowSize() - size - new Vector2(0, -5 * HelperMethods.DpiScale);
                             ImGui.GetForegroundDrawList().AddImage(tina.Value, start, start + size);
                         }
 
@@ -317,16 +317,16 @@ namespace BPSR_ZDPS
         private static void DrawSolverTab(Vector2 windowSize, float leftWidth)
         {
             var contentRegion = ImGui.GetContentRegionAvail();
-            ImGui.SetCursorPosY(58);
+            ImGui.SetCursorPosY(58 * HelperMethods.DpiScale);
 
             var clipStart = ImGui.GetCursorScreenPos();
-            ImGui.PushClipRect(clipStart, clipStart + new Vector2(leftWidth, 20), true);
+            ImGui.PushClipRect(clipStart, clipStart + new Vector2(leftWidth, 20 * HelperMethods.DpiScale), true);
             ImGui.SeparatorText($"Config");
             ImGui.PopClipRect();
-            ImGui.SetCursorPosY(85);
+            ImGui.SetCursorPosY(85 * HelperMethods.DpiScale);
 
             var configChanged = false;
-            ImGui.BeginChild("LeftSection", new Vector2(leftWidth, contentRegion.Y - 55), ImGuiChildFlags.Borders);
+            ImGui.BeginChild("LeftSection", new Vector2(leftWidth, contentRegion.Y - 55 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
             ImGui.SeparatorText("Quality");
 
             bool basicQuality = SolverConfig.QualitiesV2.TryGetValue(2, out var temp) ? temp : false;
@@ -394,13 +394,13 @@ namespace BPSR_ZDPS
             ImGui.EndChild();
 
             var pos = ImGui.GetCursorPos();
-            ImGui.SetNextItemWidth(leftWidth - 55);
+            ImGui.SetNextItemWidth(leftWidth - 55 * HelperMethods.DpiScale);
             if (ImGui.BeginCombo("##Stat", $"       {PendingStatToAdd.Name}"))
             {
                 foreach (var item in ModStatInfos.AsValueEnumerable().Where(x => !SolverConfig.StatPriorities.Any(y => y.Id == x.Key)))
                 {
                     //ImGui.BeginGroup();
-                    ImGui.Image(item.Value.IconRef.Value, new Vector2(22, 22));
+                    ImGui.Image(item.Value.IconRef.Value, new Vector2(22, 22) * HelperMethods.DpiScale);
                     ImGui.SameLine();
                     ImGui.AlignTextToFramePadding();
                     if (ImGui.Selectable($"{item.Value.Name}##StatToSelect", item.Key == PendingStatToAdd.StatId))
@@ -412,13 +412,13 @@ namespace BPSR_ZDPS
                 ImGui.EndCombo();
             }
 
-            ImGui.SetCursorPos(pos + new Vector2(2, 2));
-            ImGui.Image(PendingStatToAdd.IconRef.Value, new Vector2(22, 22));
+            ImGui.SetCursorPos(pos + new Vector2(2, 2) * HelperMethods.DpiScale);
+            ImGui.Image(PendingStatToAdd.IconRef.Value, new Vector2(22, 22) * HelperMethods.DpiScale);
 
-            ImGui.SetCursorPos(pos + new Vector2(leftWidth - 50, 0));
+            ImGui.SetCursorPos(pos + new Vector2(leftWidth - 50 * HelperMethods.DpiScale, 0));
             var isAlreadyAdded = SolverConfig.StatPriorities.Any(x => x.Id == PendingStatToAdd.StatId);
             ImGui.BeginDisabled(isAlreadyAdded || SolverConfig.StatPriorities.Count >= 12);
-            if (ImGui.Button("Add", new Vector2(50, 0)))
+            if (ImGui.Button("Add", new Vector2(50 * HelperMethods.DpiScale, 0)))
             {
                 SolverConfig.StatPriorities.Add(new StatPrio()
                 {
@@ -440,14 +440,14 @@ namespace BPSR_ZDPS
                 CurrentPresetString = SolverConfig.SaveToString();
             }
 
-            ImGui.SetCursorPosX(leftWidth + 8);
-            ImGui.SetCursorPosY(58);
+            ImGui.SetCursorPosX(leftWidth + 8 * HelperMethods.DpiScale);
+            ImGui.SetCursorPosY(58 * HelperMethods.DpiScale);
 
             ImGui.SeparatorText($"Results");
-            ImGui.SetCursorPosX(leftWidth + 8);
-            ImGui.SetCursorPosY(85);
+            ImGui.SetCursorPosX(leftWidth + 8 * HelperMethods.DpiScale);
+            ImGui.SetCursorPosY(85 * HelperMethods.DpiScale);
 
-            ImGui.BeginChild("RightSection", new Vector2(windowSize.X - leftWidth - 5, contentRegion.Y - 55), ImGuiChildFlags.Borders);
+            ImGui.BeginChild("RightSection", new Vector2(windowSize.X - leftWidth - 5 * HelperMethods.DpiScale, contentRegion.Y - 55 * HelperMethods.DpiScale), ImGuiChildFlags.Borders);
             ImGui.Spacing();
 
             if (BestModResults?.Count > 0)
@@ -471,7 +471,7 @@ namespace BPSR_ZDPS
                                     for (int i1 = 0; i1 < modsResult.Stats.Length; i1++)
                                     {
                                         PowerCore stat = modsResult.Stats[i1];
-                                        ImGui.SetCursorPos(statPos + new Vector2(i1 * 100, 0));
+                                        ImGui.SetCursorPos(statPos + new Vector2(i1 * 100 * HelperMethods.DpiScale, 0));
                                         DrawModuleStat(stat.Id, stat.Value);
                                     }
 
@@ -492,7 +492,7 @@ namespace BPSR_ZDPS
                                         if ((i1 % 2) == 0)
                                         {
                                             ImGui.SameLine();
-                                            ImGui.Dummy(new Vector2(20, 0));
+                                            ImGui.Dummy(new Vector2(20 * HelperMethods.DpiScale, 0));
                                             ImGui.SameLine();
                                             needsToNewLine = true;
                                         }
@@ -511,7 +511,7 @@ namespace BPSR_ZDPS
             else if (!IsCalculating && BestModResults != null)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red_Transparent);
-                ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 22f);
+                ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 22f * HelperMethods.DpiScale);
                 ImGui.TextUnformatted("Unable to create a valid combination. Please adjust the Stat Priorities and try again.");
                 ImGui.PopFont();
                 ImGui.PopStyleColor();
@@ -519,12 +519,12 @@ namespace BPSR_ZDPS
                 var sad = ImageHelper.LoadTexture(Path.Combine(ModuleImgBasePath, "Tired.png"));
                 if (sad != null)
                 {
-                    ImGui.Image(sad.Value, new Vector2(200, 200));
+                    ImGui.Image(sad.Value, new Vector2(200, 200) * HelperMethods.DpiScale);
                 }
             }
 
             ImGui.EndChild();
-            ImGui.SetCursorPosX(leftWidth + 8);
+            ImGui.SetCursorPosX(leftWidth + 8 * HelperMethods.DpiScale);
             if (ImGui.Button("Calculate", new Vector2(contentRegion.X - leftWidth, 0)))
             {
                 ModuleCalcTask = Task.Factory.StartNew(() =>
@@ -543,10 +543,10 @@ namespace BPSR_ZDPS
             bool shouldRemove = false;
             bool wasChanged = false;
 
-            ImGui.SetCursorPos(pos + new Vector2(0, 2));
-            ImGui.PushFont(HelperMethods.Fonts["FASIcons"], 13.0f);
+            ImGui.SetCursorPos(pos + new Vector2(0, 2 * HelperMethods.DpiScale));
+            ImGui.PushFont(HelperMethods.Fonts["FASIcons"], 13.0f * HelperMethods.DpiScale);
             ImGui.BeginDisabled(i == 0);
-            if (ImGui.Button($"{FASIcons.AngleUp}##{i}", new Vector2(32, 16)))
+            if (ImGui.Button($"{FASIcons.AngleUp}##{i}", new Vector2(32, 16) * HelperMethods.DpiScale))
             {
                 var toMoveTo = i - 1;
                 var tempStat = SolverConfig.StatPriorities[toMoveTo];
@@ -557,7 +557,7 @@ namespace BPSR_ZDPS
             ImGui.EndDisabled();
 
             ImGui.BeginDisabled(i == SolverConfig.StatPriorities.Count() - 1);
-            if (ImGui.Button($"{FASIcons.AngleDown}##{i}", new Vector2(32, 16)))
+            if (ImGui.Button($"{FASIcons.AngleDown}##{i}", new Vector2(32, 16) * HelperMethods.DpiScale))
             {
                 var toMoveTo = i + 1;
                 var tempStat = SolverConfig.StatPriorities[toMoveTo];
@@ -569,17 +569,17 @@ namespace BPSR_ZDPS
             ImGui.PopFont();
 
             var stat = ModStatInfos[SolverConfig.StatPriorities[i].Id];
-            ImGui.SetCursorPos(pos + new Vector2(40, 4));
-            ImGui.Image(stat.IconRef.Value, new Vector2(32, 32));
+            ImGui.SetCursorPos(pos + new Vector2(40, 4) * HelperMethods.DpiScale);
+            ImGui.Image(stat.IconRef.Value, new Vector2(32, 32) * HelperMethods.DpiScale);
 
-            ImGui.SetCursorPos(pos + new Vector2(80, 9));
+            ImGui.SetCursorPos(pos + new Vector2(80, 9) * HelperMethods.DpiScale);
             ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], ImGui.GetFontSize());
             ImGui.TextUnformatted(stat.Name);
             ImGui.PopFont();
 
             var availSize = ImGui.GetContentRegionAvail();
-            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 90, 5));
-            ImGui.SetNextItemWidth(40);
+            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 90 * HelperMethods.DpiScale, 5 * HelperMethods.DpiScale));
+            ImGui.SetNextItemWidth(40 * HelperMethods.DpiScale);
 
             /*
             if (ImGui.InputInt($"##MinLevel{i}", ref SolverConfig.StatPriorities[i].MinLevel, 0, ImGuiInputTextFlags.CharsDecimal))
@@ -595,7 +595,7 @@ namespace BPSR_ZDPS
             }
             ImGui.SetItemTooltip("The required Link value needed for this stat to have for the combination to be considered.\nLeave 0 to use any Link.");
 
-            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 50, 5));
+            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 50 * HelperMethods.DpiScale, 5 * HelperMethods.DpiScale));
             ImGui.Dummy(new Vector2(-4, 0));
             ImGui.SameLine();
             bool isAtleastMode = SolverConfig.StatPriorities[i].StatMode == StatMode.Atleast;
@@ -608,17 +608,17 @@ namespace BPSR_ZDPS
                 "In this mode the combo must have ATLEAST this link value." :
                 "In this mode the combo must have EXACTLY this link value.");
 
-            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 25, 0));
-            ImGui.PushFont(HelperMethods.Fonts["FASIcons"], 13.0f);
+            ImGui.SetCursorPos(pos + new Vector2(availSize.X - 25 * HelperMethods.DpiScale, 0));
+            ImGui.PushFont(HelperMethods.Fonts["FASIcons"], 13.0f * HelperMethods.DpiScale);
             ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkRed);
-            if (ImGui.Button($"{FASIcons.TrashCan}##{i}", new Vector2(25, 40)))
+            if (ImGui.Button($"{FASIcons.TrashCan}##{i}", new Vector2(25, 40) * HelperMethods.DpiScale))
             {
                 shouldRemove = true;
             }
             ImGui.PopStyleColor();
             ImGui.PopFont();
 
-            ImGui.SetCursorPos(pos + new Vector2(0, 40));
+            ImGui.SetCursorPos(pos + new Vector2(0, 40 * HelperMethods.DpiScale));
             ImGui.Separator();
 
             return (shouldRemove, wasChanged);
@@ -627,7 +627,7 @@ namespace BPSR_ZDPS
         private static void DrawModuleInv()
         {
             var contentSize = ImGui.GetContentRegionAvail();
-            ImGui.BeginChild("##ModuleInv", new Vector2(-1, contentSize.Y - 25));
+            ImGui.BeginChild("##ModuleInv", new Vector2(-1, contentSize.Y - 25 * HelperMethods.DpiScale));
             var numPerLine = Math.Floor(ImGui.GetContentRegionAvail().X / MOD_DISPLAY_SIZE.X);
             int i = 0;
             bool isCtrlPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl);
@@ -645,8 +645,8 @@ namespace BPSR_ZDPS
             ImGui.TextUnformatted($"Total: {NumTotalModules} | Attack: {NumAttackModules} | Support: {NumSupportModules} | Guard: {NumGuardModules}");
         }
 
-        static Vector2 MOD_ICON_SIZE = new Vector2(80, 80);
-        static Vector2 MOD_DISPLAY_SIZE = new Vector2(410, 105);
+        static Vector2 MOD_ICON_SIZE => new Vector2(80, 80) * HelperMethods.DpiScale;
+        static Vector2 MOD_DISPLAY_SIZE => new Vector2(410, 105) * HelperMethods.DpiScale;
         public static void DrawModule(PlayerModDataSave modInv, long id, Zproto.Item item, bool showId = false)
         {
             var modTypeData = HelperMethods.DataTables.Modules.Data[item.ConfigId];
@@ -658,7 +658,7 @@ namespace BPSR_ZDPS
             var modIcon = GetModuleIcon(item.ConfigId);
 
             ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], ImGui.GetFontSize());
-            ImGui.PushStyleVarX(ImGuiStyleVar.SeparatorTextPadding, 80);
+            ImGui.PushStyleVarX(ImGuiStyleVar.SeparatorTextPadding, 80 * HelperMethods.DpiScale);
             ImGui.SeparatorText(modTypeData.Name);
             ImGui.PopStyleVar();
             ImGui.PopFont();
@@ -683,13 +683,13 @@ namespace BPSR_ZDPS
             }
 
             pos = ImGui.GetCursorPos();
-            ImGui.SetCursorPos(pos + new Vector2(100, -MOD_ICON_SIZE.Y));
+            ImGui.SetCursorPos(pos + new Vector2(100 * HelperMethods.DpiScale, -MOD_ICON_SIZE.Y));
             var numStats = item.ModNewAttr.ModParts.Count();
             for (int i = 0; i < numStats; i++)
             {
                 var partId = item.ModNewAttr.ModParts[i];
                 var level = modInfo.InitLinkNums[i];
-                ImGui.SetCursorPos(pos + new Vector2(90 + (i * 102), -(MOD_ICON_SIZE.Y + 4)));
+                ImGui.SetCursorPos(pos + new Vector2((90 + i * 102) * HelperMethods.DpiScale, -(MOD_ICON_SIZE.Y + 4 * HelperMethods.DpiScale)));
                 DrawModuleStat(partId, level);
             }
 
@@ -702,8 +702,8 @@ namespace BPSR_ZDPS
 
         private static void DrawModuleStat(int partId, int level)
         {
-            Vector2 iconSize = new Vector2(32, 32);
-            Vector2 size = new Vector2(100, 100);
+            Vector2 iconSize = new Vector2(32, 32) * HelperMethods.DpiScale;
+            Vector2 size = new Vector2(100, 100) * HelperMethods.DpiScale;
 
             if (ModStatInfos.TryGetValue(partId, out var statInfo))
             {
@@ -711,11 +711,11 @@ namespace BPSR_ZDPS
                 var titleWidth = ImGui.CalcTextSize(statInfo.Name).X;
                 var icon = statInfo.IconRef.Value;
                 ImGui.SetCursorPos(pos + new Vector2((size.X / 2) - (titleWidth / 2), 0));
-                ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 17);
+                ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 17 * HelperMethods.DpiScale);
                 ImGui.TextUnformatted(statInfo.Name);
-                ImGui.SetCursorPos(pos + new Vector2((size.X / 2) - (iconSize.X / 2), 25));
+                ImGui.SetCursorPos(pos + new Vector2((size.X / 2) - (iconSize.X / 2), 25 * HelperMethods.DpiScale));
                 ImGui.Image(icon, iconSize);
-                ImGui.SetCursorPos(pos + new Vector2((size.X / 2) - 10, 60));
+                ImGui.SetCursorPos(pos + new Vector2((size.X / 2) - 10 * HelperMethods.DpiScale, 60 * HelperMethods.DpiScale));
                 ImGui.TextUnformatted($"+{level}");
                 ImGui.PopFont();
             }
@@ -735,7 +735,7 @@ namespace BPSR_ZDPS
         static float BannerImgPulseTimer = 0f;
         private static void DrawBanner(string msg, uint bgColor, string img = null, bool animate = false)
         {
-            float bannerheight = 200;
+            float bannerheight = 200 * HelperMethods.DpiScale;
             var pos = ImGui.GetCursorScreenPos();
             var size = ImGui.GetContentRegionAvail();
             var start = pos + new Vector2(0, (size.Y / 2) - (bannerheight / 2));
@@ -747,7 +747,7 @@ namespace BPSR_ZDPS
                 bgColor
             );
 
-            ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 30.0f);
+            ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], 30.0f * HelperMethods.DpiScale);
             var txtSize = ImGui.CalcTextSize(msg);
             var txtStartPos = start + new Vector2(size.X / 2 - txtSize.X / 2, (bannerheight / 2) - (txtSize.Y / 2));
             drawList.AddText(txtStartPos, ImGui.ColorConvertFloat4ToU32(Colors.White), msg);
@@ -756,11 +756,11 @@ namespace BPSR_ZDPS
             var imgRef = ImageHelper.LoadTexture(Path.Combine(ModuleImgBasePath, img));
             if (imgRef.HasValue)
             {
-                var offset = new Vector2(5, 5);
+                var offset = new Vector2(5, 5) * HelperMethods.DpiScale;
                 if (animate)
                 {
                     BannerImgPulseTimer += ImGui.GetIO().DeltaTime;
-                    Vector2 pulseAmount = new Vector2(5, 5);
+                    Vector2 pulseAmount = new Vector2(5, 5) * HelperMethods.DpiScale;
                     float pulseSpeed = 1;
                     offset = new Vector2(
                         pulseAmount.X * MathF.Sin(BannerImgPulseTimer * MathF.PI * pulseSpeed),
@@ -769,7 +769,7 @@ namespace BPSR_ZDPS
                 }
 
                 var imgSize = new Vector2(bannerheight, bannerheight) + offset;
-                var imgStart = txtStartPos - new Vector2(imgSize.X + 40, (imgSize.Y / 2) - txtSize.Y / 2);
+                var imgStart = txtStartPos - new Vector2(imgSize.X + 40 * HelperMethods.DpiScale, (imgSize.Y / 2) - txtSize.Y / 2);
                 drawList.AddImage(imgRef.Value, imgStart, imgStart + imgSize);
             }
         }
