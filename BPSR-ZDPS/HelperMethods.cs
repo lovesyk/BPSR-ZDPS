@@ -18,6 +18,7 @@ namespace BPSR_ZDPS
         public static IntPtr MainWindowPlatformHandleRaw;
         public static Dictionary<string, ImFontPtr> Fonts = new();
         public static Action? DeferredImGuiRenderAction = null;
+        public static float DpiScale = 1.0f;
 
         public static class DataTables
         {

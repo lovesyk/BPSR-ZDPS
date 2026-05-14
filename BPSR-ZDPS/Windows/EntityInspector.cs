@@ -99,9 +99,9 @@ namespace BPSR_ZDPS.Windows
 
             var main_viewport = ImGui.GetMainViewport();
             //ImGui.SetNextWindowPos(new Vector2(main_viewport.WorkPos.X + 200, main_viewport.WorkPos.Y + 120), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(900, 600) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
 
-            ImGui.SetNextWindowSizeConstraints(new Vector2(400, 150), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(400, 150) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -189,7 +189,7 @@ namespace BPSR_ZDPS.Windows
                         var tex = ImageHelper.GetTextureByKey($"Profession_{LoadedEntity.ProfessionId}_128");
                         if (tex != null)
                         {
-                            float texSize = 96.0f;
+                            float texSize = 96.0f * HelperMethods.DpiScale;
                             ImGui.SetCursorPosX(ImGui.GetContentRegionAvail().X - texSize - ImGui.GetStyle().ItemSpacing.X - ImGui.GetStyle().FramePadding.X);
                             if (Settings.Instance.ColorClassIconsByRole)
                             {
@@ -544,7 +544,7 @@ namespace BPSR_ZDPS.Windows
 
                 if (TableFilterMode == ETableFilterMode.SkillsDamage || TableFilterMode == ETableFilterMode.SkillsHealing || TableFilterMode == ETableFilterMode.SkillsTaken)
                 {
-                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f, ImGui.GetStyle().CellPadding.Y));
+                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f * HelperMethods.DpiScale, ImGui.GetStyle().CellPadding.Y));
 
                     int columnCount = 9;
                     if (TableFilterMode == ETableFilterMode.SkillsDamage)
@@ -908,7 +908,7 @@ namespace BPSR_ZDPS.Windows
                 }
                 else if (TableFilterMode == ETableFilterMode.EntityTaken)
                 {
-                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f, ImGui.GetStyle().CellPadding.Y));
+                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f * HelperMethods.DpiScale, ImGui.GetStyle().CellPadding.Y));
 
                     if (ImGui.BeginTable("##TakenByEntityTable", 9, ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit))
                     {
@@ -1075,7 +1075,7 @@ namespace BPSR_ZDPS.Windows
                 }
                 else if (TableFilterMode == ETableFilterMode.Buffs)
                 {
-                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f, ImGui.GetStyle().CellPadding.Y));
+                    ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f * HelperMethods.DpiScale, ImGui.GetStyle().CellPadding.Y));
 
                     if (ImGui.BeginTable("##BuffEventsTable", 10, ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit))
                     {
@@ -1416,7 +1416,7 @@ namespace BPSR_ZDPS.Windows
                             }
                         }
 
-                        if (ImPlot.BeginPlot("Total Damage Over Time"))
+                        if (ImPlot.BeginPlot("Total Damage Over Time", new Vector2(-1, 300 * HelperMethods.DpiScale)))
                         {
                             ImPlot.SetupAxes("Time (Encounter Duration In Seconds)", "Damage", ImPlotAxisFlags.AutoFit, ImPlotAxisFlags.AutoFit);
 
@@ -1440,7 +1440,7 @@ namespace BPSR_ZDPS.Windows
                             ImPlot.EndPlot();
                         }
 
-                        if (ImPlot.BeginPlot("Damage Per Second Over Time"))
+                        if (ImPlot.BeginPlot("Damage Per Second Over Time", new Vector2(-1, 300 * HelperMethods.DpiScale)))
                         {
                             ImPlot.SetupAxes("Time (Encounter Duration In Seconds)", "Damage Per Second", ImPlotAxisFlags.AutoFit, ImPlotAxisFlags.AutoFit);
 
@@ -1463,7 +1463,7 @@ namespace BPSR_ZDPS.Windows
                             ImPlot.EndPlot();
                         }
 
-                        if (ImPlot.BeginPlot("Hits By Source", new Vector2(-1, 520), ImPlotFlags.NoMouseText))
+                        if (ImPlot.BeginPlot("Hits By Source", new Vector2(-1, 520 * HelperMethods.DpiScale), ImPlotFlags.NoMouseText))
                         {
                             ImPlot.SetupAxes("", "", ImPlotAxisFlags.NoDecorations | ImPlotAxisFlags.AutoFit, ImPlotAxisFlags.NoDecorations | ImPlotAxisFlags.AutoFit);
                             ImPlot.SetupLegend(ImPlotLocation.West, ImPlotLegendFlags.Outside);
@@ -1471,7 +1471,7 @@ namespace BPSR_ZDPS.Windows
                             ImPlot.EndPlot();
                         }
 
-                        if (ImPlot.BeginPlot("Damage Skills Timeline", new Vector2(-1, 520), ImPlotFlags.None))
+                        if (ImPlot.BeginPlot("Damage Skills Timeline", new Vector2(-1, 520 * HelperMethods.DpiScale), ImPlotFlags.None))
                         {
                             ImPlot.SetupAxes("Time (Encounter Duration In Seconds)", "Casts", ImPlotAxisFlags.AutoFit, ImPlotAxisFlags.AutoFit | ImPlotAxisFlags.NoTickLabels);
 
@@ -1500,7 +1500,7 @@ namespace BPSR_ZDPS.Windows
                         {
                             var list = (List<DataTypes.Skills.SkillLevelInfo>)skillLevelIdList;
 
-                            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f, ImGui.GetStyle().CellPadding.Y));
+                            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(8f * HelperMethods.DpiScale, ImGui.GetStyle().CellPadding.Y));
 
                             if (ImGui.BeginTable("##SkillStatsTable", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit))
                             {
@@ -1622,7 +1622,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.TextUnformatted($"{TITLE} - {entityName}");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 2));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, windowSettings.TopMost ? 1.0f : 0.5f));
                 if (ImGui.MenuItem($"{FASIcons.Thumbtack}##TopMostBtn"))
                 {
@@ -1647,7 +1647,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.SetItemTooltip("Pin Window As Top Most");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 if (ImGui.MenuItem($"X##CloseBtn"))
                 {
                     IsOpened = false;

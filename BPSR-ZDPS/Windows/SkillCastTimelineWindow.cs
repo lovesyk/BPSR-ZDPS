@@ -181,7 +181,7 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(500, 720), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(500, 720) * HelperMethods.DpiScale, ImGuiCond.Appearing);
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -312,11 +312,11 @@ namespace BPSR_ZDPS.Windows
         {
             var windowSettings = Settings.Instance.WindowSettings.SkillCastTimeline;
 
-            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 100), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 100) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
-            ImGui.SetNextWindowSize(new Vector2(800, 200), ImGuiCond.FirstUseEver);
-            float maxHeight = windowSettings.TimelineIconSize + ImGui.GetStyle().FramePadding.Y;
-            ImGui.SetNextWindowSizeConstraints(new Vector2(100, maxHeight), new Vector2(ImGui.GETFLTMAX(), maxHeight));
+            ImGui.SetNextWindowSize(new Vector2(800, 200) * HelperMethods.DpiScale, ImGuiCond.FirstUseEver);
+            float maxHeight = windowSettings.TimelineIconSize * HelperMethods.DpiScale + ImGui.GetStyle().FramePadding.Y;
+            ImGui.SetNextWindowSizeConstraints(new Vector2(100 * HelperMethods.DpiScale, maxHeight), new Vector2(ImGui.GETFLTMAX(), maxHeight));
 
             if (windowSettings.TimelineSize != new Vector2())
             {
@@ -409,7 +409,7 @@ namespace BPSR_ZDPS.Windows
                     var texBg = ImageArchive.LoadImage(Path.Combine("Misc", "skill_bg"));
                     if (tex != null && texBg != null)
                     {
-                        float texSize = windowSettings.TimelineIconSize;
+                        float texSize = windowSettings.TimelineIconSize * HelperMethods.DpiScale;
                         float startX = ImGui.GetWindowWidth() - (texSize * 1);
                         double currentPosition = Lerp(startX, texSize * -2, (DateTime.Now - entry.StartTime).TotalSeconds / windowSettings.TimelineSpeed);
 

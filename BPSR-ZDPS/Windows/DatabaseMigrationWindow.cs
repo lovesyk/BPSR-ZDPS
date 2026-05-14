@@ -33,7 +33,7 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSizeConstraints(new Vector2(480, 150), new Vector2(680, 600));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(480, 150) * HelperMethods.DpiScale, new Vector2(680, 600) * HelperMethods.DpiScale);
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 

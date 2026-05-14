@@ -197,7 +197,7 @@ namespace BPSR_ZDPS.Windows
                     ImGui.SetNextWindowSize(windowSettings.RaidWarningMessageSize, ImGuiCond.Appearing);
                 }
                 
-                ImGui.SetNextWindowSizeConstraints(new Vector2(0, 20), new Vector2(maxWindowWidth, ImGui.GETFLTMAX()));
+                ImGui.SetNextWindowSizeConstraints(new Vector2(0, 20 * HelperMethods.DpiScale), new Vector2(maxWindowWidth, ImGui.GETFLTMAX()));
 
                 ImGui.SetNextWindowSize(new Vector2(maxWindowWidth, (RaidWarningMessages.Count * LineHeight) + ImGui.GetStyle().FramePadding.Y + ImGui.GetStyle().ItemSpacing.Y));
 
@@ -296,8 +296,8 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(680, 580), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSize(new Vector2(680, 580) * HelperMethods.DpiScale, ImGuiCond.Appearing);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -374,10 +374,10 @@ namespace BPSR_ZDPS.Windows
 
                 ImGui.AlignTextToFramePadding();
                 ImGui.Text("Raid Warning Notification Sound Path: ");
-                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 - ImGui.GetStyle().ItemSpacing.X);
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 140 * HelperMethods.DpiScale - ImGui.GetStyle().ItemSpacing.X);
                 ImGui.InputText("##WarningNotificationSoundPath", ref windowSettings.WarningNotificationSoundPath, 1024);
                 ImGui.SameLine();
-                if (ImGui.Button("Browse...##WarningSoundPathBrowseBtn", new Vector2(140, 0)))
+                if (ImGui.Button("Browse...##WarningSoundPathBrowseBtn", new Vector2(140 * HelperMethods.DpiScale, 0)))
                 {
                     string defaultDir = File.Exists(windowSettings.WarningNotificationSoundPath) ? Path.GetDirectoryName(windowSettings.WarningNotificationSoundPath) : "";
 
@@ -475,7 +475,7 @@ namespace BPSR_ZDPS.Windows
                         }
                     }
 
-                    if (ImGui.BeginListBox("##PlayerListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120)))
+                    if (ImGui.BeginListBox("##PlayerListBox", new Vector2(ImGui.GetContentRegionAvail().X, 120 * HelperMethods.DpiScale)))
                     {
                         if (EntityFilterMatches != null && (EntityFilterMatches.Length < 100 || EntityNameFilter.Length > 2))
                         {
@@ -489,8 +489,8 @@ namespace BPSR_ZDPS.Windows
                                     if (isSelected)
                                     {
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red_Transparent);
-                                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                        if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30)))
+                                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
+                                        if (ImGui.Button($"{FASIcons.Minus}##RemoveBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                         {
                                             windowSettings.PlayerUIDBlacklist.Remove(match.Value.UID);
                                         }
@@ -500,8 +500,8 @@ namespace BPSR_ZDPS.Windows
                                     else
                                     {
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.Green_Transparent);
-                                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
-                                        if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30)))
+                                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
+                                        if (ImGui.Button($"{FASIcons.Plus}##AddBtn_{matchIdx}", new Vector2(30, 30) * HelperMethods.DpiScale))
                                         {
                                             windowSettings.PlayerUIDBlacklist.Add(match.Value.UID);
                                         }
@@ -529,7 +529,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ImGui.SetNextWindowClass(EditModeClass);
 
-                ImGui.SetNextWindowSize(new Vector2(700, 100), ImGuiCond.Appearing);
+                ImGui.SetNextWindowSize(new Vector2(700, 100) * HelperMethods.DpiScale, ImGuiCond.Appearing);
 
                 if (windowSettings.RaidWarningMessagePosition != new Vector2())
                 {
@@ -553,7 +553,7 @@ namespace BPSR_ZDPS.Windows
                     NewWarningWindowLocation = null;
                 }
 
-                ImGui.SetNextWindowSizeConstraints(new Vector2(500, -1), new Vector2(ImGui.GETFLTMAX(), -1));
+                ImGui.SetNextWindowSizeConstraints(new Vector2(500 * HelperMethods.DpiScale, -1), new Vector2(ImGui.GETFLTMAX(), -1));
 
                 ImGui.GetStyle().WindowTitleAlign = new Vector2(0.5f, 0.5f);
                 if (ImGui.Begin("Raid Warning - Default Message Position", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
@@ -622,7 +622,7 @@ namespace BPSR_ZDPS.Windows
                     User32.RECT procRect = new();
                     User32.GetWindowRect(process.MainWindowHandle, ref procRect);
 
-                    Vector2 newSize = new Vector2(MathF.Floor((procRect.right - procRect.left) * 0.90f), 100);
+                    Vector2 newSize = new Vector2(MathF.Floor((procRect.right - procRect.left) * 0.90f), 100 * HelperMethods.DpiScale);
 
                     Settings.Instance.WindowSettings.RaidManagerRaidWarning.RaidWarningMessageSize = newSize;
                     NewWarningWindowSize = newSize;
@@ -638,7 +638,7 @@ namespace BPSR_ZDPS.Windows
                 var glfwMonitor = Hexa.NET.GLFW.GLFW.GetPrimaryMonitor();
                 var glfwVidMode = Hexa.NET.GLFW.GLFW.GetVideoMode(glfwMonitor);
 
-                Vector2 newSize = new Vector2(MathF.Floor(glfwVidMode.Width * 0.90f), 100);
+                Vector2 newSize = new Vector2(MathF.Floor(glfwVidMode.Width * 0.90f), 100 * HelperMethods.DpiScale);
 
                 Settings.Instance.WindowSettings.RaidManagerRaidWarning.RaidWarningMessageSize = newSize;
                 NewWarningWindowSize = newSize;

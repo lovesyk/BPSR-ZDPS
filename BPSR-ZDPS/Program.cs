@@ -22,6 +22,7 @@ namespace BPSR_ZDPS
         private static MainWindow mainWindow;
         private static GLFWwindowPtr window;
         public static D3D11Manager manager;
+        private static byte[]? _baseStyleBytes = null;
 
         static void Main(string[] args)
         {            
@@ -83,6 +84,14 @@ namespace BPSR_ZDPS
                 return;
             }
 
+            unsafe
+            {
+                float xscale, yscale;
+                GLFW.GetWindowContentScale(window, &xscale, &yscale);
+                HelperMethods.DpiScale = xscale;
+            }
+            Log.Debug($"DPI Scale = {HelperMethods.DpiScale}");
+
             Assembly assembly = Assembly.GetExecutingAssembly();
             string iconAssemblyPath = "BPSR_ZDPS.Resources.MainWindowIcon.png";
             using (var iconStream = assembly.GetManifestResourceStream(iconAssemblyPath))
@@ -138,6 +147,8 @@ namespace BPSR_ZDPS
             io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
             io.ConfigViewportsNoAutoMerge = true; // If this is false, putting an ImGui window on top of an GLFW window will dock into it even if it's not shown
             io.ConfigViewportsNoTaskBarIcon = false;
+            io.ConfigDpiScaleFonts = true;
+            io.ConfigDpiScaleViewports = true;
 
             LoadFonts();
 
@@ -159,15 +170,30 @@ namespace BPSR_ZDPS
 
             RendererImpl.Init(guiContext);
 
-            // Setup resizing.
+            // Setup resizing and per-viewport DPI change detection.
             unsafe
             {
                 GLFW.SetFramebufferSizeCallback(window, Window_Resized_Callback);
+                var platformIO = ImGui.GetPlatformIO();
+                platformIO.PlatformOnChangedViewport = (void*)(delegate* unmanaged[Cdecl]<ImGuiViewport*, void>)&Viewport_ContentScale_Callback;
             }
 
             InitWindows();
 
             Theme.VSDarkTheme();
+
+            unsafe
+            {
+                ImGui.GetStyle().FontSizeBase = 18.0f;
+                int styleSize = sizeof(ImGuiStyle);
+                _baseStyleBytes = new byte[styleSize];
+                fixed (byte* dest = _baseStyleBytes)
+                    Unsafe.CopyBlock(dest, ImGui.GetStyle().Handle, (uint)styleSize);
+            }
+
+            ImGui.GetStyle().FontScaleDpi = HelperMethods.DpiScale;
+            if (HelperMethods.DpiScale != 1.0f)
+                ImGui.GetStyle().ScaleAllSizes(HelperMethods.DpiScale);
 
             // Windows 11 does not properly update the task bar icon when instructed to, so you have to tell it multiple times
             using (var iconStream = assembly.GetManifestResourceStream(iconAssemblyPath))
@@ -368,10 +394,35 @@ namespace BPSR_ZDPS
             manager.Resize(width, height);
         }
 
+        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+        static unsafe void Viewport_ContentScale_Callback(ImGuiViewport* vp)
+        {
+            float newDpiScale = vp->DpiScale;
+            if (newDpiScale == HelperMethods.DpiScale)
+                return;
+
+            HelperMethods.DpiScale = newDpiScale;
+
+            Log.Debug($"DPI Scale changed to {HelperMethods.DpiScale}");
+
+            HelperMethods.DeferredImGuiRenderAction = () =>
+            {
+                unsafe
+                {
+                    fixed (byte* src = _baseStyleBytes)
+                        Unsafe.CopyBlock(ImGui.GetStyle().Handle, src, (uint)_baseStyleBytes!.Length);
+                }
+                ImGui.GetStyle().FontScaleDpi = HelperMethods.DpiScale;
+                ImGui.GetStyle().ScaleAllSizes(HelperMethods.DpiScale);
+            };
+        }
+
         static unsafe void LoadFonts()
         {
+            const float fontSize = 18.0f;
+
             var io = ImGui.GetIO();
-            var segoe = io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeui.ttf", 18.0f);
+            var segoe = io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeui.ttf", fontSize);
             HelperMethods.Fonts.Add("Segoe", segoe);
 
             // Merging additional fonts into Segoe for multi-language support
@@ -379,34 +430,34 @@ namespace BPSR_ZDPS
             // Japanese character supporting font (this is a bit heavy to load into memory - 5MB)
             //ff = new FontFile("BPSR_ZDPS.Fonts.fot-seuratpron-m.otf");
             var ff = new FontFile("BPSR_ZDPS.Fonts.fot-seuratpron-m.otf", new GlyphRange(0x3000, 0x303F));
-            var res = ff.BindToImGui(18.0f, true);
+            var res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Chinese character supporting font (this is very heavy to load into memory - 16MB)
             ff = new FontFile("BPSR_ZDPS.Fonts.SourceHanSansSC-Regular.otf", new GlyphRange(0x4E00, 0x9FFF));
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Korean character supporting font
             ff = new FontFile("BPSR_ZDPS.Fonts.NotoSansKR-Regular.ttf", new GlyphRange(0x4E00, 0x9FFF));
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Setting Segoe to be the default application font (though the other fonts will be used if their glyphs are required)
             ImGui.AddFontDefault(HelperMethods.Fonts["Segoe"].ContainerAtlas);
 
             // Note: Segoe-Bold will not support multi-language when it's used
-            HelperMethods.Fonts.Add("Segoe-Bold", io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeuib.ttf", 18.0f));
+            HelperMethods.Fonts.Add("Segoe-Bold", io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeuib.ttf", fontSize));
 
             ff = new FontFile("BPSR_ZDPS.Fonts.FAS.ttf", new GlyphRange(0x0021, 0xF8FF));
-            res = ff.BindToImGui(18.0f);
+            res = ff.BindToImGui(fontSize);
             HelperMethods.Fonts.Add("FASIcons", res);
             ff.Dispose();
 
             // Windows 11 doesn't actually have this anymore so we can't rely on the system, we have to embed it
-            //HelperMethods.Fonts.Add("Cascadia-Mono", io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\CascadiaMono.ttf", 18.0f));
+            //HelperMethods.Fonts.Add("Cascadia-Mono", io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\CascadiaMono.ttf", fontSize));
             ff = new FontFile("BPSR_ZDPS.Fonts.CascadiaMono.ttf");
-            res = ff.BindToImGui(18.0f);
+            res = ff.BindToImGui(fontSize);
             HelperMethods.Fonts.Add("Cascadia-Mono", res);
             ff.Dispose();
 
@@ -414,22 +465,22 @@ namespace BPSR_ZDPS
 
             // Japanese character supporting monospace font
             ff = new FontFile("BPSR_ZDPS.Fonts.CascadiaNextJP.wght.ttf");
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Chinese Simplified character supporting monospace font
             ff = new FontFile("BPSR_ZDPS.Fonts.CascadiaNextSC.wght.ttf");
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Chinese Traditional character supporting monospace font
             ff = new FontFile("BPSR_ZDPS.Fonts.CascadiaNextTC.wght.ttf");
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
 
             // Korean character supporting monospace font
             ff = new FontFile("BPSR_ZDPS.Fonts.D2Coding.ttf");
-            res = ff.BindToImGui(18.0f, true);
+            res = ff.BindToImGui(fontSize, true);
             ff.Dispose();
         }
 
