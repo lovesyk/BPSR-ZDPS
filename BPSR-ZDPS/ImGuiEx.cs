@@ -58,7 +58,7 @@ namespace BPSR_ZDPS
                 Vector2 scaledBR = imgCenter + scaledSize * 0.5f;
 
                 //draw_list.AddImageRounded(imTextureRef.Value, pos + new Vector2(8, 0), pos + new Vector2(size) + new Vector2(-6, 0), new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.White), size * 0.5f, ImDrawFlags.RoundCornersAll);
-                //draw_list.AddImageRounded(imTextureRef.Value, pos + new Vector2(texStretchLeft, 0), pos + new Vector2(size) + new Vector2(texStretchRight, 0), new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.White), size * 0.5f, ImDrawFlags.RoundCornersAll);
+                //draw_list.AddImageRounded(imTextureRef.Value, pos + new Vector2(texStretchLeft * HelperMethods.DpiScale, 0), pos + new Vector2(size) + new Vector2(texStretchRight * HelperMethods.DpiScale, 0), new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.White), size * 0.5f, ImDrawFlags.RoundCornersAll);
                 draw_list.AddImageRounded(imTextureRef.Value, scaledTL, scaledBR, new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.White), size * 0.5f, ImDrawFlags.RoundCornersAll);
             }
 

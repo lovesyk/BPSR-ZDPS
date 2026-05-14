@@ -52,8 +52,8 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(680, 400), ImGuiCond.Always);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400), new Vector2(680, 400));
+            ImGui.SetNextWindowSize(new Vector2(680, 400) * HelperMethods.DpiScale, ImGuiCond.Always);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400) * HelperMethods.DpiScale, new Vector2(680, 400) * HelperMethods.DpiScale);
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -107,19 +107,19 @@ namespace BPSR_ZDPS.Windows
                 ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkRed_Transparent);
                 ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Colors.Red_Transparent);
                 ImGui.PushStyleColor(ImGuiCol.ButtonActive, Colors.Red);
-                if (ImGui.Button("Older than 1 day", new Vector2(220, 0)))
+                if (ImGui.Button("Older than 1 day", new Vector2(220 * HelperMethods.DpiScale, 0)))
                 {
                     DeleteTimeFrame = EDeleteDuration.OneDay;
                     ImGui.OpenPopup(DELETECONFIRMATIONPROMPT_TITLE_ID);
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Older than 5 days", new Vector2(220, 0)))
+                if (ImGui.Button("Older than 5 days", new Vector2(220 * HelperMethods.DpiScale, 0)))
                 {
                     DeleteTimeFrame = EDeleteDuration.FiveDays;
                     ImGui.OpenPopup(DELETECONFIRMATIONPROMPT_TITLE_ID);
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("All Time", new Vector2(200, 0)))
+                if (ImGui.Button("All Time", new Vector2(200 * HelperMethods.DpiScale, 0)))
                 {
                     DeleteTimeFrame = EDeleteDuration.AllTime;
                     ImGui.OpenPopup(DELETECONFIRMATIONPROMPT_TITLE_ID);
@@ -146,7 +146,7 @@ namespace BPSR_ZDPS.Windows
             {
                 ImGui.TextUnformatted("Are you sure you want to delete previous encounter data?");
 
-                float buttonWidth = 200;
+                float buttonWidth = 200 * HelperMethods.DpiScale;
 
                 if (ImGui.Button("Yes", new Vector2(buttonWidth, 0)))
                 {

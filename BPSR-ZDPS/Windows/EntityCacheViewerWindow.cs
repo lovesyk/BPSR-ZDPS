@@ -19,7 +19,7 @@ namespace BPSR_ZDPS
         public static string TITLE = "Entity Cache Viewer";
         public static bool IsOpened = false;
         public static bool CollapseToContentOnly = false;
-        public static Vector2 DefaultWindowSize = new Vector2(700, 600);
+        public static Vector2 DefaultWindowSize => new Vector2(700, 600) * HelperMethods.DpiScale;
         public static bool ResetWindowSize = false;
 
         static int RunOnceDelayed = 0;
@@ -60,7 +60,7 @@ namespace BPSR_ZDPS
             var windowSettings = Settings.Instance.WindowSettings.EntityCacheViewer;
 
             ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 300), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(300, 300) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowSize != new Vector2())
             {
@@ -186,7 +186,7 @@ namespace BPSR_ZDPS
                 ImGui.Text($"{TITLE}");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 3));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, windowSettings.TopMost ? 1.0f : 0.5f));
                 if (ImGui.MenuItem($"{FASIcons.Thumbtack}##TopMostBtn"))
                 {
@@ -211,7 +211,7 @@ namespace BPSR_ZDPS
                 ImGui.SetItemTooltip("Pin Window As Top Most");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 2));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, 1.0f, 1.0f, CollapseToContentOnly ? 1.0f : 0.5f));
                 if (ImGui.MenuItem($"{(CollapseToContentOnly ? FASIcons.AnglesDown : FASIcons.AnglesUp)}##CollapseToContentBtn"))
                 {
@@ -230,7 +230,7 @@ namespace BPSR_ZDPS
                 }
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 if (ImGui.MenuItem($"X##CloseBtn"))
                 {
                     windowSettings.WindowSize = ImGui.GetWindowSize();
