@@ -37,8 +37,8 @@ namespace BPSR_ZDPS
             var io = ImGui.GetIO();
             var main_viewport = ImGui.GetMainViewport();
 
-            ImGui.SetNextWindowSize(new Vector2(650, 150), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(650, 150), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSize(new Vector2(650, 150) * HelperMethods.DpiScale, ImGuiCond.Appearing);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(650, 150) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -73,7 +73,7 @@ namespace BPSR_ZDPS
                 ImGui.NewLine();
 
                 ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkGreen_Transparent);
-                if (ImGui.Button("Enable Now", new Vector2(250, 0)))
+                if (ImGui.Button("Enable Now", new Vector2(250 * HelperMethods.DpiScale, 0)))
                 {
                     Settings.Instance.CheckForZDPSUpdatesOnStartup = true;
                     Settings.Instance.HasPromptedEnableUpdateChecks = true;
@@ -82,10 +82,10 @@ namespace BPSR_ZDPS
                 }
                 ImGui.PopStyleColor();
 
-                ImGui.SameLine(ImGui.GetContentRegionAvail().X - 250);
+                ImGui.SameLine(ImGui.GetContentRegionAvail().X - 250 * HelperMethods.DpiScale);
 
                 ImGui.PushStyleColor(ImGuiCol.Button, Colors.DarkRed_Transparent);
-                if (ImGui.Button("Keep Disabled", new Vector2(250, 0)))
+                if (ImGui.Button("Keep Disabled", new Vector2(250 * HelperMethods.DpiScale, 0)))
                 {
                     Settings.Instance.HasPromptedEnableUpdateChecks = true;
                     Settings.Save();

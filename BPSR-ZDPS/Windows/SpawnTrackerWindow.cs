@@ -18,7 +18,7 @@ namespace BPSR_ZDPS.Windows
         public static string TITLE = "Spawn Tracker";
         public static bool IsOpened = false;
         public static bool CollapseToContentOnly = false;
-        public static Vector2 DefaultWindowSize = new Vector2(700, 600);
+        public static Vector2 DefaultWindowSize => new Vector2(700, 600) * HelperMethods.DpiScale;
         public static bool ResetWindowSize = false;
 
         static int RunOnceDelayed = 0;
@@ -101,7 +101,7 @@ namespace BPSR_ZDPS.Windows
             var windowSettings = Settings.Instance.WindowSettings.SpawnTracker;
 
             ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(240, 140), new Vector2(ImGui.GETFLTMAX()));
+            ImGui.SetNextWindowSizeConstraints(new Vector2(240, 140) * HelperMethods.DpiScale, new Vector2(ImGui.GETFLTMAX()));
 
             if (windowSettings.WindowPosition != new Vector2())
             {
@@ -181,10 +181,10 @@ namespace BPSR_ZDPS.Windows
 
                 if (!CollapseToContentOnly)
                 {
-                    ImGui.PushStyleVarX(ImGuiStyleVar.FramePadding, 4);
-                    ImGui.PushStyleVarY(ImGuiStyleVar.FramePadding, 1);
+                    ImGui.PushStyleVarX(ImGuiStyleVar.FramePadding, 4 * HelperMethods.DpiScale);
+                    ImGui.PushStyleVarY(ImGuiStyleVar.FramePadding, 1 * HelperMethods.DpiScale);
                     ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(37 / 255f, 37 / 255f, 38 / 255f, 1.0f)));
-                    ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
+                    ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1 * HelperMethods.DpiScale);
                     ImGui.TextUnformatted("Select Monsters To Track: ");
 
                     ImGui.BeginDisabled(BPTimerManager.SpawnDataLoaded == BPTimerManager.ESpawnDataLoadStatus.InProgress);
@@ -209,7 +209,7 @@ namespace BPSR_ZDPS.Windows
                         RegionName = regions[selectedRegionIndex];
                     }
 
-                    ImGui.BeginChild("##FilterDataListBoxChild", new Vector2(0, 150), ImGuiChildFlags.Borders | ImGuiChildFlags.ResizeY);
+                    ImGui.BeginChild("##FilterDataListBoxChild", new Vector2(0, 150 * HelperMethods.DpiScale), ImGuiChildFlags.Borders | ImGuiChildFlags.ResizeY);
                     var mobs = BPTimerManager.MobsDescriptors.AsValueEnumerable();
                     foreach (var mob in mobs)
                     {
@@ -265,7 +265,7 @@ namespace BPSR_ZDPS.Windows
                     }
 
                     ImGui.SameLine();
-                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                     if (ImGui.Button($"{(windowSettings.OrderLinesByIndex ? FASIcons.ArrowDownShortWide : FASIcons.ArrowDown19)}##ToggleLineOrderBtn"))
                     {
                         windowSettings.OrderLinesByIndex = !windowSettings.OrderLinesByIndex;
@@ -364,7 +364,7 @@ namespace BPSR_ZDPS.Windows
                             bool endedOnSameLine = false;
                             foreach (var status in statusDescriptors)
                             {
-                                float lineWidth = 50 * windowSettings.LineScale;
+                                float lineWidth = 50 * HelperMethods.DpiScale * windowSettings.LineScale;
                                 float lineHeight = 18.0f * windowSettings.LineScale;
 
                                 int lineItemCount = (int)MathF.Floor(groupSize.X / (lineWidth + ImGui.GetStyle().ItemSpacing.X));
@@ -404,7 +404,7 @@ namespace BPSR_ZDPS.Windows
                                 {
                                     ImGui.PushStyleColor(ImGuiCol.Border, Colors.Red);
                                     ImGui.PushStyleColor(ImGuiCol.BorderShadow, Colors.Red_Transparent);
-                                    ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
+                                    ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1 * HelperMethods.DpiScale);
                                 }
 
                                 if (pct < 0.30 || isDead)
@@ -474,7 +474,7 @@ namespace BPSR_ZDPS.Windows
                                             var tex = ImageArchive.LoadImage(Path.Combine("BPTimer", "Maps", $"{status.MonsterId}_{status.Location}"));
                                             if (tex != null)
                                             {
-                                                float texSize = 128.0f * windowSettings.TextScale;
+                                                float texSize = 128.0f * HelperMethods.DpiScale * windowSettings.TextScale;
                                                 ImGui.Image((ImTextureRef)tex, new Vector2(texSize, texSize));
                                             }
                                         }
@@ -538,7 +538,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.BeginDisabled(BPTimerManager.SpawnDataLoaded == BPTimerManager.ESpawnDataLoadStatus.InProgress);
                 bool hasConnectionError = BPTimerManager.SpawnDataLoaded == BPTimerManager.ESpawnDataLoadStatus.Error || BPTimerManager.SpawnDataRealtimeConnection == BPTimerManager.ESpawnDataLoadStatus.Error;
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 4));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, hasConnectionError ? 0.0f : 1.0f, hasConnectionError ? 0.0f : 1.0f, 1.0f));
                 if (ImGui.MenuItem($"{FASIcons.Server}##ReconnectBtn"))
                 {
@@ -552,7 +552,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.EndDisabled();
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 3));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, AppState.MousePassthrough ? 0.0f : 1.0f, windowSettings.TopMost ? 1.0f : 0.5f));
                 if (ImGui.MenuItem($"{FASIcons.Thumbtack}##TopMostBtn"))
                 {
@@ -577,7 +577,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.SetItemTooltip("Pin Window As Top Most");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 2));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, 1.0f, 1.0f, CollapseToContentOnly ? 1.0f : 0.5f));
                 if (ImGui.MenuItem($"{(CollapseToContentOnly ? FASIcons.AnglesDown : FASIcons.AnglesUp)}##CollapseToContentBtn"))
                 {
@@ -596,7 +596,7 @@ namespace BPSR_ZDPS.Windows
                 }
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth));
-                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetStyle().FontSizeBase);
                 if (ImGui.MenuItem($"X##CloseBtn"))
                 {
                     windowSettings.WindowPosition = ImGui.GetWindowPos();

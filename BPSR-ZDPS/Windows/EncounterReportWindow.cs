@@ -98,7 +98,7 @@ namespace BPSR_ZDPS.Windows
                     .Where(x => x.Value.EntityType == Zproto.EEntityType.EntChar || (x.Value.EntityType == Zproto.EEntityType.EntMonster && x.Value.TotalDamage > 0))
                     .OrderByDescending(x => x.Value.TotalDamage);
 
-                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(ImGui.GetStyle().CellPadding.X, ImGui.GetStyle().CellPadding.Y + 2));
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(ImGui.GetStyle().CellPadding.X, ImGui.GetStyle().CellPadding.Y + 2 * HelperMethods.DpiScale));
 
                 int entityIndex = 0;
                 foreach (var entityObj in entities)
