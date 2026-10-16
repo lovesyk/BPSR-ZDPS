@@ -96,8 +96,99 @@ namespace BPSR_ZDPS
             //netCap.RegisterUnhandledHandler(ProcessUnhandled);
             //netCap.RegisterUnhandledProxyHandler(ProcessProxyUnhandled);
 
+            var thisCap = netCap;
+            thisCap.StreamStalled += () => OnStreamStalled(thisCap);
+            thisCap.StreamSynced += () => OnStreamSynced(thisCap);
+            thisCap.CaptureLost += reason => OnCaptureLost(thisCap, reason);
+
             netCap.Start();
             System.Diagnostics.Debug.WriteLine("MessageManager.InitializeCapturing : Capturing Started...");
+        }
+
+        private static volatile bool PendingNewEncounterOnResync = false;
+
+        private static void OnStreamStalled(NetCap cap)
+        {
+            if (!ReferenceEquals(cap, netCap))
+                return;
+
+            // Data was lost mid-stream so the current Encounter is incomplete; start a fresh one once the stream is back
+            if (EncounterManager.Current != null)
+            {
+                PendingNewEncounterOnResync = true;
+            }
+        }
+
+        private static void OnStreamSynced(NetCap cap)
+        {
+            if (!ReferenceEquals(cap, netCap) || !PendingNewEncounterOnResync)
+                return;
+
+            PendingNewEncounterOnResync = false;
+            Task.Run(StartEncounterAfterRestore);
+        }
+
+        private static void StartEncounterAfterRestore()
+        {
+            if (AppState.IsEncounterSavingPaused || AppState.IsBenchmarkMode)
+                return;
+
+            var reason = BattleStateMachine.IsInOpenWorld() ? EncounterStartReason.Force : EncounterStartReason.NewObjective;
+            // Several streams usually stall and resync one after another for a single outage, so only
+            // split off a new Encounter if the current one actually recorded something since the last split
+            bool hasStats = EncounterManager.Current?.HasStatsBeenRecorded() ?? false;
+            Log.Information("Starting new encounter after capture restore at {Time} (Force: {Force})", DateTime.Now, hasStats);
+            EncounterManager.StartEncounter(hasStats, reason);
+
+            // Make the meters follow the new Encounter instead of showing the old one as historical
+            if (AppState.OpenedHistoricalEncounter == null)
+            {
+                AppState.ActiveEncounter = EncounterManager.Current;
+            }
+        }
+
+        private static void OnCaptureLost(NetCap lostCap, string reason)
+        {
+            // Run off the capture/watchdog threads since this tears them down
+            Task.Run(() => RecoverCapture(lostCap, reason));
+        }
+
+        private static async Task RecoverCapture(NetCap lostCap, string reason)
+        {
+            Log.Warning("Capture lost ({Reason}), attempting to restore it", reason);
+
+            // Whether an Encounter was being recorded at the moment capture was lost
+            if (EncounterManager.Current != null)
+            {
+                PendingNewEncounterOnResync = true;
+            }
+
+            var delay = TimeSpan.FromSeconds(2);
+            var expectedCap = lostCap;
+            while (true)
+            {
+                // Someone else (manual Restart Capture) replaced the instance, so stop recovering
+                if (!ReferenceEquals(netCap, expectedCap))
+                    return;
+
+                try
+                {
+                    lostCap.Stop();
+                    InitializeCapturing();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to restore capture, retrying in {Delay}s", delay.TotalSeconds);
+                    try { netCap?.Stop(); } catch (Exception) { }
+                    expectedCap = netCap!;
+                    await Task.Delay(delay);
+                    delay = TimeSpan.FromSeconds(Math.Min(delay.TotalSeconds * 2, 30));
+                }
+            }
+
+            // The new encounter is started by OnStreamSynced once game data is flowing again
+            Log.Information("Capture restored");
         }
 
         public static void StopCapturing()
