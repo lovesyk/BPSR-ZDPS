@@ -81,9 +81,12 @@ namespace BPSR_DeepsServ
                 };
                 var discordJson = System.Text.Json.JsonSerializer.Serialize(discordPayload, AppJsonSerializerContext.Default.DiscordChatPayload);
 
-                foreach (var url in urls)
+                foreach (var webhook in urls)
                 {
-                    await PostJsonAsync(url, discordJson, "chat message");
+                    if (!webhook.Matches(chatMessage.Text))
+                        continue;
+
+                    await PostJsonAsync(webhook.Url, discordJson, "chat message");
                 }
             }
             catch (Exception ex)
