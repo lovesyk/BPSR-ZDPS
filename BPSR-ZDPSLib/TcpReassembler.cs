@@ -14,6 +14,8 @@ public class TcpReassembler
 
     public static TimeSpan ConnectionCleanUpInterval = TimeSpan.FromSeconds(60);
     public Action<TcpConnection> OnNewConnection;
+    public Action<TcpConnection>? OnConnectionStalled;
+    public Action<TcpConnection>? OnConnectionSynced;
     public ConcurrentDictionary<IPEndPoint, TcpConnection> Connections = new();
     public DateTime LastConnectionCleanUpTime = DateTime.Now;
     
@@ -100,6 +102,8 @@ public class TcpReassembler
     {
         public const int NUM_PACKETS_BEFORE_CLEAN_UP = 200;
         public const int MAX_DUPE_PACKET_SEQ_DIFF = 1700;
+        // How long buffered packets may wait on a missing segment before the stream is considered lost
+        public static readonly TimeSpan GAP_STALL_TIMEOUT = TimeSpan.FromSeconds(5);
 
         public IPEndPoint EndPoint = endPoint;
         public IPEndPoint DestEndPoint = destEndPoint;
@@ -115,6 +119,7 @@ public class TcpReassembler
         public bool IsSynced = false;
         public TcpReassembler Owner = owner;
         public DateTime LastPacketTime;
+        public DateTime LastProgressAt = DateTime.Now;
 
         static bool SeqLt(uint a, uint b) => unchecked((int)(a - b)) < 0;
         static bool SeqGt(uint a, uint b) => unchecked((int)(a - b)) > 0;
@@ -142,7 +147,9 @@ public class TcpReassembler
                     (BinaryPrimitives.ReadInt16BigEndian(payload.AsSpan()[4..]) & 0x7FFF) <= 9)
                 {
                     IsSynced = true;
+                    LastProgressAt = DateTime.Now;
                     Log.Information($"Connection {EndPoint} is synced");
+                    Owner.OnConnectionSynced?.Invoke(this);
                 }
                 else {
                     return;
@@ -247,6 +254,21 @@ public class TcpReassembler
                 PushPacketSegment(segment);
             }*/
 
+            if (Packets.Count == 0)
+            {
+                LastProgressAt = DateTime.Now;
+            }
+            else if (DateTime.Now - LastProgressAt >= GAP_STALL_TIMEOUT)
+            {
+                // A segment went missing (e.g. the capture link dropped) and never arrived, so the stream can't continue.
+                // Drop the connection so it is re-created and re-synced on the next packet.
+                Log.Warning("{SrcEp} -> {DestEp} stalled on missing seq {Seq} with {Count} packets buffered, removing stream to resync",
+                    EndPoint, DestEndPoint, NextExpectedSeq, Packets.Count);
+                Owner.RemoveConnection(this);
+                Owner.OnConnectionStalled?.Invoke(this);
+                return;
+            }
+
             if (Packets.Count >= NUM_PACKETS_BEFORE_CLEAN_UP)
             {
                 RemoveOldCachedPackets();
@@ -264,6 +286,7 @@ public class TcpReassembler
 
             NextExpectedSeq = segment.SequenceNumber + (uint)segment.PayloadData.Length;
             LastSeq = segment.SequenceNumber;
+            LastProgressAt = DateTime.Now;
         }
 
         public void RemoveOldCachedPackets()

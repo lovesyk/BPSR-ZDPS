@@ -38,6 +38,19 @@ public class NetCap
     public ulong NumGameMessagesSeen = 0;
     public ulong NumGameMessagesDequeued = 0;
 
+    /// <summary>
+    /// Raised (once per NetCap instance) when capture died unexpectedly or went silent after having seen packets.
+    /// </summary>
+    public event Action<string>? CaptureLost;
+    /// <summary>A game stream lost data and was dropped (raised on the capture thread).</summary>
+    public event Action? StreamStalled;
+    /// <summary>A (re)created stream found a message boundary and started delivering data (raised on the capture thread).</summary>
+    public event Action? StreamSynced;
+    public TimeSpan CaptureStallTimeout { get; set; } = TimeSpan.FromSeconds(30);
+    private bool IsStopping = false;
+    private int CaptureLostRaised = 0;
+    private Task? WatchdogTask;
+
     private bool IsDebugCaptureFileMode = false;
     private string DebugCaptureFile = "";//@"C:\Users\Xennma\Documents\BPSR_PacketCapture.pcap";
     private DateTime LastDebugCapturePacketTime = DateTime.MinValue;
@@ -70,15 +83,62 @@ public class NetCap
 
         TcpReassempler = new TcpReassembler();
         TcpReassempler.OnNewConnection += OnNewConnection;
+        TcpReassempler.OnConnectionStalled += _ => StreamStalled?.Invoke();
+        TcpReassempler.OnConnectionSynced += _ => StreamSynced?.Invoke();
 
         string captureFilter = "tcp and not portrange 0-1000";
         if (Config.UseRemoteCapture && !string.IsNullOrWhiteSpace(Config.RemoteCaptureFilter))
             captureFilter += $" and {Config.RemoteCaptureFilter}";
         CaptureDevice.Filter = captureFilter;
         CaptureDevice.OnPacketArrival += DeviceOnOnPacketArrival;
+        CaptureDevice.OnCaptureStopped += DeviceOnCaptureStopped;
         CaptureDevice.StartCapture();
 
+        if (!IsDebugCaptureFileMode)
+        {
+            WatchdogTask = Task.Factory.StartNew(WatchdogLoop, CancelTokenSrc.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+
         Log.Information("Capture device started");
+    }
+
+    private void DeviceOnCaptureStopped(object sender, CaptureStoppedEventStatus status)
+    {
+        if (IsStopping || IsDebugCaptureFileMode)
+            return;
+
+        RaiseCaptureLost($"Capture stopped unexpectedly ({status})");
+    }
+
+    private void WatchdogLoop()
+    {
+        while (!CancelTokenSrc.IsCancellationRequested)
+        {
+            try
+            {
+                Task.Delay(1000, CancelTokenSrc.Token).Wait();
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            // Only treat silence as a loss once traffic has been seen, so a game that was never started doesn't cause restarts
+            if (LastPacketSeenAt != DateTime.MinValue && DateTime.Now - LastPacketSeenAt > CaptureStallTimeout)
+            {
+                RaiseCaptureLost($"No packets seen for over {CaptureStallTimeout.TotalSeconds:0}s");
+                return;
+            }
+        }
+    }
+
+    private void RaiseCaptureLost(string reason)
+    {
+        if (IsStopping || Interlocked.Exchange(ref CaptureLostRaised, 1) == 1)
+            return;
+
+        Log.Warning("Capture lost: {Reason}", reason);
+        CaptureLost?.Invoke(reason);
     }
 
     public void RegisterUnhandledHandler(Action<NotifyId, ReadOnlySpan<byte>, ExtraPacketData> handler)
@@ -611,12 +671,15 @@ public class NetCap
 
     public void Stop()
     {
+        IsStopping = true;
         CancelTokenSrc.Cancel();
 
         if (CaptureDevice != null)
         {
-            CaptureDevice.StopCapture();
-            CaptureDevice.Close();
+            // The device may already be dead (e.g. dropped remote connection) so these can throw
+            try { CaptureDevice.OnCaptureStopped -= DeviceOnCaptureStopped; } catch (Exception) { }
+            try { CaptureDevice.StopCapture(); } catch (Exception ex) { Log.Warning(ex, "Error stopping capture device"); }
+            try { CaptureDevice.Close(); } catch (Exception ex) { Log.Warning(ex, "Error closing capture device"); }
             ConnectionFilters.Clear();
 
             Log.Information("Capture device stopped");
