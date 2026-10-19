@@ -48,6 +48,8 @@ public class NetCap
     public event Action? StreamSynced;
     public TimeSpan CaptureStallTimeout { get; set; } = TimeSpan.FromSeconds(30);
     private bool IsStopping = false;
+    /// <summary>True if Stop() could not stop the capture thread; the process should be restarted instead of reusing libpcap.</summary>
+    public bool StopFailed { get; private set; }
     private int CaptureLostRaised = 0;
     private Task? WatchdogTask;
 
@@ -678,8 +680,24 @@ public class NetCap
         {
             // The device may already be dead (e.g. dropped remote connection) so these can throw
             try { CaptureDevice.OnCaptureStopped -= DeviceOnCaptureStopped; } catch (Exception) { }
+
+            Log.Information("Stopping capture device (started: {Started})", CaptureDevice.Started);
             try { CaptureDevice.StopCapture(); } catch (Exception ex) { Log.Warning(ex, "Error stopping capture device"); }
-            try { CaptureDevice.Close(); } catch (Exception ex) { Log.Warning(ex, "Error closing capture device"); }
+
+            // Closing the pcap handle while the capture thread is still inside libpcap is a use-after-free that
+            // crashes the whole process natively (PAL_SEHException). If the thread didn't stop, leak the handle instead.
+            bool stillRunning = false;
+            try { stillRunning = CaptureDevice.Started; } catch (Exception) { }
+            if (stillRunning)
+            {
+                Log.Error("Capture thread did not stop, not closing the device to avoid a native crash");
+                StopFailed = true;
+            }
+            else
+            {
+                Log.Information("Closing capture device");
+                try { CaptureDevice.Close(); } catch (Exception ex) { Log.Warning(ex, "Error closing capture device"); }
+            }
             ConnectionFilters.Clear();
 
             Log.Information("Capture device stopped");
