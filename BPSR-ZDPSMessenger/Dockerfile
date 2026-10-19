@@ -2,7 +2,7 @@ FROM debian:stable-slim AS libpcap-build
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates git build-essential bison flex autoconf automake libtool \
-    && git clone https://github.com/the-tcpdump-group/libpcap.git /libpcap \
+    && git clone --depth 1 --branch libpcap-1.10.7 https://github.com/the-tcpdump-group/libpcap.git /libpcap \
     && cd /libpcap \
     && ./autogen.sh \
     && ./configure --enable-remote \
