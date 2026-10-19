@@ -27,4 +27,9 @@ RUN apt-get update \
     && ldconfig
 WORKDIR /app
 COPY --from=build /app/publish .
+# Write a crash dump on native faults (mount /dumps to keep them)
+ENV DOTNET_DbgEnableMiniDump=1 \
+    DOTNET_DbgMiniDumpType=2 \
+    DOTNET_DbgMiniDumpName=/dumps/crash-%p.dmp \
+    DOTNET_EnableCrashReport=1
 ENTRYPOINT ["./BPSR-ZDPSMessenger"]

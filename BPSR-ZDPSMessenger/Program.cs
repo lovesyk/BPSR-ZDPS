@@ -7,6 +7,14 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
+AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+{
+    Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception (terminating: {Terminating})", e.IsTerminating);
+    Log.CloseAndFlush();
+};
+AppDomain.CurrentDomain.ProcessExit += (_, _) => Log.Information("Process exiting");
+TaskScheduler.UnobservedTaskException += (_, e) => Log.Error(e.Exception, "Unobserved task exception");
+
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: true)
     .AddEnvironmentVariables(prefix: "MESSENGER_")
@@ -103,8 +111,12 @@ while (!cts.IsCancellationRequested)
     {
         try
         {
+            // A device that could not be stopped is deliberately left open (leaked) by Stop(), so continuing with a
+            // fresh instance is safe; the old handle is never closed while a native thread may still use it.
             if (!Task.Run(dead.Stop).Wait(TimeSpan.FromSeconds(10)))
-                Log.Warning("Timed out stopping previous capture, continuing anyway");
+                Log.Warning("Timed out stopping previous capture, leaking it and continuing");
+            else if (dead.StopFailed)
+                Log.Warning("Previous capture could not be stopped, leaking it and continuing");
         }
         catch (Exception ex)
         {
