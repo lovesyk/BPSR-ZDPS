@@ -93,7 +93,8 @@ public class TcpReassembler
     {
         conn.IsAlive = false;
         conn.CancelTokenSrc.Cancel();
-        Connections.TryRemove(conn.EndPoint, out var _);
+        // Only remove the entry if it is still this instance, a newer connection may already have replaced it
+        Connections.TryRemove(new KeyValuePair<IPEndPoint, TcpConnection>(conn.EndPoint, conn));
         conn.Pipe.Reader.CancelPendingRead();
         conn.Pipe.Writer.Complete();
     }
@@ -168,6 +169,7 @@ public class TcpReassembler
                         EndPoint, DestEndPoint, MAX_DUPE_PACKET_SEQ_DIFF, tcpPacket.SequenceNumber, LastSeq, (tcpPacket.SequenceNumber - LastSeq));
                     
                     Owner.RemoveConnection(this);
+                    return;
                 }
             }
 

@@ -36,6 +36,8 @@ public class NetCap
     public ConcurrentDictionary<ConnectionId, bool> ConnectionFilters = new();
     public ConcurrentBag<string> ImportantLogMsgs = [];
     public ulong NumGameMessagesSeen = 0;
+    public DateTime LastGameMessageAt = DateTime.MinValue;
+    private const uint MaxGameMessageLength = 16 * 1024 * 1024;
     public ulong NumGameMessagesDequeued = 0;
 
     /// <summary>
@@ -129,6 +131,14 @@ public class NetCap
             if (LastPacketSeenAt != DateTime.MinValue && DateTime.Now - LastPacketSeenAt > CaptureStallTimeout)
             {
                 RaiseCaptureLost($"No packets seen for over {CaptureStallTimeout.TotalSeconds:0}s");
+                return;
+            }
+
+            // Packets still arrive but no game message has been parsed: the stream is stuck in a state that never recovers on its own
+            if (LastGameMessageAt != DateTime.MinValue && DateTime.Now - LastGameMessageAt > CaptureStallTimeout &&
+                DateTime.Now - LastPacketSeenAt < TimeSpan.FromSeconds(5))
+            {
+                RaiseCaptureLost($"Packets seen but no game messages parsed for over {CaptureStallTimeout.TotalSeconds:0}s");
                 return;
             }
         }
@@ -256,6 +266,14 @@ public class NetCap
                 var msgType = (rawMsgType & 0x7FFF);
                 conn.Pipe.Reader.AdvanceTo(buff.Buffer.Start);
 
+                if (len < 6 || len > MaxGameMessageLength || msgType > (int)MsgTypeId.UNK2)
+                {
+                    // The stream is misaligned; waiting for `len` bytes would hang silently forever, so drop it and re-sync
+                    Log.Logger.Warning("{EndPoint} invalid message header (len {Len}, type {MsgType}), removing stream to resync", conn.EndPoint, len, msgType);
+                    TcpReassempler.RemoveConnection(conn);
+                    break;
+                }
+
                 /*
                 if (msgType > 20)
                 {
@@ -280,6 +298,7 @@ public class NetCap
                 RawPacketQueue.Enqueue(rawPacket);
                 conn.Pipe.Reader.AdvanceTo(msgBuff.Buffer.GetPosition(len));
                 NumGameMessagesSeen++;
+                LastGameMessageAt = DateTime.Now;
             }
 
             NumConnectionReaders--;
