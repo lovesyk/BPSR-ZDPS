@@ -1,0 +1,37 @@
+FROM debian:stable-slim AS libpcap-build
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates git build-essential bison flex autoconf automake libtool \
+    && git clone --depth 1 --branch libpcap-1.10.7 https://github.com/the-tcpdump-group/libpcap.git /libpcap \
+    && cd /libpcap \
+    && ./autogen.sh \
+    && ./configure --enable-remote \
+    && make \
+    && make install
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY BPSR-ZDPSLib/ BPSR-ZDPSLib/
+COPY BPSR-ZDPSRecorder/ BPSR-ZDPSRecorder/
+RUN dotnet publish BPSR-ZDPSRecorder/BPSR-ZDPSRecorder.csproj \
+    -c Release \
+    -r linux-x64 \
+    --self-contained true \
+    -o /app/publish
+
+FROM debian:stable-slim
+COPY --from=libpcap-build /usr/local/lib/libpcap.so* /usr/local/lib/
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libicu76 \
+    && rm -rf /var/lib/apt/lists/* \
+    && ldconfig
+WORKDIR /app
+COPY --from=build /app/publish .
+# Write a crash dump on native faults (mount /dumps to keep them)
+ENV DOTNET_DbgEnableMiniDump=1 \
+    DOTNET_DbgMiniDumpType=2 \
+    DOTNET_DbgMiniDumpName=/dumps/crash-%p.dmp \
+    DOTNET_EnableCrashReport=1
+# pcap files and the SQLite database
+VOLUME /data
+ENTRYPOINT ["./BPSR-ZDPSRecorder"]
