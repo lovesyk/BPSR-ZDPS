@@ -29,6 +29,7 @@ public sealed class RecordingSession(RecorderConfig config, RecorderDatabase db)
         NetCap.Init(netCapConfig);
         NetCap.PacketCaptured += OnPacketCaptured;
         NetCap.MessageReceived += OnMessage;
+        LiveStreamStart.Attach(NetCap);
         NetCap.Start();
         _flushTimer = new Timer(_ => { try { _pcap?.Flush(); } catch (Exception) { } }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
     }

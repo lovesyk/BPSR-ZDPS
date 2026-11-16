@@ -23,8 +23,11 @@ public static class Regenerator
             cancellationToken.ThrowIfCancellationRequested();
 
             var name = Path.GetFileName(file);
+            // The replay runs on a copy whose stream starts are re-cut, so first messages are kept (see PcapStreamStart)
+            var recutPath = Path.Combine(Path.GetTempPath(), $"zdps-regenerate-{Guid.NewGuid():N}.pcap");
             try
             {
+                var recut = PcapStreamStart.Rewrite(file, recutPath);
                 var capture = db.BeginCapture(name);
                 var netCap = new NetCap();
                 var messages = 0L;
@@ -34,9 +37,10 @@ public static class Regenerator
                     messages++;
                 };
 
-                var stats = netCap.ReplayFile(file, cancellationToken);
-                await db.EndCapture(capture, stats.FirstPacketTime, stats.LastPacketTime, stats.PacketCount, new FileInfo(file).Length);
-                Log.Information("{File}: {Packets} packets, {Messages} messages", name, stats.PacketCount, messages);
+                var stats = netCap.ReplayFile(recutPath, cancellationToken);
+                await db.EndCapture(capture, stats.FirstPacketTime, stats.LastPacketTime, recut.PacketCount, new FileInfo(file).Length);
+                Log.Information("{File}: {Packets} packets, {Messages} messages, {Recut} stream start(s) re-cut",
+                    name, recut.PacketCount, messages, recut.StreamsRecut);
             }
             catch (OperationCanceledException)
             {
@@ -46,6 +50,10 @@ public static class Regenerator
             {
                 allSucceeded = false;
                 Log.Error(ex, "Regenerating {File} failed", name);
+            }
+            finally
+            {
+                try { File.Delete(recutPath); } catch (Exception) { }
             }
         }
 
