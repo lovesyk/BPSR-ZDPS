@@ -67,8 +67,9 @@ public sealed class NameResolver
     }
 
     /// <summary>
-    /// Decodes the payload when a protobuf type named after the method exists: notifies use "{Method}", calls "{Method}Request"
-    /// and returns "{Method}Reply" (inside the container that is named like the service when the name is ambiguous).
+    /// Decodes the payload when a protobuf type named after the method exists: notifies use "{Method}", calls and returns the
+    /// service's wrappers "{Service}.{Method}" / "{Service}.{Method}_Ret", falling back to "{Method}Request" / "{Method}Reply"
+    /// (inside the container that is named like the service when the name is ambiguous).
     /// </summary>
     public string? TryDecode(string? service, string? method, MsgTypeId kind, ReadOnlySpan<byte> payload)
     {
@@ -107,6 +108,26 @@ public sealed class NameResolver
 
     private Type? FindPayloadType(string service, string method, MsgTypeId kind)
     {
+        var index = _protoTypes.Value;
+        // The service name as used in the generated containers: "WorldNtf" for notifies, "World" for the "WorldProxy" / "World" RPC service
+        var containerName = service;
+
+        // RPC calls and returns are the service's own wrapper messages: {Service}.Types.{Method} holds the arguments (often a single
+        // VRequest field with the {Method}Request), {Service}.Types.{Method}_Ret the result (field Ret). Only taken from the service's
+        // container, since other services define messages of the same name.
+        var wrapperName = kind switch
+        {
+            MsgTypeId.Call => method,
+            MsgTypeId.Return => method + "_Ret",
+            _ => null,
+        };
+        if (wrapperName != null && index.TryGetValue(wrapperName, out var wrappers))
+        {
+            var wrapper = wrappers.Where(t => IsInContainer(t, containerName)).ToList();
+            if (wrapper.Count == 1)
+                return wrapper[0];
+        }
+
         string[] names = kind switch
         {
             MsgTypeId.Call => [method + "Request", method],
@@ -114,9 +135,6 @@ public sealed class NameResolver
             _ => [method],
         };
 
-        var index = _protoTypes.Value;
-        // The service name as used in the generated containers: "WorldNtf" for notifies, "World" for the "WorldProxy" / "World" RPC service
-        var containerName = service;
         foreach (var name in names)
         {
             if (!index.TryGetValue(name, out var candidates))
@@ -126,13 +144,16 @@ public sealed class NameResolver
                 return candidates[0];
 
             // Generated as {Container}.Types.{Message}, the container being called like the service (optionally with a "Csharp" suffix)
-            var inService = candidates.Where(t => t.DeclaringType?.DeclaringType?.Name is { } container && (container == containerName || container == containerName + "Csharp")).ToList();
+            var inService = candidates.Where(t => IsInContainer(t, containerName)).ToList();
             if (inService.Count == 1)
                 return inService[0];
         }
 
         return null;
     }
+
+    private static bool IsInContainer(Type type, string containerName) =>
+        type.DeclaringType?.DeclaringType?.Name is { } container && (container == containerName || container == containerName + "Csharp");
 
     private static Dictionary<string, List<Type>> BuildProtoTypeIndex()
     {
