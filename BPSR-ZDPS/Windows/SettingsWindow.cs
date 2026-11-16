@@ -410,7 +410,7 @@ namespace BPSR_ZDPS.Windows
                             ImGui.SameLine();
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
                             ImGui.InputText("##RemoteCaptureFilter", ref remoteCaptureFilter, 512);
-                            ImGui.SetItemTooltip("BPF filter appended to the default capture filter and sent to rpcapd. Leave empty for no extra filter.");
+                            ImGui.SetItemTooltip("BPF filter sent to rpcapd, replacing the default \"tcp and not portrange 0-1000\". Leave empty to use the default.");
                         }
 
                         if (!useRemoteCapture)
