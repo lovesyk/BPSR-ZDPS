@@ -89,12 +89,14 @@ public sealed class RecorderDatabase : IDisposable
         CREATE INDEX IF NOT EXISTS idx_messages_method      ON messages(service_id, method_id, kind);
         CREATE INDEX IF NOT EXISTS idx_messages_return_uid  ON messages(capture_id, return_uid) WHERE return_uid IS NOT NULL;
         CREATE INDEX IF NOT EXISTS idx_messages_reply_to    ON messages(reply_to) WHERE reply_to IS NOT NULL;
+        -- Lets finishing find the Call a Return answers directly; without it every Return walks back through the whole capture
+        CREATE INDEX IF NOT EXISTS idx_messages_calls       ON messages(capture_id, return_uid, ts) WHERE kind = 'Call';
         """;
 
     private abstract record WorkItem;
     private sealed record BeginItem(CaptureHandle Capture) : WorkItem;
     private sealed record MessageItem(CaptureHandle Capture, GameMessageInfo Info, byte[] Payload) : WorkItem;
-    private sealed record FinishItem(CaptureHandle Capture, long? StartedAt, long? EndedAt, long PacketCount, long PcapBytes, TaskCompletionSource Done) : WorkItem;
+    private sealed record FinishItem(CaptureHandle Capture, long? StartedAt, long? EndedAt, long? PacketCount, long? PcapBytes, TaskCompletionSource Done) : WorkItem;
 
     /// <summary>A capture registered with <see cref="BeginCapture"/>. Its row is created by the writer thread, in queue order.</summary>
     public sealed class CaptureHandle(string file, string? source)
@@ -117,6 +119,7 @@ public sealed class RecorderDatabase : IDisposable
     private readonly bool _storeDecoded;
     private SqliteCommand? _insert;
     private int _queueFullLogged;
+    private readonly List<CaptureHandle> _unfinishedAtOpen = new();
 
     public RecorderDatabase(string path, bool storeDecoded)
     {
@@ -129,13 +132,26 @@ public sealed class RecorderDatabase : IDisposable
         _connection = new SqliteConnection($"Data Source={path};Pooling=False");
         _connection.Open();
         Execute("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=10000;");
+        // Truncate the WAL file back to this size after a checkpoint; it otherwise stays as large as the largest transaction ever made it
+        Execute("PRAGMA journal_size_limit=67108864;");
 
         var version = Convert.ToInt32(Scalar("PRAGMA user_version;"));
         if (version > SchemaVersion)
             throw new InvalidOperationException($"{path} has schema version {version}, newer than this recorder supports ({SchemaVersion})");
 
+        if (Scalar("SELECT 1 FROM sqlite_master WHERE name = 'messages'") != null && Scalar("SELECT 1 FROM sqlite_master WHERE name = 'idx_messages_calls'") == null)
+            Log.Information("Adding index idx_messages_calls, this reads the whole database once and can take a few minutes");
         Execute(Schema);
         Execute($"PRAGMA user_version={SchemaVersion};");
+
+        // Captures a previous run did not finish (killed while recording or finishing). Read before the writer starts, so captures of this run are never included.
+        using (var cmd = _connection.CreateCommand())
+        {
+            cmd.CommandText = "SELECT id, file, source FROM captures WHERE parsed_at IS NULL ORDER BY id";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+                _unfinishedAtOpen.Add(new CaptureHandle(reader.GetString(1), reader.IsDBNull(2) ? null : reader.GetString(2)) { Id = reader.GetInt64(0) });
+        }
 
         _writer = new Thread(WriterLoop) { Name = "RecorderDb", IsBackground = false };
         _writer.Start();
@@ -159,12 +175,68 @@ public sealed class RecorderDatabase : IDisposable
     }
 
     /// <summary>Completes once every message queued before this call was stored and the derived columns were computed; faults when finishing failed.</summary>
-    public Task EndCapture(CaptureHandle capture, DateTime? firstPacketTime, DateTime? lastPacketTime, long packetCount, long pcapBytes)
+    public Task EndCapture(CaptureHandle capture, DateTime? firstPacketTime, DateTime? lastPacketTime, long? packetCount, long? pcapBytes)
     {
         var done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Add(new FinishItem(capture, firstPacketTime == null ? null : ToMicros(firstPacketTime.Value),
             lastPacketTime == null ? null : ToMicros(lastPacketTime.Value), packetCount, pcapBytes, done));
         return done.Task;
+    }
+
+    /// <summary>
+    /// Finishes the captures a previous run left unfinished (<c>parsed_at</c> NULL when the database was opened). Their message rows are
+    /// complete up to the moment the recorder died, only the derived columns are missing. Packet statistics are read back from the pcap
+    /// when it still exists, otherwise the time range is taken from the messages.
+    /// </summary>
+    public async Task RecoverUnfinishedCaptures(string captureDirectory, CancellationToken cancellationToken)
+    {
+        foreach (var capture in _unfinishedAtOpen)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Log.Information("Finishing capture {File} left unfinished by a previous run", capture.File);
+
+            DateTime? first = null, last = null;
+            long? packets = null, bytes = null;
+            var path = Path.Combine(captureDirectory, capture.File);
+            try
+            {
+                if (File.Exists(path))
+                {
+                    long count = 0;
+                    using var pcap = new PcapFileReader(path);
+                    foreach (var packet in pcap.ReadPackets())
+                    {
+                        if ((++count & 0xFFFF) == 0)
+                            cancellationToken.ThrowIfCancellationRequested();
+                        first ??= packet.Timeval.Date;
+                        last = packet.Timeval.Date;
+                    }
+                    packets = count;
+                    bytes = new FileInfo(path).Length;
+                }
+                else
+                {
+                    Log.Warning("{Path} no longer exists, finishing {File} without packet statistics", path, capture.File);
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Log.Warning(ex, "Could not read {Path}, finishing {File} without packet statistics", path, capture.File);
+                first = last = null;
+                packets = bytes = null;
+            }
+
+            try
+            {
+                await EndCapture(capture, first, last, packets, bytes);
+                Log.Information("Finished {File} left by a previous run", capture.File);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Finishing {File} left by a previous run failed", capture.File);
+            }
+        }
+        _unfinishedAtOpen.Clear();
     }
 
     private void Add(WorkItem item)
@@ -382,6 +454,9 @@ public sealed class RecorderDatabase : IDisposable
             cmd.ExecuteNonQuery();
         }
 
+        // A finish interrupted before its commit leaves nothing behind, but clearing first keeps finishing safe to repeat
+        Run("DELETE FROM streams WHERE capture_id = $c;");
+
         Run("""
             INSERT INTO streams (capture_id, stream, src_ip, src_port, dst_ip, dst_port, dir, first_ts, last_ts, message_count)
             SELECT capture_id, stream, src_ip, src_port, dst_ip, dst_port, MAX(dir), MIN(ts), MAX(ts), COUNT(*)
@@ -418,7 +493,7 @@ public sealed class RecorderDatabase : IDisposable
         // A Return answers the latest preceding Call with the same return uid on the opposite direction of the same connection
         Run("""
             UPDATE messages SET reply_to = (
-                SELECT c.id FROM messages c
+                SELECT c.id FROM messages c INDEXED BY idx_messages_calls
                 WHERE c.capture_id = messages.capture_id AND c.kind = 'Call' AND c.return_uid = messages.return_uid
                   AND c.src_ip = messages.dst_ip AND c.src_port = messages.dst_port AND c.dst_ip = messages.src_ip AND c.dst_port = messages.src_port
                   AND c.ts <= messages.ts
@@ -451,15 +526,18 @@ public sealed class RecorderDatabase : IDisposable
         {
             cmd.Transaction = tx;
             cmd.CommandText = """
-                UPDATE captures SET started_at = $start, ended_at = $end, packet_count = $packets, message_count = $messages, pcap_bytes = $bytes, parsed_at = $now
+                UPDATE captures SET
+                    started_at = COALESCE($start, (SELECT MIN(ts) FROM messages WHERE capture_id = $c)),
+                    ended_at = COALESCE($end, (SELECT MAX(ts) FROM messages WHERE capture_id = $c)),
+                    packet_count = $packets, message_count = $messages, pcap_bytes = $bytes, parsed_at = $now
                 WHERE id = $c;
                 """;
             cmd.Parameters.AddWithValue("$c", finish.Capture.Id);
             cmd.Parameters.AddWithValue("$start", (object?)finish.StartedAt ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$end", (object?)finish.EndedAt ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$packets", finish.PacketCount);
+            cmd.Parameters.AddWithValue("$packets", (object?)finish.PacketCount ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$messages", messageCount);
-            cmd.Parameters.AddWithValue("$bytes", finish.PcapBytes);
+            cmd.Parameters.AddWithValue("$bytes", (object?)finish.PcapBytes ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$now", ToMicros(DateTime.UtcNow));
             cmd.ExecuteNonQuery();
         }
