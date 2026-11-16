@@ -13,7 +13,7 @@ public class NotificationHandler(MessengerConfig config)
         var msg = NotifyInvitation.Parser.ParseFrom(span);
         if (msg == null) return;
 
-        var charId = msg.VRequest.InviteMemData?.BasicData?.CharId;
+        var charId = msg.VRequest.InviteMemData?.BasicData?.CharID;
         var name = msg.VRequest.InviteMemData?.BasicData?.Name;
 
         Log.Information("[NotifyInvitation] {Name} ({CharId})", name, charId);
@@ -25,8 +25,8 @@ public class NotificationHandler(MessengerConfig config)
         var msg = NotifyApplyJoin.Parser.ParseFrom(span);
         if (msg == null) return;
 
-        var charId = msg.VRequest.Apply?.CharId;
-        var name = msg.VRequest.Apply?.UserSummaryData?.BasicData?.Name;
+        var charId = msg.VRequest.Apply?.ApplicantId;
+        var name = msg.VRequest.Apply?.ApplicantDisplay?.Name;
 
         Log.Information("[NotifyApplyJoin] {Name} ({CharId})", name, charId);
         _ = SendToApiAsync("NotifyApplyJoin", charId, name);
@@ -58,7 +58,7 @@ public class NotificationHandler(MessengerConfig config)
         var msg = NotifyApplyBeLeader.Parser.ParseFrom(span);
         if (msg == null) return;
 
-        var charId = msg.VRequest.MemData?.BasicData?.CharId;
+        var charId = msg.VRequest.MemData?.BasicData?.CharID;
         var name = msg.VRequest.MemData?.BasicData?.Name;
 
         Log.Information("[NotifyApplyBeLeader] {Name} ({CharId})", name, charId);
