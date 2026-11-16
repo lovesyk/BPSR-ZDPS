@@ -69,6 +69,9 @@ public class NetCap
     public event Action<string>? CaptureLost;
     /// <summary>A game stream lost data and was dropped (raised on the capture thread).</summary>
     public event Action? StreamStalled;
+
+    /// <summary>BPF filter used unless <see cref="NetCapConfig.RemoteCaptureFilter"/> replaces it.</summary>
+    public const string DefaultCaptureFilter = "tcp and not portrange 0-1000";
     /// <summary>A (re)created stream found a message boundary and started delivering data (raised on the capture thread).</summary>
     public event Action? StreamSynced;
     public TimeSpan CaptureStallTimeout { get; set; } = TimeSpan.FromSeconds(30);
@@ -113,10 +116,11 @@ public class NetCap
         TcpReassempler.OnConnectionStalled += _ => StreamStalled?.Invoke();
         TcpReassempler.OnConnectionSynced += _ => StreamSynced?.Invoke();
 
-        string captureFilter = "tcp and not portrange 0-1000";
-        if (Config.UseRemoteCapture && !string.IsNullOrWhiteSpace(Config.RemoteCaptureFilter))
-            captureFilter += $" and {Config.RemoteCaptureFilter}";
-        CaptureDevice.Filter = captureFilter;
+        // A remote capture filter replaces the default one, so it can also let through traffic the parser ignores (e.g. DNS / HTTPS for
+        // PacketCaptured subscribers). Parsing is unaffected: non-TCP packets and ports <= 1000 are still dropped before reassembly.
+        CaptureDevice.Filter = Config.UseRemoteCapture && !string.IsNullOrWhiteSpace(Config.RemoteCaptureFilter)
+            ? Config.RemoteCaptureFilter
+            : DefaultCaptureFilter;
         CaptureDevice.OnPacketArrival += DeviceOnOnPacketArrival;
         CaptureDevice.OnCaptureStopped += DeviceOnCaptureStopped;
         CaptureDevice.StartCapture();
