@@ -7,8 +7,8 @@ public class RecorderConfig
     public int RemoteCaptureDeviceIndex { get; set; } = 0;
 
     /// <summary>
-    /// Extra BPF filter, applied on top of "tcp and not portrange 0-1000". Everything matching it ends up in the pcap,
-    /// so narrow it down (e.g. "host 1.2.3.4") if the capture device sees more than the game.
+    /// BPF filter; when set it replaces the default "tcp and not portrange 0-1000". Everything matching it ends up in the pcap
+    /// (only game traffic is parsed), so narrow it down (e.g. "host 1.2.3.4") if the capture device sees more than the game PC.
     /// </summary>
     public string RemoteCaptureFilter { get; set; } = string.Empty;
 

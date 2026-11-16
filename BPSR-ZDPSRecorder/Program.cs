@@ -73,6 +73,19 @@ var retryDelay = TimeSpan.FromSeconds(2);
 // Finishing a capture (deriving columns over all its rows) can take a while; it runs in the background so recording resumes right away
 var pendingFinishes = new List<Task>();
 
+// Captures a previous run left unfinished (e.g. killed by docker stop) are finished alongside recording
+pendingFinishes.Add(Task.Run(async () =>
+{
+    try
+    {
+        await db.RecoverUnfinishedCaptures(config.CaptureDirectory, cts.Token);
+    }
+    catch (OperationCanceledException)
+    {
+        Log.Warning("Finishing captures left by a previous run was cancelled, it is retried on the next start");
+    }
+}));
+
 while (!cts.IsCancellationRequested)
 {
     var session = new RecordingSession(config, db);
