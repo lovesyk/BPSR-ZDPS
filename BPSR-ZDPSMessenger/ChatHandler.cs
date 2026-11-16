@@ -18,7 +18,7 @@ public class ChatHandler(MessengerConfig config)
                 return;
 
             var channel = msg.VRequest.ChannelType;
-            var senderId = msg.VRequest.ChatMsg.SendCharInfo.CharId;
+            var senderId = msg.VRequest.ChatMsg.SendCharInfo.CharID;
             var senderName = msg.VRequest.ChatMsg.SendCharInfo.Name;
             var timestamp = DateTimeOffset.FromUnixTimeSeconds(msg.VRequest.ChatMsg.Timestamp).LocalDateTime;
             var msgInfo = msg.VRequest.ChatMsg.MsgInfo;
