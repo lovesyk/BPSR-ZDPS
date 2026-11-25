@@ -12,11 +12,25 @@ namespace BPSR_ZDPSRecorder;
 /// <remarks>
 /// Timestamps (<c>ts</c>) are microseconds since the unix epoch (UTC) of the TCP segment that completed the message.
 /// Columns that are derived rather than recorded (<c>dir</c>, <c>service</c>, <c>method</c>, <c>reply_to</c>, <c>decoded</c>) and the
-/// <c>streams</c> table are (re)computed when the capture is finished, so regenerating from the pcap always yields the same rows.
+/// <c>streams</c> table are computed incrementally: a pass every <see cref="PassInterval"/> while recording handles the rows added since
+/// the previous one, finishing only does a last pass over the rest. How far a capture got is stored in <c>captures</c>
+/// (<c>streams_upto_id</c>, <c>derived_upto_ts</c>), so a stalled pass shows in the data and an interrupted capture resumes from there.
+/// The result does not depend on when the passes ran, so regenerating from the pcap yields the same rows (only <c>streams.id</c> may differ).
 /// </remarks>
 public sealed class RecorderDatabase : IDisposable
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = 2;
+
+    /// <summary>How often (ms) the derived columns of a capture being recorded are brought up to date.</summary>
+    private const long PassInterval = 60_000;
+
+    /// <summary>
+    /// A pass only matches the Returns whose <c>ts</c> is at least this much older than the newest row of the capture. Rows are not stored
+    /// in <c>ts</c> order: in the recordings up to 2026-11-24 a row came up to 0.25 s (outliers 3.5 s, 9 s, once 34 s) after rows with a
+    /// later <c>ts</c>, and 2–14 % of the Calls were stored after their Return. A row arriving behind the cutoff anyway is not lost, the
+    /// next pass redoes the Returns from its <c>ts</c> on; the lag only keeps that rare.
+    /// </summary>
+    private const long DeriveLagMicros = 5 * 60 * 1_000_000L;
 
     private const string Schema = """
         CREATE TABLE IF NOT EXISTS captures (
@@ -29,7 +43,11 @@ public sealed class RecorderDatabase : IDisposable
             packet_count   INTEGER,                 -- packets in the pcap
             message_count  INTEGER,                 -- rows in messages
             pcap_bytes     INTEGER,
-            parsed_at      INTEGER                  -- NULL while recording or when the recording was interrupted
+            parsed_at      INTEGER,                 -- NULL while recording or when the recording was interrupted
+            streams_upto_id INTEGER,                -- the capture's rows up to this messages.id are counted in streams / message_count and
+                                                    -- have dir where it is known yet
+            derived_upto_ts INTEGER                 -- Returns up to this ts have reply_to and the Call's method; trails the newest row by
+                                                    -- a few minutes while recording, the last ts once finished
         ) STRICT;
 
         -- One row per directional tcp stream instance. The parser starts a new instance whenever it loses sync (missing segment,
@@ -42,7 +60,9 @@ public sealed class RecorderDatabase : IDisposable
             src_port      INTEGER NOT NULL,
             dst_ip        TEXT    NOT NULL,
             dst_port      INTEGER NOT NULL,
-            dir           TEXT,                    -- 'C2S' / 'S2C'
+            dir           TEXT,                    -- 'C2S' / 'S2C'; C2S wins when both occur (the client's unframed ExitGame Notify).
+                                                   -- While recording only the direction of its own messages, a stream with only
+                                                   -- Echo / counter messages gets the opposite of its reverse stream when finished
             first_ts      INTEGER NOT NULL,
             last_ts       INTEGER NOT NULL,
             message_count INTEGER NOT NULL,
@@ -89,8 +109,10 @@ public sealed class RecorderDatabase : IDisposable
         CREATE INDEX IF NOT EXISTS idx_messages_method      ON messages(service_id, method_id, kind);
         CREATE INDEX IF NOT EXISTS idx_messages_return_uid  ON messages(capture_id, return_uid) WHERE return_uid IS NOT NULL;
         CREATE INDEX IF NOT EXISTS idx_messages_reply_to    ON messages(reply_to) WHERE reply_to IS NOT NULL;
-        -- Lets finishing find the Call a Return answers directly; without it every Return walks back through the whole capture
+        -- Lets a pass find the Call a Return answers directly; without it every Return walks back through the whole capture
         CREATE INDEX IF NOT EXISTS idx_messages_calls       ON messages(capture_id, return_uid, ts) WHERE kind = 'Call';
+        -- Lets a pass find the messages without a direction (Echo, counters) directly; passes set dir, so it stays small
+        CREATE INDEX IF NOT EXISTS idx_messages_nodir       ON messages(capture_id, stream) WHERE dir IS NULL;
         """;
 
     private abstract record WorkItem;
@@ -107,6 +129,8 @@ public sealed class RecorderDatabase : IDisposable
         internal long Id;
         /// <summary>Registering failed, the messages of this capture are skipped instead of each failing on its own.</summary>
         internal bool Failed;
+        /// <summary><see cref="Environment.TickCount64"/> at which the next pass is due. Writer thread only.</summary>
+        internal long NextPass;
     }
 
     private static readonly string ParserVersion =
@@ -120,6 +144,8 @@ public sealed class RecorderDatabase : IDisposable
     private SqliteCommand? _insert;
     private int _queueFullLogged;
     private readonly List<CaptureHandle> _unfinishedAtOpen = new();
+    /// <summary>Captures registered and not finished yet, the ones passes run for. Writer thread only.</summary>
+    private readonly HashSet<CaptureHandle> _recording = new();
 
     public RecorderDatabase(string path, bool storeDecoded)
     {
@@ -139,9 +165,21 @@ public sealed class RecorderDatabase : IDisposable
         if (version > SchemaVersion)
             throw new InvalidOperationException($"{path} has schema version {version}, newer than this recorder supports ({SchemaVersion})");
 
-        if (Scalar("SELECT 1 FROM sqlite_master WHERE name = 'messages'") != null && Scalar("SELECT 1 FROM sqlite_master WHERE name = 'idx_messages_calls'") == null)
-            Log.Information("Adding index idx_messages_calls, this reads the whole database once and can take a few minutes");
+        if (Scalar("SELECT 1 FROM sqlite_master WHERE name = 'messages'") != null)
+        {
+            foreach (var index in new[] { "idx_messages_calls", "idx_messages_nodir" })
+            {
+                if (Scalar($"SELECT 1 FROM sqlite_master WHERE name = '{index}'") == null)
+                    Log.Information("Adding index {Index}, this reads the whole database once and can take a few minutes", index);
+            }
+        }
         Execute(Schema);
+        // Schema version 1 databases: the pass watermarks (NULL for their captures; an unfinished one is then finished from its first row)
+        foreach (var column in new[] { "streams_upto_id", "derived_upto_ts" })
+        {
+            if (Scalar($"SELECT 1 FROM pragma_table_info('captures') WHERE name = '{column}'") == null)
+                Execute($"ALTER TABLE captures ADD COLUMN {column} INTEGER;");
+        }
         Execute($"PRAGMA user_version={SchemaVersion};");
 
         // Captures a previous run did not finish (killed while recording or finishing). Read before the writer starts, so captures of this run are never included.
@@ -255,38 +293,68 @@ public sealed class RecorderDatabase : IDisposable
         var batch = new List<WorkItem>();
         while (!_queue.IsCompleted)
         {
-            if (!_queue.TryTake(out var item, 250))
+            if (_queue.TryTake(out var item, 250))
+            {
+                batch.Clear();
+                do
+                {
+                    batch.Add(item);
+                } while (batch.Count < 2000 && _queue.TryTake(out item!));
+                WriteBatch(batch);
+            }
+            else
             {
                 Volatile.Write(ref _queueFullLogged, 0);
-                continue;
             }
 
-            batch.Clear();
-            do
-            {
-                batch.Add(item);
-            } while (batch.Count < 2000 && _queue.TryTake(out item!));
+            RunDuePasses();
+        }
+    }
 
+    private void WriteBatch(List<WorkItem> batch)
+    {
+        try
+        {
+            using var tx = _connection.BeginTransaction();
+            foreach (var batchItem in batch)
+                Process(batchItem, tx);
+            tx.Commit();
+        }
+        catch (Exception ex)
+        {
+            // The transaction was rolled back; redo the batch item by item so only what actually fails is lost
+            Log.Warning(ex, "Writing a batch of {Count} items failed, retrying them one by one", batch.Count);
+            foreach (var batchItem in batch)
+                ProcessAlone(batchItem);
+            return;
+        }
+
+        foreach (var batchItem in batch)
+        {
+            if (batchItem is FinishItem finish)
+                finish.Done.TrySetResult();
+        }
+    }
+
+    /// <summary>Brings the derived columns of the captures being recorded up to date, each in its own transaction.</summary>
+    private void RunDuePasses()
+    {
+        var now = Environment.TickCount64;
+        foreach (var capture in _recording)
+        {
+            if (capture.Failed || now < capture.NextPass)
+                continue;
+            capture.NextPass = now + PassInterval;
             try
             {
                 using var tx = _connection.BeginTransaction();
-                foreach (var batchItem in batch)
-                    Process(batchItem, tx);
+                Derive(capture.Id, final: false, tx);
                 tx.Commit();
             }
             catch (Exception ex)
             {
-                // The transaction was rolled back; redo the batch item by item so only what actually fails is lost
-                Log.Warning(ex, "Writing a batch of {Count} items failed, retrying them one by one", batch.Count);
-                foreach (var batchItem in batch)
-                    ProcessAlone(batchItem);
-                continue;
-            }
-
-            foreach (var batchItem in batch)
-            {
-                if (batchItem is FinishItem finish)
-                    finish.Done.TrySetResult();
+                // Nothing is lost: the next pass (or finishing) starts from the watermarks of the last successful one
+                Log.Warning(ex, "Updating the derived columns of {File} failed", capture.File);
             }
         }
     }
@@ -307,6 +375,7 @@ public sealed class RecorderDatabase : IDisposable
             {
                 case BeginItem begin:
                     begin.Capture.Failed = true;
+                    _recording.Remove(begin.Capture);
                     Log.Error(ex, "Registering capture {File} failed, its messages are not stored", begin.Capture.File);
                     break;
                 case MessageItem message:
@@ -347,7 +416,8 @@ public sealed class RecorderDatabase : IDisposable
             cmd.CommandText = """
                 INSERT INTO captures(file, source, parser_version) VALUES($file, $source, $version)
                 ON CONFLICT(file) DO UPDATE SET source = COALESCE(excluded.source, source), parser_version = excluded.parser_version,
-                    started_at = NULL, ended_at = NULL, packet_count = NULL, message_count = NULL, pcap_bytes = NULL, parsed_at = NULL
+                    started_at = NULL, ended_at = NULL, packet_count = NULL, message_count = NULL, pcap_bytes = NULL, parsed_at = NULL,
+                streams_upto_id = NULL, derived_upto_ts = NULL
                 RETURNING id;
                 """;
             cmd.Parameters.AddWithValue("$file", capture.File);
@@ -359,10 +429,17 @@ public sealed class RecorderDatabase : IDisposable
         using (var cmd = _connection.CreateCommand())
         {
             cmd.Transaction = tx;
-            cmd.CommandText = "DELETE FROM messages WHERE capture_id = $id; DELETE FROM streams WHERE capture_id = $id;";
+            // Every row of this capture is inserted after this, so its ids are above the current largest one
+            cmd.CommandText = """
+                DELETE FROM messages WHERE capture_id = $id; DELETE FROM streams WHERE capture_id = $id;
+                UPDATE captures SET streams_upto_id = (SELECT IFNULL(MAX(id), 0) FROM messages) WHERE id = $id;
+                """;
             cmd.Parameters.AddWithValue("$id", capture.Id);
             cmd.ExecuteNonQuery();
         }
+
+        capture.NextPass = Environment.TickCount64 + PassInterval;
+        _recording.Add(capture);
     }
 
     private void InsertMessage(MessageItem item, SqliteTransaction tx)
@@ -442,36 +519,92 @@ public sealed class RecorderDatabase : IDisposable
         };
     }
 
-    /// <summary>Computes the columns that can only be known once the whole capture is available, independent of the order messages were parsed in.</summary>
+    /// <summary>Does the last pass over the rows the passes while recording did not cover yet and records the packet statistics.</summary>
     private void FinishCapture(FinishItem finish, SqliteTransaction tx)
     {
-        void Run(string sql)
+        _recording.Remove(finish.Capture);
+        Derive(finish.Capture.Id, final: true, tx);
+
+        using var cmd = _connection.CreateCommand();
+        cmd.Transaction = tx;
+        cmd.CommandText = """
+            UPDATE captures SET
+                started_at = COALESCE($start, (SELECT MIN(ts) FROM messages WHERE capture_id = $c)),
+                ended_at = COALESCE($end, (SELECT MAX(ts) FROM messages WHERE capture_id = $c)),
+                packet_count = $packets, pcap_bytes = $bytes, parsed_at = $now
+            WHERE id = $c;
+            """;
+        cmd.Parameters.AddWithValue("$c", finish.Capture.Id);
+        cmd.Parameters.AddWithValue("$start", (object?)finish.StartedAt ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$end", (object?)finish.EndedAt ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$packets", (object?)finish.PacketCount ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$bytes", (object?)finish.PcapBytes ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$now", ToMicros(DateTime.UtcNow));
+        cmd.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// One pass: computes the columns that depend on other rows of the capture, for the rows added since the previous pass (read from
+    /// the watermarks in <c>captures</c>, which are updated in the same transaction, so a failed or interrupted pass is simply redone).
+    /// The result does not depend on how the rows were split into passes. <paramref name="final"/> covers every row and completes
+    /// <c>streams.dir</c>; no row may be added after it.
+    /// </summary>
+    private void Derive(long captureId, bool final, SqliteTransaction tx)
+    {
+        SqliteCommand Command(string sql, params (string Name, object? Value)[] parameters)
         {
-            using var cmd = _connection.CreateCommand();
+            var cmd = _connection.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = sql;
-            cmd.Parameters.AddWithValue("$c", finish.Capture.Id);
+            cmd.Parameters.AddWithValue("$c", captureId);
+            foreach (var (name, value) in parameters)
+                cmd.Parameters.AddWithValue(name, value ?? DBNull.Value);
+            return cmd;
+        }
+        void Run(string sql, params (string, object?)[] parameters)
+        {
+            using var cmd = Command(sql, parameters);
             cmd.ExecuteNonQuery();
         }
+        long? Long(string sql, params (string, object?)[] parameters)
+        {
+            using var cmd = Command(sql, parameters);
+            return cmd.ExecuteScalar() is long value ? value : null;
+        }
 
-        // A finish interrupted before its commit leaves nothing behind, but clearing first keeps finishing safe to repeat
-        Run("DELETE FROM streams WHERE capture_id = $c;");
+        // The capture's rows above streams_upto_id are the new ones. A capture registered by a schema version 1 recorder has no
+        // watermarks; it was never finished (so has no streams rows), all of its rows are new.
+        long? streamsUpto = null, derivedUpto = null;
+        using (var cmd = Command("SELECT streams_upto_id, derived_upto_ts FROM captures WHERE id = $c"))
+        using (var reader = cmd.ExecuteReader())
+        {
+            if (!reader.Read())
+                throw new InvalidOperationException($"Capture {captureId} does not exist");
+            streamsUpto = reader.IsDBNull(0) ? null : reader.GetInt64(0);
+            derivedUpto = reader.IsDBNull(1) ? null : reader.GetInt64(1);
+        }
+        var fromId = streamsUpto
+            ?? Long("SELECT IFNULL(MIN(id) - 1, (SELECT IFNULL(MAX(id), 0) FROM messages)) FROM messages WHERE capture_id = $c")!.Value;
+        var toId = Long("SELECT IFNULL(MAX(id), 0) FROM messages")!.Value;
+        // The new rows are read by id range (NOT INDEXED: the rowid, not the capture's index, which would read the whole capture)
+        const string NewRows = "messages NOT INDEXED WHERE id > $fromId AND id <= $toId AND capture_id = $c";
+        (string, object?) FromId = ("$fromId", fromId), ToId = ("$toId", toId);
 
-        Run("""
+        // A new row at or before the previous cutoff arrived later than the lag allows for; the Returns from its ts on are redone below
+        var lateTs = derivedUpto == null ? null : Long($"SELECT MIN(ts) FROM {NewRows} AND ts <= $derived", FromId, ToId, ("$derived", derivedUpto));
+
+        // Streams: add the new rows to the totals. dir is the direction of the stream's own messages, C2S winning over S2C (a client
+        // stream ends with the client's unframed ExitGame Notify, which DirectionOf takes for S2C)
+        var before = StreamDirections(captureId, tx);
+        Run($"""
             INSERT INTO streams (capture_id, stream, src_ip, src_port, dst_ip, dst_port, dir, first_ts, last_ts, message_count)
-            SELECT capture_id, stream, src_ip, src_port, dst_ip, dst_port, MAX(dir), MIN(ts), MAX(ts), COUNT(*)
-            FROM messages WHERE capture_id = $c GROUP BY stream;
-            """);
-
-        // A stream with only Echo / counter messages has the opposite direction of the other half of its connection
-        Run("""
-            UPDATE streams SET dir = (
-                SELECT CASE o.dir WHEN 'C2S' THEN 'S2C' ELSE 'C2S' END FROM streams o
-                WHERE o.capture_id = streams.capture_id AND o.dir IS NOT NULL
-                  AND o.src_ip = streams.dst_ip AND o.src_port = streams.dst_port AND o.dst_ip = streams.src_ip AND o.dst_port = streams.src_port
-                LIMIT 1)
-            WHERE capture_id = $c AND dir IS NULL;
-            """);
+            SELECT capture_id, stream, src_ip, src_port, dst_ip, dst_port, MIN(dir), MIN(ts), MAX(ts), COUNT(*)
+            FROM {NewRows} GROUP BY stream
+            ON CONFLICT (capture_id, stream) DO UPDATE SET
+                dir = COALESCE(MIN(dir, excluded.dir), dir, excluded.dir), first_ts = MIN(first_ts, excluded.first_ts),
+                last_ts = MAX(last_ts, excluded.last_ts), message_count = message_count + excluded.message_count;
+            """, FromId, ToId);
+        var after = StreamDirections(captureId, tx);
 
         // Stream ids are assigned in packet order, so the latest lower id on the same endpoints is the instance this one replaced
         Run("""
@@ -483,77 +616,137 @@ public sealed class RecorderDatabase : IDisposable
             WHERE capture_id = $c;
             """);
 
-        // Messages without a direction of their own (Echo, counters) share the direction of their stream
-        Run("""
-            UPDATE messages SET dir = s.dir
-            FROM streams s
-            WHERE messages.capture_id = $c AND messages.dir IS NULL AND s.capture_id = $c AND s.stream = messages.stream AND s.dir IS NOT NULL;
-            """);
-
-        // A Return answers the latest preceding Call with the same return uid on the opposite direction of the same connection
-        Run("""
-            UPDATE messages SET reply_to = (
-                SELECT c.id FROM messages c INDEXED BY idx_messages_calls
-                WHERE c.capture_id = messages.capture_id AND c.kind = 'Call' AND c.return_uid = messages.return_uid
-                  AND c.src_ip = messages.dst_ip AND c.src_port = messages.dst_port AND c.dst_ip = messages.src_ip AND c.dst_port = messages.src_port
-                  AND c.ts <= messages.ts
-                ORDER BY c.ts DESC, c.id DESC LIMIT 1)
-            WHERE capture_id = $c AND kind = 'Return' AND return_uid IS NOT NULL;
-            """);
-
-        // The Return itself does not say which method it belongs to, that is the Call's. ZDPSLib's own guess (the latest Call with that
-        // return uid on any connection) is only kept when no Call was matched; a corrected Return is decoded again below.
-        Run("""
-            UPDATE messages SET service_id = c.service_id, service = c.service, method_id = c.method_id, method = c.method, decoded = NULL
-            FROM messages c
-            WHERE messages.capture_id = $c AND messages.kind = 'Return' AND c.id = messages.reply_to
-              AND (messages.service_id IS NOT c.service_id OR messages.method_id IS NOT c.method_id);
-            """);
-
-        if (_storeDecoded)
-            DecodeReturns(finish.Capture.Id, tx);
-
-        long messageCount;
-        using (var cmd = _connection.CreateCommand())
+        // Messages without a direction of their own (Echo, counters) take their stream's. A stream whose direction changed since an
+        // earlier pass (C2S arriving after S2C, or the reverse stream deciding it) gets its already filled ones corrected.
+        foreach (var (stream, dir) in after)
         {
-            cmd.Transaction = tx;
-            cmd.CommandText = "SELECT COUNT(*) FROM messages WHERE capture_id = $c";
-            cmd.Parameters.AddWithValue("$c", finish.Capture.Id);
-            messageCount = (long)cmd.ExecuteScalar()!;
+            if (before.TryGetValue(stream, out var old) && old != null && old != dir)
+            {
+                Run("""
+                    UPDATE messages INDEXED BY idx_messages_stream SET dir = $dir
+                    WHERE capture_id = $c AND stream = $s AND dir = $old AND container IS NULL AND kind NOT IN ('Call', 'Notify', 'Return');
+                    """, ("$s", stream), ("$dir", dir), ("$old", old));
+            }
+        }
+        var undirected = new List<long>();
+        using (var cmd = Command("SELECT DISTINCT stream FROM messages INDEXED BY idx_messages_nodir WHERE capture_id = $c AND dir IS NULL"))
+        using (var reader = cmd.ExecuteReader())
+        {
+            while (reader.Read())
+                undirected.Add(reader.GetInt64(0));
+        }
+        foreach (var stream in undirected)
+        {
+            if (after.TryGetValue(stream, out var dir) && dir != null)
+                Run("UPDATE messages INDEXED BY idx_messages_nodir SET dir = $dir WHERE capture_id = $c AND stream = $s AND dir IS NULL;", ("$s", stream), ("$dir", dir));
+        }
+        if (final)
+        {
+            foreach (var (stream, dir) in after)
+            {
+                if (dir != null)
+                    Run("UPDATE streams SET dir = $dir WHERE capture_id = $c AND stream = $s AND dir IS NULL;", ("$s", stream), ("$dir", dir));
+            }
         }
 
-        using (var cmd = _connection.CreateCommand())
+        // Returns: only up to the cutoff, so their Calls (stored up to a few seconds late) are there
+        var newestTs = Long("SELECT MAX(ts) FROM messages WHERE capture_id = $c");
+        var cutoff = final ? newestTs : newestTs - DeriveLagMicros;
+        var fromTs = derivedUpto ?? long.MinValue;
+        if (lateTs != null)
+            fromTs = Math.Min(fromTs, lateTs.Value - 1);
+        if (cutoff != null && cutoff > fromTs)
         {
-            cmd.Transaction = tx;
-            cmd.CommandText = """
-                UPDATE captures SET
-                    started_at = COALESCE($start, (SELECT MIN(ts) FROM messages WHERE capture_id = $c)),
-                    ended_at = COALESCE($end, (SELECT MAX(ts) FROM messages WHERE capture_id = $c)),
-                    packet_count = $packets, message_count = $messages, pcap_bytes = $bytes, parsed_at = $now
-                WHERE id = $c;
-                """;
-            cmd.Parameters.AddWithValue("$c", finish.Capture.Id);
-            cmd.Parameters.AddWithValue("$start", (object?)finish.StartedAt ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$end", (object?)finish.EndedAt ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$packets", (object?)finish.PacketCount ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$messages", messageCount);
-            cmd.Parameters.AddWithValue("$bytes", (object?)finish.PcapBytes ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$now", ToMicros(DateTime.UtcNow));
-            cmd.ExecuteNonQuery();
+            (string, object?) From = ("$fromTs", fromTs), To = ("$toTs", cutoff);
+            const string Range = "messages.capture_id = $c AND messages.ts > $fromTs AND messages.ts <= $toTs";
+
+            // A Return answers the latest preceding Call with the same return uid on the opposite direction of the same connection
+            Run($"""
+                UPDATE messages INDEXED BY idx_messages_capture_ts SET reply_to = (
+                    SELECT c.id FROM messages c INDEXED BY idx_messages_calls
+                    WHERE c.capture_id = messages.capture_id AND c.kind = 'Call' AND c.return_uid = messages.return_uid
+                      AND c.src_ip = messages.dst_ip AND c.src_port = messages.dst_port AND c.dst_ip = messages.src_ip AND c.dst_port = messages.src_port
+                      AND c.ts <= messages.ts
+                    ORDER BY c.ts DESC, c.id DESC LIMIT 1)
+                WHERE {Range} AND messages.kind = 'Return' AND messages.return_uid IS NOT NULL;
+                """, From, To);
+
+            // The Return itself does not say which method it belongs to, that is the Call's. ZDPSLib's own guess (the latest Call with that
+            // return uid on any connection) is only kept when no Call was matched; a corrected Return is decoded again below.
+            Run($"""
+                UPDATE messages INDEXED BY idx_messages_capture_ts
+                SET service_id = c.service_id, service = c.service, method_id = c.method_id, method = c.method, decoded = NULL
+                FROM messages c
+                WHERE {Range} AND messages.kind = 'Return' AND messages.return_uid IS NOT NULL AND c.id = messages.reply_to
+                  AND (messages.service_id IS NOT c.service_id OR messages.method_id IS NOT c.method_id);
+                """, From, To);
+
+            if (_storeDecoded)
+                DecodeReturns(captureId, fromTs, cutoff.Value, tx);
+
+            derivedUpto = derivedUpto == null ? cutoff : Math.Max(derivedUpto.Value, cutoff.Value);
         }
+
+        Run("""
+            UPDATE captures SET streams_upto_id = $toId, derived_upto_ts = $derived,
+                message_count = (SELECT IFNULL(SUM(message_count), 0) FROM streams WHERE capture_id = $c)
+            WHERE id = $c;
+            """, ToId, ("$derived", derivedUpto));
     }
 
-    private void DecodeReturns(long captureId, SqliteTransaction tx)
+    /// <summary>
+    /// The direction of each stream of the capture: its own (<c>streams.dir</c>), else the opposite of its reverse stream's own one
+    /// (the lowest stream number with one); null while neither is known.
+    /// </summary>
+    private Dictionary<long, string?> StreamDirections(long captureId, SqliteTransaction tx)
+    {
+        var streams = new List<(long Stream, string Src, string Dst, string? Dir)>();
+        using (var cmd = _connection.CreateCommand())
+        {
+            cmd.Transaction = tx;
+            cmd.CommandText = "SELECT stream, src_ip, src_port, dst_ip, dst_port, dir FROM streams WHERE capture_id = $c ORDER BY stream";
+            cmd.Parameters.AddWithValue("$c", captureId);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                streams.Add((reader.GetInt64(0), $"{reader.GetString(1)}:{reader.GetInt64(2)}", $"{reader.GetString(3)}:{reader.GetInt64(4)}",
+                    reader.IsDBNull(5) ? null : reader.GetString(5)));
+            }
+        }
+
+        var ownByEndpoints = new Dictionary<(string Src, string Dst), string>();
+        foreach (var s in streams)
+        {
+            if (s.Dir != null)
+                ownByEndpoints.TryAdd((s.Src, s.Dst), s.Dir);
+        }
+
+        var result = new Dictionary<long, string?>();
+        foreach (var s in streams)
+        {
+            result[s.Stream] = s.Dir ?? (ownByEndpoints.TryGetValue((s.Dst, s.Src), out var reverse) ? (reverse == "C2S" ? "S2C" : "C2S") : null);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Decodes the Returns in the ts range whose method a pass corrected (<c>decoded</c> cleared above). Only Returns with a return uid
+    /// can be corrected; any other Return without <c>decoded</c> already failed to decode with the same method on insert.
+    /// </summary>
+    private void DecodeReturns(long captureId, long fromTs, long toTs, SqliteTransaction tx)
     {
         var updates = new List<(long Id, string Json)>();
         using (var cmd = _connection.CreateCommand())
         {
             cmd.Transaction = tx;
             cmd.CommandText = """
-                SELECT id, service, method, payload FROM messages
-                WHERE capture_id = $c AND kind = 'Return' AND decoded IS NULL AND method IS NOT NULL AND error IS NULL AND payload_len > 0;
+                SELECT id, service, method, payload FROM messages INDEXED BY idx_messages_capture_ts
+                WHERE capture_id = $c AND ts > $fromTs AND ts <= $toTs
+                  AND kind = 'Return' AND return_uid IS NOT NULL AND decoded IS NULL AND method IS NOT NULL AND error IS NULL AND payload_len > 0;
                 """;
             cmd.Parameters.AddWithValue("$c", captureId);
+            cmd.Parameters.AddWithValue("$fromTs", fromTs);
+            cmd.Parameters.AddWithValue("$toTs", toTs);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

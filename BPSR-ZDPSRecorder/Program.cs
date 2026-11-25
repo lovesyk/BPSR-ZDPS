@@ -70,7 +70,7 @@ Log.Information("Running. Press Ctrl+C to stop.");
 // Capture loss (rpcapd gone, connection dropped, or traffic stalled) is signalled through this semaphore.
 var lostSignal = new SemaphoreSlim(0);
 var retryDelay = TimeSpan.FromSeconds(2);
-// Finishing a capture (deriving columns over all its rows) can take a while; it runs in the background so recording resumes right away
+// Finishing a capture (the last pass over the rows added since the previous one) runs in the background so recording resumes right away
 var pendingFinishes = new List<Task>();
 
 // Captures a previous run left unfinished (e.g. killed by docker stop) are finished alongside recording
